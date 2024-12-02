@@ -1,8 +1,6 @@
 package com.cormontia.adventOfCode2024
 
-import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
-import scala.io.Source
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 @main
