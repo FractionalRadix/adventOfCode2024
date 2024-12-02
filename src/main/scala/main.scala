@@ -11,45 +11,99 @@ def main(): Unit =
   solveDay02()
 
 def solveDay02(): Unit =
-  val reports = parseDay02Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay02_sample.txt")
+  val reports = parseDay02Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay02.txt")
   val nrOfSafeReports = solveDay02Part1(reports)
   println(s"Number of safe reports: $nrOfSafeReports") // 639
   solveDay02Part2(reports)
 
 def solveDay02Part2(reports: List[Array[Int]]): Unit =
+  var count = 0
   reports.foreach( report =>
-    var asc = isSafeAscending(report)
-    var desc = isSafeDescending(report)
+    var asc = isSafeAscending2(report)
+    var desc = isSafeDescending2(report)
+    //println(report.mkString(" "))
+    //println(s"Ascending: $asc Descending: $desc")
     if (!asc && !desc)
-      asc = trySafeAscending(report)
-      desc = trySafeDescending(report)
-      println(s"($asc,$desc)")
+      asc = trySafeAscending3(report)
+      desc = trySafeDescending3(report)
+      //println(s"With error level removal: ($asc,$desc)")
+    if asc || desc then count = count + 1
   )
+  println(s"Nr of safe reports if a single level can be removed: $count")
+
+  def trySafeAscending3(report: Array[Int]): Boolean =
+    // Naive solution that works: just try removing all levels. 
+    for i <- report.indices do
+      val candidate = report.patch(i, Nil, 1)
+      if isSafeAscending2(candidate) then
+        // If the entire report is safe after removing a single level, then it is safe.
+        return true //TODO!+ Lookup "boundary" and "boundary.break"  in scala.util
+    false
+
+  def trySafeDescending3(report: Array[Int]): Boolean =
+    for i <- report.indices do
+      val candidate = report.patch(i, Nil, 1)
+      if isSafeDescending2(candidate) then
+        // If the entire report is safe after removing a single level, then it is safe.
+        return true //TODO!+ Lookup "boundary" and "boundary.break"  in scala.util
+    false
+
 
   @tailrec
-  def trySafeAscending(report: Array[Int]): Boolean =
-    if report.length == 1
+  def isSafeAscending2(report: Array[Int]): Boolean =
+    if report.length == 1 then
+      true
+    else
+      val head = report(0)
+      val next = report(1)
+      if head >= next then
+        false // Not ascending
+      else if next - head > 3 then
+        false // Difference is too large
+      else
+        isSafeAscending2(report.drop(1))
+
+  @tailrec
+  def isSafeDescending2(report: Array[Int]): Boolean =
+    if report.length == 1 then
+      true
+    else
+      val head = report(0)
+      val next = report(1)
+      if next >= head then
+        false // Not descending
+      else if head - next > 3 then
+        false // Difference is too large
+      else
+        isSafeDescending2(report.drop(1))
+
+
+  //TODO?~ Erratic
+  @tailrec
+  def trySafeAscending2(report: Array[Int]): Boolean =
+    // 2 7 8 9
+    if report.length == 1 // false
       then true
     else
-      val notAscending = report(0) >= report(1)
-      val differenceTooLarge = report(1) - report(0) > 3
+      val notAscending = report(0) >= report(1) // 2 >= 7 ? false
+      val differenceTooLarge = report(1) - report(0) > 3 // 7 -2 > 3? true
       if notAscending || differenceTooLarge then
-        isSafeAscending(report.drop(1))
+        isSafeAscending2(report.drop(1)) // isSafeAscending(7,8,9) ... JA.
       else
-        trySafeAscending(report.drop(1))
+        trySafeAscending2(report.drop(1))
 
-
+  //TODO?~ Erratic
   @tailrec
-  def trySafeDescending(report: Array[Int]): Boolean =
+  def trySafeDescending2(report: Array[Int]): Boolean =
     if report.length == 1
       then true
     else
       val notDescending = report(0) <= report(1)
       val differenceTooLarge = report(0) - report(1) > 3
       if notDescending || differenceTooLarge then
-        isSafeDescending(report.drop(1))
+        isSafeDescending2(report.drop(1))
       else
-        trySafeDescending(report.drop(1))
+        trySafeDescending2(report.drop(1))
 
 
 
