@@ -1,5 +1,6 @@
 package com.cormontia.adventOfCode2024
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 import scala.math.abs
@@ -7,6 +8,90 @@ import scala.math.abs
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 @main
 def main(): Unit =
+  solveDay02()
+
+def solveDay02(): Unit =
+  val reports = parseDay02Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay02_sample.txt")
+  val nrOfSafeReports = solveDay02Part1(reports)
+  println(s"Number of safe reports: $nrOfSafeReports") // 639
+  solveDay02Part2(reports)
+
+def solveDay02Part2(reports: List[Array[Int]]): Unit =
+  reports.foreach( report =>
+    var asc = isSafeAscending(report)
+    var desc = isSafeDescending(report)
+    if (!asc && !desc)
+      asc = trySafeAscending(report)
+      desc = trySafeDescending(report)
+      println(s"($asc,$desc)")
+  )
+
+  @tailrec
+  def trySafeAscending(report: Array[Int]): Boolean =
+    if report.length == 1
+      then true
+    else
+      val notAscending = report(0) >= report(1)
+      val differenceTooLarge = report(1) - report(0) > 3
+      if notAscending || differenceTooLarge then
+        isSafeAscending(report.drop(1))
+      else
+        trySafeAscending(report.drop(1))
+
+
+  @tailrec
+  def trySafeDescending(report: Array[Int]): Boolean =
+    if report.length == 1
+      then true
+    else
+      val notDescending = report(0) <= report(1)
+      val differenceTooLarge = report(0) - report(1) > 3
+      if notDescending || differenceTooLarge then
+        isSafeDescending(report.drop(1))
+      else
+        trySafeDescending(report.drop(1))
+
+
+
+
+def solveDay02Part1(reports: List[Array[Int]]): Int =
+  reports.count( report => isSafe(report))
+
+def parseDay02Input(filename: String) =
+  val source = Source.fromFile(filename)
+  val lines = source.getLines
+  val reports = lines.map( line =>
+    line.split("\\s+").map( str => str.toInt )
+  ).toList
+  reports
+
+def isSafe(report: Array[Int]) =
+  if isAscending(report) then
+    isSafeAscending(report)
+  else if isDescending(report) then
+    isSafeDescending(report)
+  else
+    false
+
+def isSafeAscending(report: Array[Int]): Boolean =
+  val reportAsList = report.toList
+  val tuples = reportAsList.zip(reportAsList.tail)
+  tuples.forall( (a,b) => b - a <= 3 ) // Difference of at least 1 already established by isAscending method.
+
+def isSafeDescending(report: Array[Int]): Boolean =
+  val reportAsList = report.toList
+  val tuples = reportAsList.zip(reportAsList.tail)
+  tuples.forall((a, b) => a - b <= 3) // Difference of at least 1 already established by isDescending method.
+
+def isAscending(report: Array[Int]) =
+  val indices = Range(0, report.length - 1)
+  indices.forall( idx => report(idx) < report(idx + 1) )
+
+def isDescending(report: Array[Int]) =
+  val indices = Range(0, report.length - 1)
+  indices.forall(idx => report(idx) > report(idx + 1))
+
+def solveDay01(): Unit =
   //TODO!~ Get it from the proper resources folder
   //val bufferedSource = Source.fromResource("inputFiles\\AoCDay01_sample.txt")
   //val firstPart = day01part1(bufferedSource)
