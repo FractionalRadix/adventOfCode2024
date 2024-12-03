@@ -7,12 +7,20 @@ import scala.collection.mutable.ArrayBuffer
 def main(): Unit =
   //solveDay01()
   //solveDay02()
-  solveDay03()
+  //solveDay03()
+  solveDay04()
+
+def solveDay04(): Unit =
+  val solver = SolverDay04()
+  val input = solver.parseDay04Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay04_sample.txt")
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The solution to part 1 is: $solutionPart1")
+  val solutionPart2 = solver.solvePart2(input)
+  println(s"The solution to part 2 is: $solutionPart2")
 
 def solveDay03(): Unit =
   val solver = SolverDay03()
   solver.solve()
-
 
 def solveDay02(): Unit =
   val solver = SolverDay02()
