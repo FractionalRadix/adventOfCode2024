@@ -30,6 +30,10 @@ class CharacterBlock {
         scala.Predef.print(ch)
       println
   }
+  
+  def getNrOfRows: Int = maxRow + 1
+  def getNrOfColumns: Int = maxCol + 1
+  def getCharAt(rowIdx: Int, colIdx: Int): Option[Char] = block.get(rowIdx, colIdx)
 
   def getRows: List[String] = {
     val rowSequence = for rowIdx <- Range(0, maxRow + 1)

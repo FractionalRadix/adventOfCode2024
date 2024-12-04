@@ -11,7 +11,6 @@ class SolverDay04 {
 
   def solvePart1(lines: List[String]): Int = {
     val block = CharacterBlock(lines)
-    block.print()
 
     val horizontalMatches = countMatches(lines)
     val verticalMatches = countMatches(block.getColumns)
@@ -19,10 +18,6 @@ class SolverDay04 {
     val forwardDiagonalMatches = countMatches(forwardDiagonals)
     val backwardDiagonals = block.getBackwardsDiagonals
     val backwardDiagonalMatches = countMatches(backwardDiagonals)
-
-    //minitest() // This would not have been necessary if IntelliJ and build.sbt could agree on how to import a Test framework...
-
-    println(s"$horizontalMatches $verticalMatches $forwardDiagonalMatches $backwardDiagonalMatches")
 
     horizontalMatches + verticalMatches + forwardDiagonalMatches + backwardDiagonalMatches
   }
@@ -56,8 +51,35 @@ class SolverDay04 {
 
     // First, find every 'A' in the block.
     // Then, for every 'A', see if it is surrounded diagonally by opposing 'M' and 'S' characters.
+    val nrOfRows = block.getNrOfRows
+    val nrOfCols = block.getNrOfColumns
 
+    var count = 0
+    for rowIdx <- Range(0, nrOfRows) do
+      for colIdx <- Range(0, nrOfCols) do
+        val center = block.getCharAt(rowIdx, colIdx)
+        if center.contains('A') then
+          if surroundedByMS(block, rowIdx, colIdx) then
+            count = count + 1
+    count
+  }
 
-    0 //TODO!+
+  private def surroundedByMS(block: CharacterBlock, rowIdx: Int, colIdx: Int): Boolean = {
+    val aboveLeft = block.getCharAt(rowIdx - 1, colIdx - 1)
+    val aboveRight = block.getCharAt(rowIdx - 1, colIdx + 1)
+    val belowLeft = block.getCharAt(rowIdx + 1, colIdx - 1)
+    val belowRight = block.getCharAt(rowIdx + 1, colIdx + 1)
+
+    // First, check if aboveLeft/belowRight form "SAM" or "MAS"
+    val condition1 = aboveLeft.contains('S') && belowRight.contains('M')
+    val condition2 = aboveLeft.contains('M') && belowRight.contains('S')
+    val diagonal1 = condition1 || condition2
+
+    // Next, check if belowLeft/aboveRight form "SAM" or "MAS"
+    val condition3 = belowLeft.contains('S') && aboveRight.contains('M')
+    val condition4 = belowLeft.contains('M') && aboveRight.contains('S')
+    val diagonal2 = condition3 || condition4
+
+    diagonal1 && diagonal2
   }
 }

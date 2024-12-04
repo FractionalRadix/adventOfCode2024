@@ -16,7 +16,7 @@ def solveDay04(): Unit =
   val solutionPart1 = solver.solvePart1(input)
   println(s"The solution to part 1 is: $solutionPart1") // 2633
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution to part 2 is: $solutionPart2")
+  println(s"The solution to part 2 is: $solutionPart2") // 1936
 
 def solveDay03(): Unit =
   val solver = SolverDay03()
