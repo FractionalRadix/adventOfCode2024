@@ -9,7 +9,16 @@ def main(): Unit =
   //solveDay02()
   //solveDay03()
   //solveDay04()
-  solveDay05()
+  //solveDay05()
+  solveDay06()
+
+def solveDay06(): Unit =
+  val solver = SolverDay06()
+  val input = solver.parseDay06Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06_sample.txt")
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The solution to day 6, part 1 is $solutionPart1.")
+  val solutionPart2 = solver.solvePart2(input)
+  println(s"The solution to day 6, part 2 is $solutionPart2.")
 
 def solveDay05(): Unit =
   val solver = SolverDay05()
