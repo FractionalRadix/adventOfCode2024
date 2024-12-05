@@ -10,21 +10,17 @@ class SolverDay05 {
 
   def solvePart2(input: List[String]): Int = {
     val rules = parseRules(input)
-    //rules.foreach( (pair) => println(s"(${pair._1},${pair._2})"))
     val pageLists = parsePageLists(input)
-    //pageLists.foreach( (list) => println(s"${list.mkString(",")}"))
 
-    val incorrectPageLists = for pageList <- pageLists if validate(pageList, rules)
+    val incorrectPageLists = for pageList <- pageLists if !validate(pageList, rules)
       yield pageList
 
     var sum = 0
     for pageList <- incorrectPageLists do
-      println(s"${pageList.mkString(",")}")
-      //TODO!~  Not yet working right. Probably needs multiple swaps, until the rules are all obeyed...
       var correctedList = pageList
-      for rule <- rules do
-        correctedList = applyRule(correctedList, rule)
-      println(s"Corrected: ${correctedList.mkString(",")}")
+      while !validate(correctedList, rules) do
+        for rule <- rules do
+          correctedList = OLD_applyRule(correctedList, rule)
       val arrayLen = correctedList.length
       val idx = (arrayLen - 1) / 2
       val middle = correctedList(idx)
@@ -34,21 +30,19 @@ class SolverDay05 {
 
   }
 
-  private def applyRule(pageList: Array[Int], rule: (Int, Int)): Array[Int] = {
+  private def OLD_applyRule(pageList: Array[Int], rule: (Int, Int)): Array[Int] = {
     val fst = rule._1
     val snd = rule._2
     val indexOfFst = pageList.indexOf(fst)
     val indexOfSnd = pageList.indexOf(snd)
-    if indexOfFst > 0 && indexOfSnd > 0 then
-      if indexOfSnd > indexOfFst then
+    if indexOfFst >= 0 && indexOfSnd >= 0 then
+      if indexOfSnd < indexOfFst then
         return copyAndSwap(pageList, indexOfFst, indexOfSnd)
     pageList
   }
 
   private def copyAndSwap(array: Array[Int], fst: Int, snd: Int): Array[Int] = {
-    //println("Swapping..")
     val result = Array.ofDim[Int](array.length)
-    //println(s"Size allocated: ${result.length}")
 
     for i <- array.indices do
       result(i) = if i == fst then
@@ -63,9 +57,7 @@ class SolverDay05 {
 
   def solvePart1(input: List[String]): Int = {
     val rules = parseRules(input)
-    //rules.foreach( (pair) => println(s"(${pair._1},${pair._2})"))
     val pageLists = parsePageLists(input)
-    //pageLists.foreach( (list) => println(s"${list.mkString(",")}"))
 
     var sum = 0
     for pageList <- pageLists do
@@ -85,7 +77,6 @@ class SolverDay05 {
     for rule <- rules do
       val obeyed = validate(pageList, rule)
       valid = valid && obeyed
-      //println(s"Rule $rule is $obeyed.")
 
     valid
   }
