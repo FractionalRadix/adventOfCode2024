@@ -58,7 +58,7 @@ class SolverDay05 {
       else
         array(i)
 
-    result.toArray
+    result
   }
 
   def solvePart1(input: List[String]): Int = {

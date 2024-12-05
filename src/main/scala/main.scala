@@ -14,8 +14,8 @@ def main(): Unit =
 def solveDay05(): Unit =
   val solver = SolverDay05()
   val input = solver.parseDay05Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay05_sample.txt")
-  //val solutionPart1 = solver.solvePart1(input)
-  //println(s"The sum of middle pages of correctly printed updates is $solutionPart1.")
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The sum of middle pages of correctly printed updates is $solutionPart1.")
   val solutionPart2 = solver.solvePart2(input)
   println(s"The sum of middle pages of corrected updates is $solutionPart2.")
 
