@@ -93,7 +93,7 @@ class SolverDay05 {
   private def validate(pageList: Array[Int], rule: (Int, Int)): Boolean = {
     val first = rule._1
     val second = rule._2
-    val tail = pageList.dropWhile( (pageNr) => pageNr != second )
+    val tail = pageList.dropWhile( pageNr => pageNr != second )
 
     if tail.length == 0 then
       true
