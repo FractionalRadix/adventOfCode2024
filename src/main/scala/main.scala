@@ -15,8 +15,8 @@ def main(): Unit =
 def solveDay06(): Unit =
   val solver = SolverDay06()
   val input = solver.parseDay06Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The number of unique positions visited is $solutionPart1.") // 4776
+  //val solutionPart1 = solver.solvePart1(input)
+  //println(s"The number of unique positions visited is $solutionPart1.") // 4776
   val solutionPart2 = solver.solvePart2(input)
   println(s"The solution to day 6, part 2 is $solutionPart2.")
 
