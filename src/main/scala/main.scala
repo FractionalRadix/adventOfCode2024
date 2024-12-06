@@ -10,15 +10,21 @@ def main(): Unit =
   //solveDay03()
   //solveDay04()
   //solveDay05()
-  solveDay06()
+  //solveDay06()
+  val sample6 = "/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06_sample.txt"
+  val solver = SolverDay06()
+  val lines6 = solver.parseDay06Input(sample6)
+  val block6 = CharacterBlock2(lines6)
+  block6.print()
+
 
 def solveDay06(): Unit =
   val solver = SolverDay06()
   val input = solver.parseDay06Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06.txt")
-  //val solutionPart1 = solver.solvePart1(input)
-  //println(s"The number of unique positions visited is $solutionPart1.") // 4776
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The number of unique positions visited is $solutionPart1.") // 4776
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution to day 6, part 2 is $solutionPart2.")
+  println(s"The number of places where an obstacle leads to an infinite loop is $solutionPart2.") // 1586
 
 def solveDay05(): Unit =
   val solver = SolverDay05()

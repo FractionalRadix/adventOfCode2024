@@ -7,7 +7,7 @@ import scala.io.Source
 
 class SolverDay06 {
 
-  enum Direction:
+  private enum Direction:
     case Up, Right, Down, Left
 
   def parseDay06Input(filename: String): List[String] = {
@@ -151,8 +151,6 @@ class SolverDay06 {
       else
         visited = positionAndDirection :: visited
     }
-    //println(s"${visited.mkString(",")}")
-    //println(s"...${!visitingUniques}")
     !visitingUniques
 
   }

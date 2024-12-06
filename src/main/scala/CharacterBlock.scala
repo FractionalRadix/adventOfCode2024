@@ -20,6 +20,13 @@ class CharacterBlock {
         block += (row, col) -> ch
   }
 
+  def this(source: CharacterBlock) =
+    this()
+    maxRow = source.maxRow
+    maxCol = source.maxCol
+    for elt <- source.block do
+      block.put(elt._1, elt._2)
+
   def print(): Unit = {
     val keys = block.keys
 
