@@ -110,7 +110,7 @@ class SolverDay06 {
             direction = Direction.Right
           else
             visited = (rowIdx, colIdx, Direction.Up) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
+            //block.setCharAt(rowIdx, colIdx, '*')
             rowIdx = rowIdx - 1
         case Direction.Right =>
           //println("Moving right.")
@@ -118,7 +118,7 @@ class SolverDay06 {
             direction = Direction.Down
           else
             visited = (rowIdx, colIdx, Direction.Right) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
+            //block.setCharAt(rowIdx, colIdx, '*')
             colIdx = colIdx + 1
         case Direction.Down =>
           //println("Moving down.")
@@ -126,7 +126,7 @@ class SolverDay06 {
             direction = Direction.Left
           else
             visited = (rowIdx, colIdx, Direction.Down) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
+            //block.setCharAt(rowIdx, colIdx, '*')
             rowIdx = rowIdx + 1
         case Direction.Left =>
           //println("Moving left.")
@@ -134,7 +134,7 @@ class SolverDay06 {
             direction = Direction.Up
           else
             visited = (rowIdx, colIdx, Direction.Left) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
+            //block.setCharAt(rowIdx, colIdx, '*')
             colIdx = colIdx - 1
     }
 

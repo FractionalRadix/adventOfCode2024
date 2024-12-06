@@ -12,6 +12,7 @@ class SolverDay06Part2Alt {
   def solvePart2(block: CharacterBlock2): Int =
     val startPosition = block.findCoordinatesOf('^').head
     markVisits(block, startPosition)
+    block.print()
     val blockingPositions = block.findCoordinatesOf('X').toList.filter(pos => pos != startPosition)
 
     val freshBlock = CharacterBlock2(block)
@@ -20,49 +21,47 @@ class SolverDay06Part2Alt {
     val answer = loopingPositions.count( elem => elem )
     answer
 
-  private def markVisits(input: CharacterBlock2, startPosition: (Int, Int)): Unit = {
+  private def markVisits(input: CharacterBlock2, startPosition: (Int, Int)): Unit =
     var rowIdx = startPosition._1
     var colIdx = startPosition._2
+    var direction: Direction = Direction.Up
+    var finished = false
 
-    while (rowIdx >= 0 && rowIdx < input.getNrOfRows && colIdx >= 0 && colIdx < input.getNrOfCols) {
-      moveUpward()
-      moveRightward()
-      moveDownward()
-      moveLeftward()
-    }
-
-    def moveUpward(): Unit = {
-      while rowIdx >= 0 && input.getCharAt(rowIdx, colIdx) != '#' do
-        input.setCharAt(rowIdx, colIdx, 'X')
-        rowIdx = rowIdx - 1
-      if rowIdx >= 0 && input.getCharAt(rowIdx, colIdx) == '#' then
-        rowIdx = rowIdx + 1
-    }
-
-    def moveDownward(): Unit = {
-      while rowIdx < input.getNrOfRows && input.getCharAt(rowIdx, colIdx) != '#' do
-        input.setCharAt(rowIdx, colIdx, 'X')
-        rowIdx = rowIdx + 1
-      if rowIdx < input.getNrOfRows && input.getCharAt(rowIdx, colIdx) == '#' then
-        rowIdx = rowIdx - 1
-    }
-
-    def moveRightward(): Unit = {
-      while colIdx < input.getNrOfCols && input.getCharAt(rowIdx, colIdx) != '#' do
-        input.setCharAt(rowIdx, colIdx, 'X')
-        colIdx = colIdx + 1
-      if colIdx < input.getNrOfCols && input.getCharAt(rowIdx, colIdx) == '#' then
-        colIdx = colIdx - 1
-    }
-
-    def moveLeftward(): Unit = {
-      while colIdx >= 0 && input.getCharAt(rowIdx, colIdx) != '#' do
-        input.setCharAt(rowIdx, colIdx, 'X')
-        colIdx = colIdx - 1
-      if colIdx >= 0 && input.getCharAt(rowIdx, colIdx) == '#' then
-        colIdx = colIdx + 1
-    }
-  }
+    while !finished do
+      input.setCharAt(rowIdx, colIdx, 'X')
+      direction match
+        case Direction.Up =>
+          val nextRowIdx = rowIdx - 1
+          if nextRowIdx < 0 then
+            finished = true
+          else if input.getCharAt(nextRowIdx, colIdx) == '#' then
+            direction = Direction.Right
+          else
+            rowIdx = nextRowIdx
+        case Direction.Right =>
+          val nextColIdx = colIdx + 1
+          if nextColIdx >= input.getNrOfCols then
+            finished = true
+          else if input.getCharAt(rowIdx, nextColIdx) == '#' then
+            direction = Direction.Down
+          else
+            colIdx = nextColIdx
+        case Direction.Down =>
+          val nextRowIdx = rowIdx + 1
+          if nextRowIdx >= input.getNrOfRows then
+            finished = true
+          else if input.getCharAt(nextRowIdx, colIdx) == '#' then
+            direction = Direction.Left
+          else
+            rowIdx = nextRowIdx
+        case Direction.Left =>
+          val nextColIdx = colIdx - 1
+          if nextColIdx < 0 then
+            finished = true
+          else if input.getCharAt(rowIdx, nextColIdx) == '#' then
+            direction = Direction.Up
+          else
+            colIdx = nextColIdx
 
   private enum Direction:
     case Up, Right, Down, Left
@@ -73,43 +72,50 @@ class SolverDay06Part2Alt {
     var rowIdx = startPosition._1
     var colIdx = startPosition._2
     var visited: List[(Int, Int, Direction)] = Nil
-    //val block = CharacterBlock(lines)
     block.setCharAt(blockedPosition._1, blockedPosition._2, '#')
-
+    var outOfBounds = false
+    
+    //while !outOfBounds && withinBounds(block, rowIdx, colIdx) do 
+    //  move()
+    
     def move(): Unit = {
       direction match
         case Direction.Up =>
-          //println("Moving up.")
-          if block.getCharAt(rowIdx - 1, colIdx) == '#' then
-            direction = Direction.Right
-          else
-            visited = (rowIdx, colIdx, Direction.Up) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
-            rowIdx = rowIdx - 1
+          println("Moving up.")
+          val nextChar = block.safeGetCharAt(rowIdx - 1, colIdx)
+          nextChar match
+            case Some('#') => direction = Direction.Right
+            case None => outOfBounds = true // Out of bounds! We're done moving!
+            case _ =>
+              visited = (rowIdx, colIdx, Direction.Up) :: visited
+              rowIdx = rowIdx - 1
         case Direction.Right =>
-          //println("Moving right.")
-          if block.getCharAt(rowIdx, colIdx + 1) == '#' then
-            direction = Direction.Down
-          else
-            visited = (rowIdx, colIdx, Direction.Right) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
-            colIdx = colIdx + 1
+          println("Moving right.")
+          val nextChar = block.safeGetCharAt(rowIdx, colIdx + 1)
+          nextChar match
+            case Some('#') => direction = Direction.Down
+            case None => outOfBounds = true // Out of bounds! we're done moving!
+            case _ =>
+              visited = (rowIdx, colIdx, Direction.Right) :: visited
+              colIdx = colIdx + 1
         case Direction.Down =>
-          //println("Moving down.")
-          if block.getCharAt(rowIdx + 1, colIdx) == '#' then
-            direction = Direction.Left
-          else
-            visited = (rowIdx, colIdx, Direction.Down) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
-            rowIdx = rowIdx + 1
+          println("Moving down.")
+          val nextChar = block.safeGetCharAt(rowIdx + 1, colIdx)
+          nextChar match
+            case Some('#') => direction = Direction.Left
+            case None => outOfBounds = true // Out of bounds! We're done moving!
+            case _ =>
+              visited = (rowIdx, colIdx, Direction.Down) :: visited
+              rowIdx = rowIdx + 1
         case Direction.Left =>
-          //println("Moving left.")
-          if block.getCharAt(rowIdx, colIdx - 1) == '#' then
-            direction = Direction.Up
-          else
-            visited = (rowIdx, colIdx, Direction.Left) :: visited
-            block.setCharAt(rowIdx, colIdx, '*')
-            colIdx = colIdx - 1
+          println("Moving left.")
+          val nextChar = block.safeGetCharAt(rowIdx, colIdx - 1)
+          nextChar match
+            case Some('#') => direction = Direction.Up
+            case None => outOfBounds = true // Out of bounds! We're done moving!
+            case _ =>
+              visited = (rowIdx, colIdx, Direction.Left) :: visited
+              colIdx = colIdx - 1
     }
 
     def withinBounds(block: CharacterBlock2, rowIdx: Int, colIdx: Int): Boolean = {

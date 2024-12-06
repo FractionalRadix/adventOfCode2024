@@ -16,7 +16,6 @@ class CharacterBlock2 {
   private var nrOfCols = 0
   def getNrOfCols: Int = nrOfCols
 
-  
   def this(lines: List[String]) =
     // PRE: at least one line
     // PRE: all lines equally long
@@ -36,6 +35,7 @@ class CharacterBlock2 {
     this()
     this.nrOfRows = source.nrOfRows
     this.nrOfCols = source.nrOfCols
+    arr = Array.ofDim[Char](nrOfRows, nrOfCols)
     for rowIdx <- 0 until nrOfRows; colIdx <- 0 until nrOfCols do
       this.arr(rowIdx)(colIdx) = source.arr(rowIdx)(colIdx)
 
@@ -50,6 +50,27 @@ class CharacterBlock2 {
     for rowIdx <- 0 until nrOfRows; colIdx <- 0 until nrOfCols if arr(rowIdx)(colIdx) == ch
       yield (rowIdx, colIdx)
 
+  /**
+   * Get the character at the position (rowIdx, colIdx).
+   * This is the safe but slow method - it checks the bounds.
+   * @param rowIdx Row index of the character, 0-based.
+   * @param colIdx Column index of the character, 0-based.
+   * @return The character at column "colIdx" of row "rowIdx", or None if the given position is out of bounds.
+   */
+  def safeGetCharAt(rowIdx: Int, colIdx: Int): Option[Char] =
+    if 0 <= rowIdx && rowIdx < nrOfRows && 0 <= colIdx && colIdx < nrOfCols then
+      Some(arr(rowIdx)(colIdx))
+    else
+      None
+
+  /**
+   * Get the character at the position (rowIdx, colIdx).
+   * This is the fastest method because it does not check the bounds.
+   * It is the caller's responsibility to make sure that the position exists on this block!
+   * @param rowIdx Row index of the character, 0-based.
+   * @param colIdx Column index of the character, 0-based.
+   * @return The character at column "colIdx" of row "rowIdx".
+   */
   def getCharAt(rowIdx: Int, colIdx: Int): Char = arr(rowIdx)(colIdx)
 
   def setCharAt(rowIdx: Int, colIdx: Int, ch: Char): Unit =
