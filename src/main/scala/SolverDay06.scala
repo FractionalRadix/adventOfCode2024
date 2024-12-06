@@ -86,7 +86,6 @@ class SolverDay06 {
 
     val freshBlock  = CharacterBlock(lines)
     println()
-    //val loopingPositions = blockingPositions.map( position => resultsInLoop(lines, position, startPosition) )
     val loopingPositions = blockingPositions.map( position => resultsInLoop(CharacterBlock(freshBlock), position, startPosition))
     val answer = loopingPositions.count( elem => elem )
     answer
@@ -98,8 +97,8 @@ class SolverDay06 {
     var direction = Direction.Up
     var rowIdx = startPosition._1
     var colIdx = startPosition._2
-    var visited: List[(Int, Int, Direction)] = Nil
-    //val block = CharacterBlock(lines)
+    //var visited: List[(Int, Int, Direction)] = Nil
+    val visited = scala.collection.mutable.Set[(Int, Int, Direction)]()
     block.setCharAt(blockedPosition._1, blockedPosition._2, '#')
 
     def move(): Unit = {
@@ -109,32 +108,32 @@ class SolverDay06 {
           if block.getCharAt(rowIdx - 1, colIdx).contains('#') then
             direction = Direction.Right
           else
-            visited = (rowIdx, colIdx, Direction.Up) :: visited
-            //block.setCharAt(rowIdx, colIdx, '*')
+            val triple = (rowIdx, colIdx, Direction.Up)
+            visited += triple // With Java Sets it would tell you right away if it was contained already...
             rowIdx = rowIdx - 1
         case Direction.Right =>
           //println("Moving right.")
           if block.getCharAt(rowIdx, colIdx + 1).contains('#') then
             direction = Direction.Down
           else
-            visited = (rowIdx, colIdx, Direction.Right) :: visited
-            //block.setCharAt(rowIdx, colIdx, '*')
+            val triple = (rowIdx, colIdx, Direction.Right)
+            visited += triple
             colIdx = colIdx + 1
         case Direction.Down =>
           //println("Moving down.")
           if block.getCharAt(rowIdx + 1, colIdx).contains('#') then
             direction = Direction.Left
           else
-            visited = (rowIdx, colIdx, Direction.Down) :: visited
-            //block.setCharAt(rowIdx, colIdx, '*')
+            val triple = (rowIdx, colIdx, Direction.Down)
+            visited += triple
             rowIdx = rowIdx + 1
         case Direction.Left =>
           //println("Moving left.")
           if block.getCharAt(rowIdx, colIdx - 1).contains('#') then
             direction = Direction.Up
           else
-            visited = (rowIdx, colIdx, Direction.Left) :: visited
-            //block.setCharAt(rowIdx, colIdx, '*')
+            val triple = (rowIdx, colIdx, Direction.Left)
+            visited += triple
             colIdx = colIdx - 1
     }
 
@@ -149,7 +148,7 @@ class SolverDay06 {
       if visited.contains(positionAndDirection) then
         visitingUniques = false
       else
-        visited = positionAndDirection :: visited
+        visited += positionAndDirection
     }
     !visitingUniques
 

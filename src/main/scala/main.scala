@@ -14,13 +14,14 @@ def main(): Unit =
   //solveDay07()
 
 
+  /*
   val sample6 = "/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06_sample.txt"
   val solver = SolverDay06Part2Alt()
   val block = solver.parseDay06Input(sample6)
   //val block6 = CharacterBlock2(lines6)
   //block6.print()
   solver.solvePart2(block)
-
+*/
 
 def solveDay07(): Unit =
   val solver = SolverDay07()
