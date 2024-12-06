@@ -2,9 +2,6 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 
-//TODO!+ Build a COPY function for our CharacterBlock class.
-
-
 class SolverDay06 {
 
   private enum Direction:
@@ -87,19 +84,22 @@ class SolverDay06 {
     markVisits(block, startPosition)
     val blockingPositions = block.findCoordinatesOf('X').toList.filter(pos => pos != startPosition)
 
+    val freshBlock  = CharacterBlock(lines)
     println()
-    val loopingPositions = blockingPositions.map( position => resultsInLoop(lines, position, startPosition) )
+    //val loopingPositions = blockingPositions.map( position => resultsInLoop(lines, position, startPosition) )
+    val loopingPositions = blockingPositions.map( position => resultsInLoop(CharacterBlock(freshBlock), position, startPosition))
     val answer = loopingPositions.count( elem => elem )
     answer
   }
 
-  private def resultsInLoop(lines: List[String], blockedPosition: (Int, Int), startPosition: (Int, Int)): Boolean = {
-    println(s"Blocking position (${blockedPosition._1}, ${blockedPosition._2}).")
+  //private def resultsInLoop(lines: List[String], blockedPosition: (Int, Int), startPosition: (Int, Int)): Boolean = {
+  private def resultsInLoop(block: CharacterBlock, blockedPosition: (Int, Int), startPosition: (Int, Int)): Boolean = {
+    //println(s"Blocking position (${blockedPosition._1}, ${blockedPosition._2}).")
     var direction = Direction.Up
     var rowIdx = startPosition._1
     var colIdx = startPosition._2
     var visited: List[(Int, Int, Direction)] = Nil
-    val block = CharacterBlock(lines)
+    //val block = CharacterBlock(lines)
     block.setCharAt(blockedPosition._1, blockedPosition._2, '#')
 
     def move(): Unit = {

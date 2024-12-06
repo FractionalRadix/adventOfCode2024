@@ -12,8 +12,11 @@ class CharacterBlock2 {
   private var arr = Array.ofDim[Char](2, 2)
 
   private var nrOfRows = 0
+  def getNrOfRows: Int = nrOfRows
   private var nrOfCols = 0
+  def getNrOfCols: Int = nrOfCols
 
+  
   def this(lines: List[String]) =
     // PRE: at least one line
     // PRE: all lines equally long
@@ -29,6 +32,13 @@ class CharacterBlock2 {
         colIdx = colIdx + 1
       rowIdx = rowIdx + 1
 
+  def this(source: CharacterBlock2) =
+    this()
+    this.nrOfRows = source.nrOfRows
+    this.nrOfCols = source.nrOfCols
+    for rowIdx <- 0 until nrOfRows; colIdx <- 0 until nrOfCols do
+      this.arr(rowIdx)(colIdx) = source.arr(rowIdx)(colIdx)
+
   def print(): Unit =
     for (rowIdx <- 0 until nrOfRows) do
       for (colIdx <- 0 until nrOfCols) do
@@ -41,7 +51,7 @@ class CharacterBlock2 {
       yield (rowIdx, colIdx)
 
   def getCharAt(rowIdx: Int, colIdx: Int): Char = arr(rowIdx)(colIdx)
-  
+
   def setCharAt(rowIdx: Int, colIdx: Int, ch: Char): Unit =
-    arr(rowIdx)(colIdx) = ch  
+    arr(rowIdx)(colIdx) = ch
 }
