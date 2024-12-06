@@ -7,13 +7,11 @@ class SolverDay06 {
     val source = Source.fromFile(filename)
     val lines = source.getLines.toList
     val block = CharacterBlock(lines)
-    block.print()
     block
   }
 
   def solvePart1(input: CharacterBlock): Int = {
     val startPosition = input.findCoordinatesOf('^').head
-    println(startPosition)
 
     var rowIdx = startPosition._1
     var colIdx = startPosition._2
