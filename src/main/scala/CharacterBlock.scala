@@ -34,6 +34,12 @@ class CharacterBlock {
   def getNrOfRows: Int = maxRow + 1
   def getNrOfColumns: Int = maxCol + 1
   def getCharAt(rowIdx: Int, colIdx: Int): Option[Char] = block.get(rowIdx, colIdx)
+  def setCharAt(rowIdx: Int, colIdx: Int, ch: Char): Option[Char] = block.put((rowIdx, colIdx), ch)
+
+  def findCoordinatesOf(ch: Character): Seq[(Int, Int)] = {
+    for { row <- 0 until getNrOfRows; col <- 0 until getNrOfColumns if getCharAt(row, col).contains(ch) }
+        yield (row, col)
+  }
 
   def getRows: List[String] = {
     val rowSequence = for rowIdx <- Range(0, maxRow + 1)
