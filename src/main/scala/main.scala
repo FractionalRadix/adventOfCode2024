@@ -11,7 +11,8 @@ def main(): Unit =
   //solveDay04()
   //solveDay05()
   //solveDay06()
-  solveDay07()
+  //solveDay07()
+  solveDay08()
 
 def solveDay08(): Unit =
   val solver = SolverDay08()
