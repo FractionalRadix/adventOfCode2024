@@ -17,9 +17,9 @@ def solveDay07(): Unit =
   val solver = SolverDay07()
   val input = solver.parseDay07Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay07.txt")
   val solutionPart1 = solver.solvePart1(input)
-  println(s"The solution for day 7, part 1 is $solutionPart1")
+  println(s"The total calibration result is $solutionPart1") // 4122618559853
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution for day 7, part 2 is $solutionPart2")
+  println(s"The corrected total calibration result is $solutionPart2") // 227615740238334
 
 def solveDay06(): Unit =
   val solver = SolverDay06()

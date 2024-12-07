@@ -32,7 +32,6 @@ class SolverDay07 {
         val binary = binaryString(combination, nrOfOperands)
         val result = calculateUsingBinary(binary, equation._2)
         if equation._1 == result then
-          println(s"${equation._1} $result")
           totalCalibration += equation._1
           found = true
     totalCalibration
@@ -68,7 +67,50 @@ class SolverDay07 {
     result
 
   def solvePart2(equations: List[(Long, Array[Long])]): Long = {
-    0 //TODO!~
+    var sum: Long = 0
+    for equation <- equations do
+      if eval(equation._1, 0, equation._2) then
+        //println(s"Found: ${equation._1}")
+        sum = sum + equation._1
+    sum
   }
+
+  private def concat(fst: Long, snd: Long): Long =
+    (fst.toString ++ snd.toString).toLong
+
+  private def eval(target: Long, total: Long, numbers: Array[Long]): Boolean =
+    if numbers.length == 1 then
+      // Last number, end of the recursion.
+      if total + numbers(0) == target then
+        true
+      else if total * numbers(0) == target then
+        true
+      else if concat(total, numbers(0)) == target then
+        true
+      else
+        false
+    else
+      // Optimize: note that the numbers never grow smaller,
+      // so as soon as the running total exceeds the target you may skip that branch.
+      if total > target then
+        false
+      else
+        // Three-way recursion
+        val candidate1 = total + numbers(0)
+        val result = eval(target, candidate1, numbers.tail)
+        if result then
+          true
+        else
+          val candidate2 = total * numbers(0)
+          val result = eval(target, candidate2, numbers.tail)
+          if result then
+            true
+          else
+            val candidate3 = concat(total, numbers(0))
+            val result = eval(target, candidate3, numbers.tail)
+            if result then
+              true
+            else
+              false
 
 }
