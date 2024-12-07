@@ -10,12 +10,12 @@ def main(): Unit =
   //solveDay03()
   //solveDay04()
   //solveDay05()
-  solveDay06()
-  //solveDay07()
+  //solveDay06()
+  solveDay07()
 
 def solveDay07(): Unit =
   val solver = SolverDay07()
-  val input = solver.parseDay07Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay07_sample.txt")
+  val input = solver.parseDay07Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay07.txt")
   val solutionPart1 = solver.solvePart1(input)
   println(s"The solution for day 7, part 1 is $solutionPart1")
   val solutionPart2 = solver.solvePart2(input)
