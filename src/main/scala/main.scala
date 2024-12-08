@@ -20,7 +20,7 @@ def solveDay08(): Unit =
   val solutionPart1 = solver.solvePart1(input)
   println(s"The number of anti-nodes is $solutionPart1.") // 289
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The number of anti-nodes, including resonant harmonics, is $solutionPart2.")
+  println(s"The number of anti-nodes, including resonant harmonics, is $solutionPart2.") // 1030
 
 def solveDay07(): Unit =
   val solver = SolverDay07()
