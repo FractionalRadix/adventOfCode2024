@@ -49,10 +49,13 @@ class CharacterBlock2 {
   def findCoordinatesOf(ch: Char): Seq[(Int, Int)] =
     for rowIdx <- 0 until nrOfRows; colIdx <- 0 until nrOfCols if arr(rowIdx)(colIdx) == ch
       yield (rowIdx, colIdx)
+  
+  def withinBounds(row: Int, col: Int): Boolean =
+      0 <= row && row < getNrOfRows && 0 <= col && col < getNrOfCols
 
-  def withinBounds(coordinate: (Int, Int)): Boolean =
-    0 <= coordinate._1 && coordinate._1 < nrOfRows && 0 <= coordinate._2 && coordinate._2 < nrOfCols
-    
+  def withinBounds(coordinate: Coor): Boolean =
+    0 <= coordinate.row && coordinate.row < getNrOfRows && 0 <= coordinate.col && coordinate.col < getNrOfCols
+
   /**
    * Get the character at the position (rowIdx, colIdx).
    * This is the safe but slow method - it checks the bounds.

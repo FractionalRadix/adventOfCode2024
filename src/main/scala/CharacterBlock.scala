@@ -43,9 +43,12 @@ class CharacterBlock {
   def getCharAt(rowIdx: Int, colIdx: Int): Option[Char] = block.get(rowIdx, colIdx)
   def setCharAt(rowIdx: Int, colIdx: Int, ch: Char): Option[Char] = block.put((rowIdx, colIdx), ch)
 
-  def withinBounds(coordinate: (Int, Int)): Boolean =
-    0 <= coordinate._1 && coordinate._1 < getNrOfRows && 0 <= coordinate._2 && coordinate._2 < getNrOfColumns
-    
+  def withinBounds(row: Int, col: Int): Boolean =
+    0 <= row && row < getNrOfRows && 0 <= col && col < getNrOfColumns
+
+  def withinBounds(coordinate: Coor): Boolean =
+    0 <= coordinate.row && coordinate.row < getNrOfRows && 0 <= coordinate.col && coordinate.col < getNrOfColumns
+
   def findCoordinatesOf(ch: Character): Seq[(Int, Int)] = {
     for { row <- 0 until getNrOfRows; col <- 0 until getNrOfColumns if getCharAt(row, col).contains(ch) }
         yield (row, col)

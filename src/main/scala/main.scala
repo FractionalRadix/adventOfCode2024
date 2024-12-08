@@ -16,11 +16,11 @@ def main(): Unit =
 
 def solveDay08(): Unit =
   val solver = SolverDay08()
-  val input = solver.parseDay08Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay08_sample.txt")
+  val input = solver.parseDay08Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay08.txt")
   val solutionPart1 = solver.solvePart1(input)
   println(s"The number of anti-nodes is $solutionPart1.") // 289
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution to day 8, part 2 is $solutionPart2.")
+  println(s"The number of anti-nodes, including resonant harmonics, is $solutionPart2.")
 
 def solveDay07(): Unit =
   val solver = SolverDay07()

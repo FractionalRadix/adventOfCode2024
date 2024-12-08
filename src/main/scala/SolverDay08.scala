@@ -2,8 +2,6 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 
-case class Coor(row: Int, col: Int)
-
 class SolverDay08 {
   def parseDay08Input(filename: String): List[String] =
     val source = Source.fromFile(filename)
@@ -14,21 +12,21 @@ class SolverDay08 {
     val block = CharacterBlock2(lines)
     val testBlock = CharacterBlock2(block)
 
-    val pairs = findAntennaePairs(block)
+    val pairs = findAntennaePairs2(block)
 
     for pair <- pairs do
       val antenna1 = pair._1
       val antenna2 = pair._2
-      val rowDiff = antenna1._1 - antenna2._1
-      val colDiff = antenna1._2 - antenna2._2
+      val rowDiff = antenna1.row - antenna2.row
+      val colDiff = antenna1.col - antenna2.col
       // Use these distances to determine the two anti-nodes that they create.
       // Finally, record all anti-nodes that are within bounds.
-      val antiNode1_row = antenna1._1 + rowDiff
-      val antiNode1_col = antenna1._2 + colDiff
-      val antiNode2_row = antenna2._1 - rowDiff
-      val antiNode2_col = antenna2._2 - colDiff
-      val antiNode1 = (antiNode1_row, antiNode1_col)
-      val antiNode2 = (antiNode2_row, antiNode2_col)
+      val antiNode1_row = antenna1.row + rowDiff
+      val antiNode1_col = antenna1.col + colDiff
+      val antiNode2_row = antenna2.row - rowDiff
+      val antiNode2_col = antenna2.col - colDiff
+      val antiNode1 = Coor(antiNode1_row, antiNode1_col)
+      val antiNode2 = Coor(antiNode2_row, antiNode2_col)
       if block.withinBounds(antiNode1) then
         testBlock.setCharAt(antiNode1_row, antiNode1_col, '#')
       if block.withinBounds(antiNode2) then
@@ -78,6 +76,20 @@ class SolverDay08 {
       val rowDiff = antenna1.row - antenna2.row
       val colDiff = antenna1.col - antenna2.col
       println(s"Pair: $antenna1, $antenna2")
-
-    0 //TODO!~
+      // "Forward" nodes:
+      var pos = antenna1
+      testBlock.setCharAt(pos.row, pos.col, '#')
+      while block.withinBounds(pos) do
+        pos = Coor(pos.row + rowDiff, pos.col + colDiff)
+        if (block.withinBounds(pos) /* && pos != antenna1 && pos != antenna2 */)
+          testBlock.setCharAt(pos.row, pos.col, '#')
+      pos = antenna1 // antenna2 ?    
+      while block.withinBounds(pos) do
+        pos = Coor(pos.row - rowDiff, pos.col - colDiff)
+        if (block.withinBounds(pos) /* && pos != antenna1 && pos != antenna2 */)
+          testBlock.setCharAt(pos.row, pos.col, '#')
+          
+    testBlock.print()
+    val antiNodes = testBlock.findCoordinatesOf('#').toList.length
+    antiNodes
 }
