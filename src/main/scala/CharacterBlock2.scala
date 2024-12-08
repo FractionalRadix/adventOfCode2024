@@ -50,6 +50,9 @@ class CharacterBlock2 {
     for rowIdx <- 0 until nrOfRows; colIdx <- 0 until nrOfCols if arr(rowIdx)(colIdx) == ch
       yield (rowIdx, colIdx)
 
+  def withinBounds(coordinate: (Int, Int)): Boolean =
+    0 <= coordinate._1 && coordinate._1 < nrOfRows && 0 <= coordinate._2 && coordinate._2 < nrOfCols
+    
   /**
    * Get the character at the position (rowIdx, colIdx).
    * This is the safe but slow method - it checks the bounds.
@@ -75,4 +78,17 @@ class CharacterBlock2 {
 
   def setCharAt(rowIdx: Int, colIdx: Int, ch: Char): Unit =
     arr(rowIdx)(colIdx) = ch
+
+  /**
+   * Find the distinct elements in the grid.
+   * For example, if the grid consisted of the rows 'zzA', 'zAz', and 'zzA', it would return {'z', 'A'}.
+   * @return A set of all the distinct elements in the list.
+   */
+  def findDistinct(): Set[Char] =
+    val mutableSet = scala.collection.mutable.Set[Char]()
+    for (rowIdx <- 0 until nrOfRows) do
+      for (colIdx <- 0 until nrOfCols) do
+        val ch = arr(rowIdx)(colIdx)
+        mutableSet += ch
+    mutableSet.toSet
 }

@@ -43,6 +43,9 @@ class CharacterBlock {
   def getCharAt(rowIdx: Int, colIdx: Int): Option[Char] = block.get(rowIdx, colIdx)
   def setCharAt(rowIdx: Int, colIdx: Int, ch: Char): Option[Char] = block.put((rowIdx, colIdx), ch)
 
+  def withinBounds(coordinate: (Int, Int)): Boolean =
+    0 <= coordinate._1 && coordinate._1 < getNrOfRows && 0 <= coordinate._2 && coordinate._2 < getNrOfColumns
+    
   def findCoordinatesOf(ch: Character): Seq[(Int, Int)] = {
     for { row <- 0 until getNrOfRows; col <- 0 until getNrOfColumns if getCharAt(row, col).contains(ch) }
         yield (row, col)
@@ -157,4 +160,11 @@ class CharacterBlock {
       yield block(coordinate)
     characters.mkString
   }
+
+  /**
+   * Find the distinct elements in the grid.
+   * For example, if the grid consisted of the rows 'zzA', 'zAz', and 'zzA', it would return {'z', 'A'}.
+   * @return A set of all the distinct elements in the list.
+   */
+  def findDistinct(): Set[Char] = block.values.toSet
 }
