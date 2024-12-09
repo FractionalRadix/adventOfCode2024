@@ -8,10 +8,10 @@ class SolverDay09 {
     val lines = source.getLines.toList
     lines.head
 
-  def quickConvert(ch: Character): Int =
+  private def quickConvert(ch: Character): Int =
     ch - '0'
 
-  def solvePart1(input: String) =
+  def solvePart1(input: String): Int =
     println(s"Input: $input")
 
     // NOTE: Since file numbers are going to be larger than 9, we'll need a Map, not a String.
