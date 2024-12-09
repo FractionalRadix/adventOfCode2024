@@ -18,6 +18,101 @@ class SolverDay09 {
     moveBlocks(map2)
     calcChecksum(map2)
 
+  def solvePart2(input: String): Long =
+    val map = buildMap(input)
+    printMapAsString(map)
+    // First, let's convert this to a more efficient data structure:
+    // a set of (fileNr, first position, length).
+    val files = determineFiles(map).reverse
+    for file <- files do
+      println(file)
+    printFileList(files)
+
+    // Algorithm:
+    // Find the file with the highest unused file ID.
+    // Find the earliest gap in which it will fit.
+    // Change its position to the start position of that gap.
+    // Adjust the start position and length of the gap accordingly: it is now a (possibly much) smaller gap, might even have length 0.
+    // Do this until ...?
+    var set = scala.collection.mutable.Set[File]()
+    set = set ++ files
+    val usedFileIDs = scala.collection.mutable.Set[Int]()
+    var running = true
+    while running do
+      val candidateFiles = set.filter(f => f.fileNr != -1).filter( f => !usedFileIDs.contains(f.fileNr) )
+      if candidateFiles.isEmpty then
+        running = false
+      else
+        val currentFile = candidateFiles.maxBy( f => f.fileNr )
+        val fittingGaps = set.filter( f => f.fileNr == -1 && f.length >= currentFile.length )
+        if fittingGaps.isEmpty then
+          // No gap big enough for this one. Move on to the next one.
+          usedFileIDs.add(currentFile.fileNr)
+        else
+          val earliestFittingGap = fittingGaps.minBy( f => f.startPos )
+          val newFile = File(currentFile.fileNr, earliestFittingGap.startPos, currentFile.length)
+          val newGap = File(-1, earliestFittingGap.startPos + currentFile.length, earliestFittingGap.length - currentFile.length)
+          if (earliestFittingGap.startPos < currentFile.startPos)
+            val gapLeftByMovedFile = File(-1, currentFile.startPos, currentFile.length)
+            set.remove(earliestFittingGap)
+            set.remove(currentFile)
+            set.add(newFile)
+            set.add(newGap)
+            set.add(gapLeftByMovedFile)
+            usedFileIDs.add(currentFile.fileNr)
+          else
+            usedFileIDs.add(currentFile.fileNr)
+          val intermediateMap = fileSetToMap(set)
+          printMapAsString(intermediateMap)
+
+    val newMap = fileSetToMap(set)
+    printMapAsString(newMap)
+    calcChecksum(newMap)
+
+
+  private def fileSetToMap(set: scala.collection.mutable.Set[File]): scala.collection.mutable.Map[Int, Int] =
+    val list = set.toList.sortWith(_.startPos < _.startPos)
+    val result = scala.collection.mutable.Map[Int, Int]()
+    for file <- list do
+      // Note that a file could also be a gap here!
+      for i <- 0 until file.length do
+        result(file.startPos + i) = file.fileNr
+    result
+
+  // PRE: File list is sorted by start position, ascending.
+  private def printFileList(files: List[File]): Unit =
+    println
+    for file <- files do
+      for block <- 0 until file.length do
+        if file.fileNr == -1 then
+          print(".")
+        else
+          print(file.fileNr)
+    println
+    //TODO!+
+
+  private case class File(fileNr: Int, startPos: Int, length: Int)
+
+  private def determineFiles(map: scala.collection.mutable.Map[Int, Int]): List[File] =
+    var files = List[File]()
+    var startPos = 0
+    var currentFileNr = map(startPos)
+    var length = 0
+    for i <- map.keys do
+      val foundFileNr = map.get(i).head //TODO!~  Might be None, or -1 ...
+      if foundFileNr == currentFileNr then
+        length = length + 1
+      else
+        val file = File(currentFileNr, startPos, length)
+        files = file :: files
+        currentFileNr = foundFileNr
+        startPos = i
+        length = 1 // You've already found the first element, so the length is 1.
+    // Add the last one...
+    val lastFile = File(currentFileNr, startPos, length)
+    files = lastFile :: files
+    files
+
 
   private def calcChecksum(map: scala.collection.mutable.Map[Int, Int]): Long =
     var sum: Long = 0
@@ -89,8 +184,8 @@ class SolverDay09 {
         val value = map.get(key)
         value match
           case Some(-1) => print(".")
-          case Some(n) => print(s"($n)")
-          //case Some(n) => print(n)
+          //case Some(n) => print(s"($n)")
+          case Some(n) => print(n)
           case None => print("!")
     println
 

@@ -17,10 +17,11 @@ def main(): Unit =
 
 def solveDay09(): Unit =
   val solver = SolverDay09()
-  val input = solver.parseDay09input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09.txt")
-  val solutionPart1 = solver.solvePart1(input) // 6344673854800
-  println(s"The checksum is $solutionPart1.")
-  //TODO!+ Add part 2.
+  val input = solver.parseDay09input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09_sample.txt")
+  //val solutionPart1 = solver.solvePart1(input) // 6344673854800
+  //println(s"The checksum is $solutionPart1.")
+  val solutionPart2 = solver.solvePart2(input)
+  println(s"The new checksum is $solutionPart2.")
   
 def solveDay08(): Unit =
   val solver = SolverDay08()
