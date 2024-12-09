@@ -24,9 +24,9 @@ class SolverDay09 {
     // First, let's convert this to a more efficient data structure:
     // a set of (fileNr, first position, length).
     val files = determineFiles(map).reverse
-    for file <- files do
-      println(file)
-    printFileList(files)
+    //for file <- files do
+    //  println(file)
+    //printFileList(files)
 
     // Algorithm:
     // Find the file with the highest unused file ID.
@@ -63,10 +63,10 @@ class SolverDay09 {
           else
             usedFileIDs.add(currentFile.fileNr)
           val intermediateMap = fileSetToMap(set)
-          printMapAsString(intermediateMap)
+          //printMapAsString(intermediateMap)
 
     val newMap = fileSetToMap(set)
-    printMapAsString(newMap)
+    //printMapAsString(newMap)
     calcChecksum(newMap)
 
 
