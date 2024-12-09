@@ -12,8 +12,16 @@ def main(): Unit =
   //solveDay05()
   //solveDay06()
   //solveDay07()
-  solveDay08()
+  //solveDay08()
+  solveDay09()
 
+def solveDay09(): Unit =
+  val solver = SolverDay09()
+  val input = solver.parseDay09input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09_sample.txt")
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The checksum is $solutionPart1.")
+  //TODO!+ Add part 2.
+  
 def solveDay08(): Unit =
   val solver = SolverDay08()
   val input = solver.parseDay08Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay08.txt")
