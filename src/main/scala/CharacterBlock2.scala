@@ -46,9 +46,14 @@ class CharacterBlock2 {
         Predef.print(ch)
       println
 
+  @Deprecated("Use findCoordinatesOf2(ch: Char) instead, which returns a Seq[Coor].")
   def findCoordinatesOf(ch: Char): Seq[(Int, Int)] =
     for rowIdx <- 0 until nrOfRows; colIdx <- 0 until nrOfCols if arr(rowIdx)(colIdx) == ch
       yield (rowIdx, colIdx)
+
+  def findCoordinatesOf2(ch: Char): Seq[Coor] =
+    for rowIdx <- 0 until nrOfRows; colIdx <- 0 until nrOfCols if arr(rowIdx)(colIdx) == ch
+      yield Coor(rowIdx, colIdx)
   
   def withinBounds(row: Int, col: Int): Boolean =
       0 <= row && row < getNrOfRows && 0 <= col && col < getNrOfCols
@@ -69,6 +74,12 @@ class CharacterBlock2 {
     else
       None
 
+  def safeGetCharAt(coor: Coor): Option[Char] =
+    if 0 <= coor.row && coor.row < nrOfRows && 0 <= coor.col && coor.col < nrOfCols then
+      Some(arr(coor.row)(coor.col))
+    else
+      None
+
   /**
    * Get the character at the position (rowIdx, colIdx).
    * This is the fastest method because it does not check the bounds.
@@ -78,6 +89,10 @@ class CharacterBlock2 {
    * @return The character at column "colIdx" of row "rowIdx".
    */
   def getCharAt(rowIdx: Int, colIdx: Int): Char = arr(rowIdx)(colIdx)
+  
+  def getCharAt(coor: Coor): Char = arr(coor.row)(coor.col)
+  
+  
 
   def setCharAt(rowIdx: Int, colIdx: Int, ch: Char): Unit =
     arr(rowIdx)(colIdx) = ch

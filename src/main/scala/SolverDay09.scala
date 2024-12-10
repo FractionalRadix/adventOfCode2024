@@ -3,7 +3,7 @@ package com.cormontia.adventOfCode2024
 import scala.io.Source
 
 class SolverDay09 {
-  def parseDay09input(filename: String): String =
+  def parseDay09Input(filename: String): String =
     val source = Source.fromFile(filename)
     val lines = source.getLines.toList
     lines.head
@@ -24,19 +24,28 @@ class SolverDay09 {
     // First, let's convert this to a more efficient data structure:
     // a set of (fileNr, first position, length).
     val files = determineFiles(map).reverse
-    //for file <- files do
-    //  println(file)
-    //printFileList(files)
+
+    println("Stats:")
+    val smallestFileSize = files.filter { f => f.fileNr != - 1 }.map { f => f.length }.min
+    val largestFileSize = files.filter { f => f.fileNr != -1 }.map { f => f.length }.max
+    println(s"Smallest file size: $smallestFileSize")
+    println(s"Largest file size: $largestFileSize")
+    val smallestGapSize = files.filter { f => f.fileNr == - 1 }.map { f => f.length }.min
+    val largestGapSize = files.filter { f => f.fileNr == -1 }.map { f => f.length }.max
+    println(s"Smallest gap size: $smallestGapSize")
+    println(s"Largest gap size: $largestGapSize")
 
     // Algorithm:
     // Find the file with the highest unused file ID.
     // Find the earliest gap in which it will fit.
     // Change its position to the start position of that gap.
     // Adjust the start position and length of the gap accordingly: it is now a (possibly much) smaller gap, might even have length 0.
-    // Do this until ...?
+    // Do this until ?? the file Nr you want to move, is one that you have moved already ??
     var set = scala.collection.mutable.Set[File]()
     set = set ++ files
+    var movedFiles = scala.collection.mutable.Set[File]()
     val usedFileIDs = scala.collection.mutable.Set[Int]()
+    val movedFileIDs = scala.collection.mutable.Set[Int]() //TODO?- For testing.
     var running = true
     while running do
       val candidateFiles = set.filter(f => f.fileNr != -1).filter( f => !usedFileIDs.contains(f.fileNr) )
@@ -44,26 +53,28 @@ class SolverDay09 {
         running = false
       else
         val currentFile = candidateFiles.maxBy( f => f.fileNr )
+        //println(currentFile)
         val fittingGaps = set.filter( f => f.fileNr == -1 && f.length >= currentFile.length )
-        if fittingGaps.isEmpty then
-          // No gap big enough for this one. Move on to the next one.
-          usedFileIDs.add(currentFile.fileNr)
-        else
+        if fittingGaps.nonEmpty then
           val earliestFittingGap = fittingGaps.minBy( f => f.startPos )
           val newFile = File(currentFile.fileNr, earliestFittingGap.startPos, currentFile.length)
           val newGap = File(-1, earliestFittingGap.startPos + currentFile.length, earliestFittingGap.length - currentFile.length)
           if (earliestFittingGap.startPos < currentFile.startPos)
+            if movedFileIDs.contains(currentFile.fileNr) then
+              println("WARNING! Moving already moved file!!")
+            else
+              print(s"${currentFile.fileNr} ")
             val gapLeftByMovedFile = File(-1, currentFile.startPos, currentFile.length)
             set.remove(earliestFittingGap)
             set.remove(currentFile)
             set.add(newFile)
             set.add(newGap)
-            set.add(gapLeftByMovedFile)
-            usedFileIDs.add(currentFile.fileNr)
-          else
-            usedFileIDs.add(currentFile.fileNr)
+            if (gapLeftByMovedFile.length > 0) then
+              set.add(gapLeftByMovedFile)
+            movedFileIDs.add(currentFile.fileNr)
           val intermediateMap = fileSetToMap(set)
           //printMapAsString(intermediateMap)
+        usedFileIDs.add(currentFile.fileNr)
 
     val newMap = fileSetToMap(set)
     //printMapAsString(newMap)
@@ -123,8 +134,7 @@ class SolverDay09 {
         case None => println("Oops! For key $key, pos $pos, sum $sum")
         case Some(fileNr) =>
           if fileNr != -1 then
-            sum = sum + pos * fileNr
-            println(s"blockNr * position = $pos * $fileNr")
+            sum = sum + pos.toLong * fileNr.toLong
       pos = pos + 1
     sum
 
