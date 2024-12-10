@@ -60,25 +60,56 @@ class SolverDay09 {
           val newFile = File(currentFile.fileNr, earliestFittingGap.startPos, currentFile.length)
           val newGap = File(-1, earliestFittingGap.startPos + currentFile.length, earliestFittingGap.length - currentFile.length)
           if (earliestFittingGap.startPos < currentFile.startPos)
-            if movedFileIDs.contains(currentFile.fileNr) then
-              println("WARNING! Moving already moved file!!")
-            else
-              print(s"${currentFile.fileNr} ")
+            //if movedFileIDs.contains(currentFile.fileNr) then
+            //  println("WARNING! Moving already moved file!!")
+            //else
+            //  print(s"${currentFile.fileNr} ")
             val gapLeftByMovedFile = File(-1, currentFile.startPos, currentFile.length)
             set.remove(earliestFittingGap)
             set.remove(currentFile)
             set.add(newFile)
             set.add(newGap)
-            if (gapLeftByMovedFile.length > 0) then
+            if gapLeftByMovedFile.length > 0 then
               set.add(gapLeftByMovedFile)
             movedFileIDs.add(currentFile.fileNr)
-          val intermediateMap = fileSetToMap(set)
+          //val intermediateMap = fileSetToMap(set)
+          //print(s"${calcChecksum(intermediateMap)} ")
           //printMapAsString(intermediateMap)
+          printFileList2(set.toSet)
+          //print(s"${calcChecksum2(set.toSet)} ")
         usedFileIDs.add(currentFile.fileNr)
 
-    val newMap = fileSetToMap(set)
+        if !allBlocksAccountedFor(set.toSet) then
+          println("NOT ALL BLOCKS ACCOUNTED FOR!")
+
+    //val newMap = fileSetToMap(set)
     //printMapAsString(newMap)
-    calcChecksum(newMap)
+    //calcChecksum(newMap)
+    calcChecksum2(set.toSet)
+
+  private def calcChecksum2(set: Set[File]): Long =
+    var sum: Long = 0
+    for file <- set if file.fileNr != -1 do
+      val len = file.fileNr
+      for i <- 0 until file.length do
+        sum = sum + (file.startPos + i) * file.fileNr
+    sum
+
+  /**
+   * Given the list of files and gaps, verify that every block is either in a file or in a gap.
+   */
+  private def allBlocksAccountedFor(set: Set[File]): Boolean =
+    // Verify that, for every entry (_, startPos, length), the next entry is (_, startPos + length, _)
+    var list = List[File]()
+    list = list ++ set
+    list = list.sortWith(_.startPos > _.startPos)
+    val pairs = list.zip(list.tail)
+    for pair <- pairs do
+      val expectedNextPos = pair._1.startPos + pair._1.length
+      val actualNextPos = pair._2.startPos
+      if actualNextPos != expectedNextPos then
+        false
+    true
 
 
   private def fileSetToMap(set: scala.collection.mutable.Set[File]): scala.collection.mutable.Map[Int, Int] =
@@ -101,6 +132,27 @@ class SolverDay09 {
           print(file.fileNr)
     println
     //TODO!+
+
+  private def printFileList2(files: Set[File]): Unit =
+    println
+    val fileWithHighestNr = files.maxBy(f => f.startPos)
+    val highestBlock = fileWithHighestNr.startPos + fileWithHighestNr.length
+    for i <- 0 to highestBlock do
+      // Find all files on block i. There SHOULD be only one!
+      // TESTCASE: i=8, file = File (_,5,4). This file occupies blocks 5,6,7,8 (5 + 4 - 1).
+      //   file.startPos + file.length = 5 + 4 = 9.
+      //   i < file.startPos + file.length because 8 < 9.
+      //   If i==9, the condition would have failed as it should.
+      val foundFiles = files.filter(f => f.startPos <= i && i < (f.startPos + f.length))
+      if foundFiles.size > 1 then
+        println(s"ERROR!! Block $i contains multiple files/gaps: ${foundFiles.mkString(",")}")
+      else if foundFiles.size == 1 then // Note that we ignore the case that foundFiles.size == 0 ....
+        val foundFile = foundFiles.head
+        if foundFile.fileNr == -1 then
+          print(".")
+        else
+          print(foundFile.fileNr)
+
 
   private case class File(fileNr: Int, startPos: Int, length: Int)
 

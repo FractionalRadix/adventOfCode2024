@@ -14,8 +14,8 @@ def main(): Unit =
   //solveDay06()
   //solveDay07()
   //solveDay08()
-  //solveDay09() //TODO!+ Part 2 is still wrong...
-  solveDay10()
+  solveDay09() //TODO!+ Part 2 is still wrong...
+  //solveDay10()
 
 def solveDay10(): Unit =
   val solver = SolverDay10()
@@ -27,7 +27,7 @@ def solveDay10(): Unit =
 
 def solveDay09(): Unit =
   val solver = SolverDay09()
-  val input = solver.parseDay09Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09.txt")
+  val input = solver.parseDay09Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09_sample.txt")
   //val solutionPart1 = solver.solvePart1(input) // 6344673854800
   //println(s"The checksum is $solutionPart1.")
   val startTime = LocalDateTime.now()
@@ -35,6 +35,7 @@ def solveDay09(): Unit =
   val endTime = LocalDateTime.now()
   val duration = Duration.between(startTime, endTime)
   println(s"The new checksum is $solutionPart2.") // 8018178824463 is TOO HIGH.
+                                                  // 8556621219989 is TOO HIGH.
   println(s"It took: ${duration.toSeconds} seconds.")
   
 def solveDay08(): Unit =
