@@ -121,6 +121,33 @@ class SolverDay11 {
         count = count + followTransitionsAndCount(targets._2.head, n - 1)
       count
 
+  /**
+   * Cache the values and how many stones they yield after a given number of iterations.
+   * For example, cache(240, 13) would give you the number of stones that "240" would yield after 13 iterations.
+   */
+  private val cache = scala.collection.mutable.Map[(Long, Int), Long]()
+
+  /**
+   * Recursively follow "n" transitions of a given stone.
+   * Count the resulting number of stones.
+   * @param engraving The engraving on the current stone.
+   * @param n         The number of transitions to follow.
+   */
+  private def followTransitionsAndCount2(engraving: Long, n: Int): Long =
+    if cache.contains(engraving, n) then
+      cache(engraving, n)
+    else
+      if n == 0 then
+        1
+      else
+        val targets = transitions(engraving)
+        var count = followTransitionsAndCount2(targets._1, n - 1)
+        if targets._2.isDefined then
+          count = count + followTransitionsAndCount2(targets._2.head, n - 1)
+        cache((engraving, n)) = count
+        count
+
+
   def solvePart2(input: List[Long]): Long =
     // Let's process the list once...
     for engraving <- input do
@@ -131,7 +158,7 @@ class SolverDay11 {
     println
     var count: Long = 0
     for i <- input do
-      count = count + followTransitionsAndCount(i, 75)
+      count = count + followTransitionsAndCount2(i, 75)
     count
 
 
