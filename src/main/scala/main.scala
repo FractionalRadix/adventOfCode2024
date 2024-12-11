@@ -1,6 +1,6 @@
 package com.cormontia.adventOfCode2024
 
-import java.time.{Duration, LocalDateTime, Period}
+import java.time.{Duration, LocalDateTime}
 import scala.collection.mutable.ArrayBuffer
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -47,24 +47,18 @@ def solveDay09(): Unit =
   val solver = SolverDay09()
   val input = solver.parseDay09Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09.txt")
 
-  //val startTime1 = LocalDateTime.now()
-  //val solutionPart1 = solver.solvePart1(input) // 6344673854800
-  //val endTime1 = LocalDateTime.now()
-  //val duration1 = Duration.between(startTime1, endTime1)
-  //println(s"The checksum is $solutionPart1.")
-  //println(s"It took: ${duration1.toSeconds} seconds.")
+  val startTime1 = LocalDateTime.now()
+  val solutionPart1 = solver.solvePart1(input)
+  val endTime1 = LocalDateTime.now()
+  val duration1 = Duration.between(startTime1, endTime1)
+  println(s"The checksum is $solutionPart1.") // 6344673854800
+  println(s"It took: ${duration1.toSeconds} seconds.")
 
   val startTime2 = LocalDateTime.now()
   val solutionPart2 = solver.solvePart2(input)
-  //val input2 = solver.parseDay09Input2("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09.txt")
-  //val solutionPart2 = solver.solvePart2(input2)
   val endTime2 = LocalDateTime.now()
   val duration2 = Duration.between(startTime2, endTime2)
-  println(s"The new checksum is $solutionPart2.") // 8018178824463 is TOO HIGH.
-                                                  // 8024585585404 <-- then that must also be TOO HIGH....
-                                                  // 8556621219989 is TOO HIGH.
-                                                  // 8583963700787 <-- then that MUST also be TOO HIGH....
-                                                  // 6360363199987
+  println(s"The new checksum is $solutionPart2.") // 6360363199987
   println(s"It took: ${duration2.toSeconds} seconds.")
   
 def solveDay08(): Unit =

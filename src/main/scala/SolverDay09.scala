@@ -8,17 +8,6 @@ class SolverDay09 {
     val lines = source.getLines.toList
     lines.head
 
-  def parseDay09Input2(filename: String): scala.collection.mutable.Map[Int, Int] =
-    val bigMap = scala.collection.mutable.Map[Int, Int]()
-    val source = Source.fromFile(filename)
-    var i = 0
-    for char <- source do
-      print(char)
-      bigMap(i) = char - '0'
-      i = i + 1
-    println()
-    bigMap
-
   private def quickConvert(ch: Character): Int =
     ch - '0'
 
@@ -37,15 +26,9 @@ class SolverDay09 {
 
   def solvePart2(input: String): Long =
     println(s"Input string has length ${input.length}.")
-
     files = stringToFileSet(input)
-    //printFileList2(files.toSet)
-    println
-
-    //TODO!~ DIFFERENT WAY TO READ INPUT!
-    // Scala (and JVM in general) have String length maximum 65536 .....
     if !allBlocksAccountedFor(files.toSet) then
-      println("OOPSIE in the input!")
+      println("ERROR in the input!")
 
     // Algorithm:
     // Find the file with the highest unused file ID.
@@ -72,22 +55,9 @@ class SolverDay09 {
               running = false // Abnormal program termination... should just throw an Exception...
         usedFileIDs.add(currentFile.fileNr.head)
 
-        //if !allBlocksAccountedFor(files.toSet) then
-        //  println("NOT ALL BLOCKS ACCOUNTED FOR!")
-
     val newMap = fileSetToMap(files)
-    //printMapAsString2(newMap)
-    val checksum3 = calcChecksum3(newMap)
-    println(s"Checksum #3: $checksum3.")
-    //val checksum1 = calcChecksum(newMap)
-    //println(s"Checksum #1: $checksum1.")
-    val checksum2 = calcChecksum2(files.toSet)
-    println(s"Checksum #2: $checksum2.")
+    calcChecksum2(files.toSet)
 
-    checksum2
-    //TODO!~ Look at those checksum calculators.
-    // Three different checksum calculators provide the same value for the sample input...
-    // But they provide thee DIFFERENT answers for the actual output!
 
   /**
    * Update the "files" structure. Move the File named `file` to the gap named `gap`.
@@ -99,13 +69,11 @@ class SolverDay09 {
    * @param gap The gap to move it to.
    */
   private def moveFileToGap(file: File, gap: File): Unit =
-    //println(s"Moving $file to $gap")
     val newFile = File(file.fileNr, gap.startPos, file.length)
     val newGap = File(None, file.startPos, file.length)
     val smallerGap = File(None, gap.startPos + file.length, gap.length - file.length)
     files.remove(file)
     files.remove(gap)
-    //println(s"New elements: $newFile, $smallerGap, $newGap.")
     files.add(newFile)
     files.add(newGap)
     if smallerGap.length > 0 then
