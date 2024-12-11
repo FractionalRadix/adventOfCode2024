@@ -228,7 +228,6 @@ class SolverDay09 {
       pos = pos + 1
     sum
 
-
   private def moveBlocks(map: scala.collection.mutable.Map[Int, Int]): Unit =
     // Keep taking the last element and move it to the first free position.
     // If the first free position is AT or BEFORE that last element, stop.
@@ -243,23 +242,6 @@ class SolverDay09 {
       else
         going = false
 
-  private def mapToArray(map: scala.collection.mutable.Map[Int, Int]): Array[Option[Int]] =
-    val maxKey = map.keys.max()
-    val array = Array.ofDim[Option[Int]](maxKey + 1)
-    for i <- 0 to maxKey do
-      val value = map.get(i)
-      array(i) = value match
-        case Some(-1) => None
-        case Some(n) => Some(n)
-        case None => None //TODO?+ Error message?
-    array
-
-  private def printArrayAsString(arr: Array[Option[Int]]): Unit =
-    for i <- arr do
-      i match
-        case Some(n) => print(n)
-        case None => print(".")
-
   private def buildMap(input: String): scala.collection.mutable.Map[Int, Int] =
     val map = scala.collection.mutable.Map[Int, Int]()
     // First, let's process the thing...
@@ -268,7 +250,6 @@ class SolverDay09 {
     var position = 0
     for i <- 0 until input.length do
       val digit = quickConvert(input.charAt(i))
-      //print(s"($position,$digit)")
       if file then
         for j <- 0 until digit do
           map(position + j) = fileNum
@@ -280,6 +261,12 @@ class SolverDay09 {
       file = !file
     map
 
+  /**
+   * Parse the input string to a Set of File instances.
+   * For convenience, a File instance can also be a gap here.
+   * @param input A list of digits (in String form) representing the number of blocks each file or gap takes.
+   * @return The set of File instances corresponding to the input list.
+   */
   private def stringToFileSet(input: String): scala.collection.mutable.Set[File] =
     val result = scala.collection.mutable.Set[File]()
     var fileNr = 0
@@ -292,42 +279,14 @@ class SolverDay09 {
       else
         if isFile then
           val file = File(Some(fileNr), position, length)
-          //println(s"Inserting $file")
           result.add(file)
           fileNr = fileNr + 1
           isFile = false
           position = position + length
         else
           val file = File(None, position, length)
-          //println(s"Inserting $file")
           result.add(file)
           isFile = true
           position = position + length
     result
-
-  //TODO?~ Pas an IMMUTABLE version of the map?
-  private def printMapAsString(map: scala.collection.mutable.Map[Int, Int]): Unit =
-    for key <- map.keys do
-        val value = map.get(key)
-        value match
-          case Some(-1) => print(".")
-          //case Some(n) => print(s"($n)")
-          case Some(n) => print(n)
-          case None => print("!")
-    println
-
-  private def printMapAsString2(map: scala.collection.mutable.Map[Int, Option[Int]]): Unit =
-    val lowestKey = map.keys.min
-    val highestKey = map.keys.max
-    for key <- lowestKey to highestKey do
-      val contents = map.get(key)
-      if contents.isEmpty then
-        print("!")
-      else
-        val fileNr = contents.head
-        val str = if fileNr.isEmpty then "(.)" else s"(${fileNr.head})"
-        print(str)
-    println()
-
 }
-

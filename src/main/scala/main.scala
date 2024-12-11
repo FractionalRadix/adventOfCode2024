@@ -14,10 +14,10 @@ def main(): Unit =
   //solveDay06()
   //solveDay07()
   //solveDay08()
-  solveDay09() //TODO!+ Part 2 is still wrong...
+  //solveDay09()
   //solveDay10()
   //solveDay11()
-  //solveDay12()
+  solveDay12()
 
 def solveDay12(): Unit =
   val solver = SolverDay12()
