@@ -50,7 +50,7 @@ class SolverDay11 {
     result.reverse
 
 
-  private val transitions = scala.collection.mutable.Map[Long, (Option[Long], Option[Long])]()
+  private val transitions = scala.collection.mutable.Map[Long, (Long, Option[Long])]()
 
   /**
    * Given the engraving on a stone (the value to process), update the list of transitions.
@@ -62,7 +62,7 @@ class SolverDay11 {
   private def processEngraving(engraving: Long): Unit =
     if (!transitions.contains(engraving))
       if engraving == 0 then
-          transitions(engraving) = (Some(1), None)
+          transitions(engraving) = (1, None)
       else
         val str = engraving.toString
         val len = str.length
@@ -70,9 +70,9 @@ class SolverDay11 {
           val n = len / 2
           val target1 = str.take(n).toLong
           val target2 = str.drop(n).toLong
-          transitions(engraving) = (Some(target1), Some(target2))
+          transitions(engraving) = (target1, Some(target2))
         else
-          transitions(engraving) = (Some(2024 * engraving), None)
+          transitions(engraving) = (2024 * engraving, None)
 
   /**
    * For every transition in our list, look at its targets.
@@ -81,7 +81,7 @@ class SolverDay11 {
   private def processAllValues(): Unit =
     for transition <- transitions do
       val target1 = transition._2._1
-      processEngraving(target1.head)
+      processEngraving(target1)
       val target2 = transition._2._2
       if target2.isDefined then
         processEngraving(target2.head)
@@ -90,14 +90,50 @@ class SolverDay11 {
     for transition <- transitions do
       println(s"${transition._1} -> ${transition._2._1} ${transition._2._2}")
 
+  /**
+   * Recursively follow "n" transitions of a given stone.
+   * Print the result. (Later we'll just count the number of stones that we transition to).
+   * @param engraving The engraving on the current stone.
+   * @param n The number of transitions to follow.
+   */
+  private def followTransitions(engraving: Long, n: Int): Unit =
+    if n == 0 then
+      print(s"$engraving ")
+    else
+      val targets = transitions(engraving)
+      followTransitions(targets._1, n - 1)
+      if targets._2.isDefined then
+        followTransitions(targets._2.head, n - 1)
+
+  /**
+   * Recursively follow "n" transitions of a given stone.
+   * Count the resulting number of stones.
+   * @param engraving The engraving on the current stone.
+   * @param n         The number of transitions to follow.
+   */
+  private def followTransitionsAndCount(engraving: Long, n: Int): Long =
+    if n == 0 then
+      1
+    else
+      val targets = transitions(engraving)
+      var count = followTransitionsAndCount(targets._1, n - 1)
+      if targets._2.isDefined then
+        count = count + followTransitionsAndCount(targets._2.head, n - 1)
+      count
+
   def solvePart2(input: List[Long]): Long =
     // Let's process the list once...
     for engraving <- input do
       processEngraving(engraving)
     for i <- 1 to 75 do
       processAllValues()
-    printTransitions()
-    0 // TODO!~
+    // Now, for every value, we should also cache what value it yields for (up to) 75 iterations....
+    println
+    var count: Long = 0
+    for i <- input do
+      count = count + followTransitionsAndCount(i, 75)
+    count
+
 
 
 }
