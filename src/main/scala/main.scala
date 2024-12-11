@@ -20,9 +20,9 @@ def main(): Unit =
 
 def solveDay11(): Unit =
   val solver = SolverDay11()
-  val input = solver.parseDay11Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay11_sample1.txt")
+  val input = solver.parseDay11Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay11.txt")
   val solutionPart1 = solver.solvePart1(input)
-  println(s"The solution to part 1 is $solutionPart1.")
+  println(s"The solution to part 1 is $solutionPart1.") // 198075
   val solutionPart2 = solver.solvePart2(input)
   println(s"The solution to part 2 is $solutionPart2.")
 
