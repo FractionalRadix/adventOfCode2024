@@ -17,6 +17,14 @@ def main(): Unit =
   solveDay09() //TODO!+ Part 2 is still wrong...
   //solveDay10()
 
+def solveDay11(): Unit =
+  val solver = SolverDay11()
+  val input = solver.parseDay11Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay11_sample.txt")
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The solution to part 1 is $solutionPart1.")
+  val solutionPart2 = solver.solvePart1(input)
+  println(s"The solution to part 2 is $solutionPart2.")
+
 def solveDay10(): Unit =
   val solver = SolverDay10()
   val input = solver.parseDay10Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay10.txt")
@@ -28,15 +36,23 @@ def solveDay10(): Unit =
 def solveDay09(): Unit =
   val solver = SolverDay09()
   val input = solver.parseDay09Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09_sample.txt")
+
+  //val startTime1 = LocalDateTime.now()
   //val solutionPart1 = solver.solvePart1(input) // 6344673854800
+  //val endTime1 = LocalDateTime.now()
+  //val duration1 = Duration.between(startTime1, endTime1)
   //println(s"The checksum is $solutionPart1.")
-  val startTime = LocalDateTime.now()
+  //println(s"It took: ${duration1.toSeconds} seconds.")
+
+  val startTime2 = LocalDateTime.now()
   val solutionPart2 = solver.solvePart2(input)
-  val endTime = LocalDateTime.now()
-  val duration = Duration.between(startTime, endTime)
+  val endTime2 = LocalDateTime.now()
+  val duration2 = Duration.between(startTime2, endTime2)
   println(s"The new checksum is $solutionPart2.") // 8018178824463 is TOO HIGH.
+                                                  // 8024585585404 <-- then that must also be TOO HIGH....
                                                   // 8556621219989 is TOO HIGH.
-  println(s"It took: ${duration.toSeconds} seconds.")
+                                                  // 8583963700787 <-- then that MUST also be TOO HIGH....
+  println(s"It took: ${duration2.toSeconds} seconds.")
   
 def solveDay08(): Unit =
   val solver = SolverDay08()

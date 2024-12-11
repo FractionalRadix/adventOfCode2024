@@ -26,12 +26,12 @@ class SolverDay09 {
     val files = determineFiles(map).reverse
 
     println("Stats:")
-    val smallestFileSize = files.filter { f => f.fileNr != - 1 }.map { f => f.length }.min
-    val largestFileSize = files.filter { f => f.fileNr != -1 }.map { f => f.length }.max
+    val smallestFileSize = files.filter { f => f.fileNr.isDefined }.map { f => f.length }.min
+    val largestFileSize = files.filter { f => f.fileNr.isDefined }.map { f => f.length }.max
     println(s"Smallest file size: $smallestFileSize")
     println(s"Largest file size: $largestFileSize")
-    val smallestGapSize = files.filter { f => f.fileNr == - 1 }.map { f => f.length }.min
-    val largestGapSize = files.filter { f => f.fileNr == -1 }.map { f => f.length }.max
+    val smallestGapSize = files.filter { f => f.fileNr.isEmpty }.map { f => f.length }.min
+    val largestGapSize = files.filter { f => f.fileNr.isEmpty }.map { f => f.length }.max
     println(s"Smallest gap size: $smallestGapSize")
     println(s"Largest gap size: $largestGapSize")
 
@@ -48,51 +48,74 @@ class SolverDay09 {
     val movedFileIDs = scala.collection.mutable.Set[Int]() //TODO?- For testing.
     var running = true
     while running do
-      val candidateFiles = set.filter(f => f.fileNr != -1).filter( f => !usedFileIDs.contains(f.fileNr) )
+      val candidateFiles = set.filter(f => f.fileNr.isDefined).filter(f => !usedFileIDs.contains(f.fileNr.head) )
       if candidateFiles.isEmpty then
         running = false
       else
         val currentFile = candidateFiles.maxBy( f => f.fileNr )
         //println(currentFile)
-        val fittingGaps = set.filter( f => f.fileNr == -1 && f.length >= currentFile.length )
+        val fittingGaps = set.filter( f => f.fileNr.isEmpty && f.length >= currentFile.length )
         if fittingGaps.nonEmpty then
           val earliestFittingGap = fittingGaps.minBy( f => f.startPos )
           val newFile = File(currentFile.fileNr, earliestFittingGap.startPos, currentFile.length)
-          val newGap = File(-1, earliestFittingGap.startPos + currentFile.length, earliestFittingGap.length - currentFile.length)
+          val newGap = File(None, earliestFittingGap.startPos + currentFile.length, earliestFittingGap.length - currentFile.length)
           if (earliestFittingGap.startPos < currentFile.startPos)
             //if movedFileIDs.contains(currentFile.fileNr) then
             //  println("WARNING! Moving already moved file!!")
             //else
             //  print(s"${currentFile.fileNr} ")
-            val gapLeftByMovedFile = File(-1, currentFile.startPos, currentFile.length)
+            val gapLeftByMovedFile = File(None, currentFile.startPos, currentFile.length)
             set.remove(earliestFittingGap)
             set.remove(currentFile)
             set.add(newFile)
             set.add(newGap)
             if gapLeftByMovedFile.length > 0 then
               set.add(gapLeftByMovedFile)
-            movedFileIDs.add(currentFile.fileNr)
+            movedFileIDs.add(currentFile.fileNr.head)
           //val intermediateMap = fileSetToMap(set)
           //print(s"${calcChecksum(intermediateMap)} ")
           //printMapAsString(intermediateMap)
-          printFileList2(set.toSet)
+          //printFileList2(set.toSet)
           //print(s"${calcChecksum2(set.toSet)} ")
-        usedFileIDs.add(currentFile.fileNr)
+        usedFileIDs.add(currentFile.fileNr.head)
 
         if !allBlocksAccountedFor(set.toSet) then
           println("NOT ALL BLOCKS ACCOUNTED FOR!")
 
-    //val newMap = fileSetToMap(set)
+    val newMap = fileSetToMap(set)
     //printMapAsString(newMap)
-    //calcChecksum(newMap)
-    calcChecksum2(set.toSet)
+    //val checksum1 = calcChecksum(newMap)
+    //println(s"Checksum #1: $checksum1.")
+    val checksum2 = calcChecksum2(set.toSet)
+    println(s"Checksum #2: $checksum2.")
+    val checksum3 = calcChecksum3(newMap.toMap) //TODO!~ Yields the wrong result even on the sample input! 2868 iso 2858 ...
+    println(s"Checksum #3: $checksum3.")
+
+    checksum2
+    //TODO!~ Look at those checksum calculators.
+    // Three different checksum calculators provide the same value for the sample input...
+    // But they provide thee DIFFERENT answers for the actual output!
+
 
   private def calcChecksum2(set: Set[File]): Long =
     var sum: Long = 0
-    for file <- set if file.fileNr != -1 do
+    for file <- set if file.fileNr.isDefined do
       val len = file.fileNr
       for i <- 0 until file.length do
-        sum = sum + (file.startPos + i) * file.fileNr
+        sum = sum + (file.startPos + i) * file.fileNr.head
+    sum
+
+  private def calcChecksum3(map: Map[Int, Option[Int]]): Long =
+    var sum: Long = 0
+    var pos = 0
+    for key <- map.keys do
+      val value = map.get(key)
+      value match
+        case None => println("Oops! For key $key, pos $pos, sum $sum")
+        case Some(fileNr) =>
+          if fileNr.isDefined then
+            sum = sum + pos.toLong * fileNr.head.toLong
+      pos = pos + 1
     sum
 
   /**
@@ -112,9 +135,9 @@ class SolverDay09 {
     true
 
 
-  private def fileSetToMap(set: scala.collection.mutable.Set[File]): scala.collection.mutable.Map[Int, Int] =
+  private def fileSetToMap(set: scala.collection.mutable.Set[File]): scala.collection.mutable.Map[Int, Option[Int]] =
     val list = set.toList.sortWith(_.startPos < _.startPos)
-    val result = scala.collection.mutable.Map[Int, Int]()
+    val result = scala.collection.mutable.Map[Int, Option[Int]]()
     for file <- list do
       // Note that a file could also be a gap here!
       for i <- 0 until file.length do
@@ -126,7 +149,7 @@ class SolverDay09 {
     println
     for file <- files do
       for block <- 0 until file.length do
-        if file.fileNr == -1 then
+        if file.fileNr.isEmpty then
           print(".")
         else
           print(file.fileNr)
@@ -148,13 +171,12 @@ class SolverDay09 {
         println(s"ERROR!! Block $i contains multiple files/gaps: ${foundFiles.mkString(",")}")
       else if foundFiles.size == 1 then // Note that we ignore the case that foundFiles.size == 0 ....
         val foundFile = foundFiles.head
-        if foundFile.fileNr == -1 then
-          print(".")
-        else
-          print(foundFile.fileNr)
+        foundFile.fileNr match
+          case None => print(".")
+          case Some(fileNr) => print(fileNr)
 
 
-  private case class File(fileNr: Int, startPos: Int, length: Int)
+  private case class File(fileNr: Option[Int], startPos: Int, length: Int)
 
   private def determineFiles(map: scala.collection.mutable.Map[Int, Int]): List[File] =
     var files = List[File]()
@@ -166,13 +188,15 @@ class SolverDay09 {
       if foundFileNr == currentFileNr then
         length = length + 1
       else
-        val file = File(currentFileNr, startPos, length)
+        val n: Option[Int] = if currentFileNr == -1 then None else Some(currentFileNr)
+        val file = File(n, startPos, length)
         files = file :: files
         currentFileNr = foundFileNr
         startPos = i
         length = 1 // You've already found the first element, so the length is 1.
     // Add the last one...
-    val lastFile = File(currentFileNr, startPos, length)
+    val n: Option[Int] = if currentFileNr == -1 then None else Some(currentFileNr)
+    val lastFile = File(n, startPos, length)
     files = lastFile :: files
     files
 
