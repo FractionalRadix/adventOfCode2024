@@ -17,14 +17,23 @@ def main(): Unit =
   //solveDay09() //TODO!+ Part 2 is still wrong...
   //solveDay10()
   solveDay11()
+  //solveDay12()
+
+def solveDay12(): Unit =
+  val solver = SolverDay12()
+  val input = solver.parseDay12Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay12_sample.txt")
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The solution to part 1 is $solutionPart1.") // 198075
+  val solutionPart2 = solver.solvePart2(input)
+  println(s"The solution to part 2 is $solutionPart2.") // 235571309320764
 
 def solveDay11(): Unit =
   val solver = SolverDay11()
   val input = solver.parseDay11Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay11.txt")
   val solutionPart1 = solver.solvePart1(input)
-  println(s"The solution to part 1 is $solutionPart1.") // 198075
+  println(s"The number of stones after blinking 25 times is $solutionPart1.") // 198075
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution to part 2 is $solutionPart2.")
+  println(s"The number of stones after blinking 75 times is $solutionPart2.") // 235571309320764
 
 def solveDay10(): Unit =
   val solver = SolverDay10()
