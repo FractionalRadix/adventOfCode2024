@@ -16,6 +16,12 @@ class Grid[T: ClassTag] {
   private var _nrOfCols = 0
   def nrOfCols: Int = _nrOfCols
 
+  def this(nrOfRows: Int, nrOfCols: Int) =
+    this()
+    this._nrOfRows = nrOfRows
+    this._nrOfCols = nrOfCols
+    arr = Array.ofDim[T](_nrOfRows, _nrOfCols)
+
   def this(lines: List[String], transform: Char => T) =
     // PRE: at least one line
     // PRE: all lines equally long
