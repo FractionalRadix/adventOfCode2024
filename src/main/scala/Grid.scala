@@ -52,13 +52,8 @@ class Grid[T: ClassTag] {
         Predef.print(ch)
       println
 
-  @Deprecated("Use findCoordinatesOf2(elt: T) instead, which returns a Seq[Coor].")
-  def findCoordinatesOf(elt: T): Seq[(Int, Int)] =
+  def findCoordinatesOf(elt: T): Seq[Coor] =
     for rowIdx <- 0 until _nrOfRows; colIdx <- 0 until _nrOfCols if arr(rowIdx)(colIdx) == elt
-      yield (rowIdx, colIdx)
-
-  def findCoordinatesOf2(ch: Char): Seq[Coor] =
-    for rowIdx <- 0 until _nrOfRows; colIdx <- 0 until _nrOfCols if arr(rowIdx)(colIdx) == ch
       yield Coor(rowIdx, colIdx)
 
   def withinBounds(row: Int, col: Int): Boolean =
@@ -102,13 +97,13 @@ class Grid[T: ClassTag] {
    */
   def get(rowIdx: Int, colIdx: Int): T = arr(rowIdx)(colIdx)
 
-/**
- * Get the element at the position (rowIdx, colIdx).
- * This is the fastest method because it does not check the bounds.
- * It is the caller's responsibility to make sure that the position exists on this block!
- * @param coor The (row, column) pair that locates the value. Note that row- and column-numbers are 0-based.
- * @return The element at column "colIdx" of row "rowIdx".
- */         
+  /**
+   * Get the element at the position (rowIdx, colIdx).
+   * This is the fastest method because it does not check the bounds.
+   * It is the caller's responsibility to make sure that the position exists on this block!
+   * @param coor The (row, column) pair that locates the value. Note that row- and column-numbers are 0-based.
+   * @return The element at column "colIdx" of row "rowIdx".
+   */
   def get(coor: Coor): T = arr(coor.row)(coor.col)
 
   def set(rowIdx: Int, colIdx: Int, elt: T): Unit =
@@ -127,4 +122,18 @@ class Grid[T: ClassTag] {
         val elt = arr(rowIdx)(colIdx)
         mutableSet += elt
     mutableSet.toSet
+
+  /**
+   * Find all coordinates in the grid that satisfy a user-supplied predicate.
+   * @param predicate The function that determines if a specific coordinate belongs to the result.
+   * @return The list of all coordinates c for which `predicate(c)` returns `true`.
+   */
+  def findAll(predicate: Coor => Boolean): List[Coor] =
+    var result: List[Coor] = Nil
+    for (rowIdx <- 0 until _nrOfRows) do
+      for (colIdx <- 0 until _nrOfCols) do
+        val coor = Coor(rowIdx, colIdx)
+        if predicate(coor) then
+          result = coor :: result
+    result
 }
