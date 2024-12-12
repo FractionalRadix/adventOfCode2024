@@ -22,14 +22,10 @@ class SolverDay12 {
       for colIdx <- 0 until grid.nrOfCols do
         if newGrid.get(rowIdx, colIdx).isEmpty then
           val region = identifyRegion(grid, Coor(rowIdx, colIdx))
-          // NOTE that the size of "region" is the area.
-          // We could even determine the perimeter!
           val area = region.size
           val xPerimeter = perimeter(region)
           println(s"Area: $area Perimeter: $xPerimeter")
           price = price + area * xPerimeter
-          //printRegion(grid, region)
-          //scala.io.StdIn.readLine() // <-- wait for user to accept.
           for coor <- region do
             newGrid.set(coor.row, coor.col, Some(regionId))
           regionId = regionId + 1
@@ -51,7 +47,7 @@ class SolverDay12 {
       for plot <- List(above, below, left, right) do
       if (!region.contains(plot))
         perimeter = perimeter + 1
-    perimeter //TODO!~
+    perimeter
 
   private def printRegion(grid: Grid[Char], plots: Set[Coor]): Unit =
     println
