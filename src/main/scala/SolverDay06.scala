@@ -4,9 +4,6 @@ import scala.io.Source
 
 class SolverDay06 {
 
-  private enum Direction:
-    case Up, Right, Down, Left
-
   def parseDay06Input(filename: String): List[String] = {
     val source = Source.fromFile(filename)
     val lines = source.getLines.toList

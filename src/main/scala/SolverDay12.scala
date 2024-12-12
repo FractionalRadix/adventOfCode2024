@@ -86,29 +86,121 @@ class SolverDay12 {
     println(s"Region IDs: ${regionIDs.mkString(",")}")
     for regionID <- regionIDs do
       val plots = newGrid.findCoordinatesOf(regionID).toList
-      println(s"Area: ${plots.size}")
+      println(s"Region $regionID (plant type ${grid.get(plots.head)}): ")
+      println(s"  Area: ${plots.size}")
+      val topRow = plots.minBy( coor => coor.row ).row
+      val topLeftPlot = plots.filter( coor => coor.row == topRow ).minBy( coor => coor.col )
+      var cur = topLeftPlot
+      print(s"  Starting plot: $cur")
+      // How about grouping all elements that have "sameSide[Above|Below|Left|Right]GoingInDirection[Left|Right|Left|Right|Above|Below|Above|Below]" ?
+      // Note that there are 8 variants (Above-Leftward, Above-Rightward, Below-Leftward, Below-Rightward, Left-Upward, Left-Downward, Right-Upward, Right-Downward).
+      // So we'd get 8 groups of groups.... The sum of these should be the answer.
+      while sameSideAboveGoingInDirection(newGrid, cur, regionID.head, rightward) do
+        cur = Coor(cur.row, cur.col + 1)
+        print(s" $cur")
+      println
 
-    // Approach:
-    // First, find all contiguous lines on each row and column.
-    // AFTER that we include gaps for "diagonal crossings".
-    // And MAYBE this is a case for an "inside/outside" algorithm used in computer graphics.
-    val regionID = regionIDs.head //TODO!~ Make that a loop over regionIDs later.
-    /*
-    val bordersAbove = bordersAtDirection(newGrid, regionID.head, c => Coor(c.row - 1, c.col))
-    println(s"ABOVE: [${bordersAbove.mkString(",")}]")
-
-    val bordersBelow = bordersAtDirection(newGrid, regionID.head, c => Coor(c.row + 1, c.col))
-    println(s"BELOW: [${bordersBelow.mkString(",")}]")
-
-    val bordersLeft  = bordersAtDirection(newGrid, regionID.head, c => Coor(c.row, c.col - 1))
-    println(s"LEFT : [${bordersLeft.mkString(",")}]")
-
-    val bordersRight = bordersAtDirection(newGrid, regionID.head, c => Coor(c.row, c.col + 1))
-    println(s"RIGHT : [${bordersRight.mkString(",")}]")
-     */
-      ;
     0 //TODO!~
 
+  private def rightward: Coor => Coor =
+    c => Coor(c.row, c.col + 1)
+  private def leftward: Coor => Coor =
+    c => Coor(c.row, c.col - 1)
+  private def upward: Coor => Coor =
+    c => Coor(c.row - 1, c.col)
+  private def downward: Coor => Coor =
+    c => Coor(c.row + 1, c.col)
+
+  private def hasSideAbove(grid: Grid[Option[Int]], pos: Coor) =
+    grid.safeGet(pos.row, pos.col) != grid.safeGet(pos.row - 1, pos.col)
+
+  private def hasSideBelow(grid: Grid[Option[Int]], pos: Coor) =
+    grid.safeGet(pos.row, pos.col) != grid.safeGet(pos.row + 1, pos.col)
+
+  private def hasSideRight(grid: Grid[Option[Int]], pos: Coor) =
+    grid.safeGet(pos.row, pos.col) != grid.safeGet(pos.row, pos.col + 1)
+
+  private def hasSideLeft(grid: Grid[Option[Int]], pos: Coor) =
+    grid.safeGet(pos.row, pos.col) != grid.safeGet(pos.row, pos.col - 1)
+
+  /**
+   * Determine if the current position `pos` and its successor are part of the same horizontal top side of region `regionID`
+   * This is the case if two conditions hold:
+   *  - These two plots both belong to the given region
+   *  - The two plots above neither belong to the given region
+   *
+   * @param grid The grid in which the regions are defined.
+   * @param pos The plot whose upper border might be a horizontal side.
+   * @param direction The function that gives the coordinates of the neighbour we're interested in (rightward or leftward).
+   * @return `true` if and only if the given position and its successor share a side above them.
+   */
+  private def sameSideAboveGoingInDirection(grid: Grid[Option[Int]], pos: Coor, regionID: Int, direction: Coor => Coor): Boolean =
+    val abovePos = Coor(pos.row - 1, pos.col)
+    val next = direction(pos)
+    val aboveNext = Coor(next.row - 1, next.col)
+    val condition1 = grid.safeGet(pos).contains(Some(regionID)) && grid.safeGet(next).contains(Some(regionID))
+    val condition2 = !grid.safeGet(abovePos).contains(Some(regionID)) && !grid.safeGet(aboveNext).contains(Some(regionID))
+    condition1 && condition2
+
+  /**
+   * Determine if the current position `pos` and its successor are part of the same horizontal lower side of region `regionID`
+   * This is the case if two conditions hold:
+   *  - These two plots both belong to the given region
+   *  - The two plots below neither belong to the given region
+   *
+   * @param grid      The grid in which the regions are defined.
+   * @param pos       The plot whose lower border might be a horizontal side.
+   * @param direction The function that gives the coordinates of the neighbour we're interested in (rightward or leftward).
+   * @return `true` if and only if the given position and its successor share a side below them.
+   */
+  private def sameSideBelowGoingInDirection(grid: Grid[Option[Int]], pos: Coor, regionID: Int, direction: Coor => Coor): Boolean =
+    val belowPos = Coor(pos.row + 1, pos.col)
+    val next = direction(pos)
+    val aboveNext = Coor(next.row + 1, next.col)
+    val condition1 = grid.safeGet(pos).contains(Some(regionID)) && grid.safeGet(next).contains(Some(regionID))
+    val condition2 = !grid.safeGet(belowPos).contains(Some(regionID)) && !grid.safeGet(aboveNext).contains(Some(regionID))
+    condition1 && condition2
+
+  /**
+   * Determine if the current position `pos` and its successor are part of the same vertical left side of region `regionID`
+   * This is the case if two conditions hold:
+   *  - These two plots both belong to the given region
+   *  - The two plots to their left neither belong to the given region
+   *
+   * @param grid      The grid in which the regions are defined.
+   * @param pos       The plot whose left border might be a vertical side.
+   * @param direction The function that gives the coordinates of the neighbour we're interested in (upward or downward).
+   * @return `true` if and only if the given position and its successor share a side below them.
+   */
+  private def sameSideLeftGoingInDirection(grid: Grid[Option[Int]], pos: Coor, regionID: Int, direction: Coor => Coor): Boolean =
+    val leftOfPos = Coor(pos.row, pos.col - 1)
+    val next = direction(pos)
+    val leftOfNext = Coor(next.row, next.col - 1)
+    val condition1 = grid.safeGet(pos).contains(Some(regionID)) && grid.safeGet(next).contains(Some(regionID))
+    val condition2 = !grid.safeGet(leftOfPos).contains(Some(regionID)) && !grid.safeGet(leftOfNext).contains(Some(regionID))
+    condition1 && condition2
+
+  /**
+   * Determine if the current position `pos` and its successor are part of the same vertical right side of region `regionID`
+   * This is the case if two conditions hold:
+   *  - These two plots both belong to the given region
+   *  - The two plots to their right neither belong to the given region
+   *
+   * @param grid      The grid in which the regions are defined.
+   * @param pos       The plot whose right border might be a vertical side.
+   * @param direction The function that gives the coordinates of the neighbour we're interested in (upward or downward).
+   * @return `true` if and only if the given position and its successor share a side below them.
+   */
+  private def sameSideRightGoingInDirection(grid: Grid[Option[Int]], pos: Coor, regionID: Int, direction: Coor => Coor): Boolean =
+    val rightOfPos = Coor(pos.row, pos.col + 1)
+    val next = direction(pos)
+    val rightOfNext = Coor(next.row, next.col + 1)
+    val condition1 = grid.safeGet(pos).contains(Some(regionID)) && grid.safeGet(next).contains(Some(regionID))
+    val condition2 = !grid.safeGet(rightOfPos).contains(Some(regionID)) && !grid.safeGet(rightOfNext).contains(Some(regionID))
+    condition1 && condition2
+
+
+  //TODO?-
   private def followSideAbove(grid: Grid[Option[Int]], startPos: Coor): Coor =
     println
     var coor = startPos
@@ -123,16 +215,28 @@ class SolverDay12 {
     val minRow = list.minBy( coor => coor.row ).row
     val maxRow = list.maxBy( coor => coor.row ).row
     for row <- minRow to maxRow do
-      // Determine all the column ID's present in this row.
+      // Determine all the column IDs present in this row.
       val columnIDs = list.filter( coor => coor.row == row ).map( coor => coor.col )
+      println(s"   column ID's for row $row: [${columnIDs.mkString(",")}]")
       sum = sum + countContiguousChunks( columnIDs )
+    sum
+
+  private def countContiguousVerticalChunks(list: List[Coor]): Int =
+    var sum = 0
+    val minCol = list.minBy( coor => coor.col ).col
+    val maxCol = list.maxBy( coor => coor.col ).col
+    for col <- minCol to maxCol do
+      // Determine all the row IDs present in this column.
+      val rowIDs = list.filter( coor => coor.col == col ).map( coor => coor.row )
+      println(s"   row ID's for column $col: [${rowIDs.mkString(",")}]")
+      sum = sum + countContiguousChunks( rowIDs )
     sum
 
   /**
    * Given a list of integers, determine how many contiguous chunks there are in it.
    * For example, [2,3,5,6,7] has two chunks: [2,3] and [5,6,7].
    * As another example, [1,4,5,7,9] has 4 chunks: [1], [4,5], [7], and [9].
-   * As an example of an edge case, [8] has 1 chunck: [8]
+   * As an example of an edge case, [8] has 1 chunk: [8]
    * @param list A list of integers.
    * @return The number of contiguous chunks in the list.
    */
