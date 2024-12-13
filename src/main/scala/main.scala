@@ -2,6 +2,7 @@ package com.cormontia.adventOfCode2024
 
 import java.time.{Duration, LocalDateTime}
 import scala.collection.mutable.ArrayBuffer
+import scala.util.{Failure, Success}
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 @main
@@ -17,16 +18,30 @@ def main(): Unit =
   //solveDay09()
   //solveDay10()
   //solveDay11()
-  solveDay12() //TODO!+ Solve part 2
-  //solveDay13()
+  solveDay12()
+  solveDay13()
+
+def solveDay14(): Unit =
+  val solver = SolverDay14()
+  val input = solver.parseDay14Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay14.txt")
+  input match
+    case Success(lines) =>
+      val solutionPart1 = solver.solvePart1(lines)
+      println(s"The solution to Part 1 is $solutionPart1.")
+      val solutionPart2 = solver.solvePart2(lines)
+      println(s"The solution to Part 2 is is $solutionPart2.")
+    case Failure(_) => println("Failed to read input file!")
 
 def solveDay13(): Unit =
   val solver = SolverDay13()
   val input = solver.parseDay13Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The fewest amount of tokens needed to win all available prizes is $solutionPart1.") // 38839
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The fewest amount of tokens needed to winn all available prizes (at the new positions) is $solutionPart2.") // 75200131617108
+  input match
+    case Success(lines) =>
+      val solutionPart1 = solver.solvePart1(lines)
+      println(s"The fewest amount of tokens needed to win all available prizes is $solutionPart1.") // 38839
+      val solutionPart2 = solver.solvePart2(lines)
+      println(s"The fewest amount of tokens needed to winn all available prizes (at the new positions) is $solutionPart2.") // 75200131617108
+    case Failure(_) => println("Failed to read input file!")
 
 def solveDay12(): Unit =
   val solver = SolverDay12()

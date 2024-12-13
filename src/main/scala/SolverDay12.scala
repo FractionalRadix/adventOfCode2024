@@ -90,52 +90,15 @@ class SolverDay12 {
     val newGrid = uniqueRegions(grid)
     val regionIDs = newGrid.findDistinct()
     var totalSum = 0
-    println(s"Region IDs: ${regionIDs.mkString(",")}")
     for regionID <- regionIDs do
       val plots = newGrid.findCoordinatesOf(regionID).toList
-      println(s"Region $regionID (plant type ${grid.get(plots.head)}): ")
-      println(s"  Area: ${plots.size}")
       val sidesAbove = plotsSharingSideAbove(newGrid, regionID.head)
-      println(s"  MAPPING:")
-      for side <- sidesAbove do
-        println(s"     ${side._1} -> { ${side._2.mkString(",")} }")
-      println(s"     Sides above: ${sidesAbove.keys.size}")
-
       val sidesBelow = plotsSharingSideBelow(newGrid, regionID.head)
-      println(s"     Sides below: ${sidesBelow.keys.size}")
-
       val sidesLeft = plotsSharingLeftSide(newGrid, regionID.head)
-      println(s"     Sides left: ${sidesLeft.keys.size}")
-
       val sidesRight = plotsSharingRightSide(newGrid, regionID.head)
-      println(s"     Sides right: ${sidesRight.keys.size}")
-
       val sidesForRegion = sidesAbove.keys.size + sidesBelow.keys.size + sidesLeft.keys.size + sidesRight.keys.size
-      println(s"    Total nr of sides: $sidesForRegion")
       val costForRegion = plots.size * sidesForRegion
-      println(s"    Cost for region: $costForRegion")
-
       totalSum = totalSum + costForRegion
-      // How about grouping all elements that have "sameSide[Above|Below|Left|Right]GoingInDirection[Left|Right|Left|Right|Above|Below|Above|Below]" ?
-      // Note that there are 8 variants (Above-Leftward, Above-Rightward, Below-Leftward, Below-Rightward, Left-Upward, Left-Downward, Right-Upward, Right-Downward).
-      // So we'd get 8 groups of groups.... The sum of these should be the total number of sides.
-
-      // Or maybe:
-      // * Give every side an ID. Plots that belong to the same side get grouped in the set for that ID.
-      //   (Keep in mind that a plot may participate in multiple sides, so the same plot may appear in multiple of these lists).
-      // * After finding all sides, it's a matter of counting...
-
-      /*
-      val topRow = plots.minBy( coor => coor.row ).row
-      val topLeftPlot = plots.filter( coor => coor.row == topRow ).minBy( coor => coor.col )
-      var cur = topLeftPlot
-      print(s"  Starting plot: $cur")
-
-      while sameSideAboveGoingInDirection(newGrid, cur, regionID.head, rightward) do
-        cur = Coor(cur.row, cur.col + 1)
-        print(s" $cur")
-      println
-       */
 
     totalSum
 

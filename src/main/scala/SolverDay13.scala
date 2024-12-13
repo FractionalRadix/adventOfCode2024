@@ -1,11 +1,16 @@
 package com.cormontia.adventOfCode2024
 
 import scala.io.Source
+import scala.util.{Try, Using}
 
 class SolverDay13 {
-  def parseDay13Input(filename: String): List[String] =
-    val source = Source.fromFile(filename)
-    source.getLines.toList
+  //def parseDay13Input(filename: String): List[String] =
+  //  val source = Source.fromFile(filename)
+  //  source.getLines.toList
+  def parseDay13Input(filename: String): Try[List[String]] =
+    Using(Source.fromFile(filename)) { source =>
+      source.getLines.toList
+    }
 
   def solvePart1(lines: List[String]): Long =
     val machines = parseInput(lines)
@@ -60,17 +65,13 @@ class SolverDay13 {
 // m = (ax * y - ay * x) / (ax * by - ay * bx)
 // (And presumably, by analogy, m = (bx * y - by * x) / (bx * ay - by * ax) ....)
 
-
   def solvePart2(lines: List[String]): Long =
-    println("Starting part 2.")
     val originalMachines = parseInput(lines)
     val machines = for machine <- originalMachines yield
       ClawMachine(machine.ax, machine.ay, machine.bx, machine.by, machine.x + 10000000000000L , machine.y + 10000000000000L)
-      //  10000000000000
 
     var tokens: Long = 0
     for machine <- machines do
-      //machine.print()
       val nominator = machine.ax * machine.y - machine.ay * machine.x
       val denominator = machine.ax * machine.by - machine.ay * machine.bx
       if denominator == 0 then
@@ -91,7 +92,7 @@ class SolverDay13 {
 
     tokens
 
-  case class ClawMachine(ax: Long, ay: Long, bx: Long, by: Long, x: Long, y: Long) {
+  private case class ClawMachine(ax: Long, ay: Long, bx: Long, by: Long, x: Long, y: Long) {
     def print(): Unit =
       println()
       println("Claw Machine:")
