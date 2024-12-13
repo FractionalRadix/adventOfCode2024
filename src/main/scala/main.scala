@@ -22,11 +22,11 @@ def main(): Unit =
 
 def solveDay13(): Unit =
   val solver = SolverDay13()
-  val input = solver.parseDay13Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13_sample.txt")
+  val input = solver.parseDay13Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13.txt")
   val solutionPart1 = solver.solvePart1(input)
-  println(s"The fewest amount of tokens needed to win all available prizes is $solutionPart1.")
-  //val solutionPart2 = solver.solvePart2(input)
-  //println(s"The answer to part 2 is $solutionPart2.")
+  println(s"The fewest amount of tokens needed to win all available prizes is $solutionPart1.") // 38839
+  val solutionPart2 = solver.solvePart2(input)
+  println(s"The fewest amount of tokens needed to winn all available prizes (at the new positions) is $solutionPart2.")
 
 def solveDay12(): Unit =
   val solver = SolverDay12()

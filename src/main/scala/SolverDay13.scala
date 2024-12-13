@@ -9,6 +9,7 @@ class SolverDay13 {
 
   def solvePart1(lines: List[String]): Long =
     val machines = parseInput(lines)
+    var tokens: Long = 0
     for machine <- machines do
       machine.print()
       //val r = // m = (ax * y - ay * x) / (ax * by - ay * bx)
@@ -25,10 +26,11 @@ class SolverDay13 {
         val reachedY = n * machine.ay + m * machine.by
         if reachedX == machine.x && reachedY == machine.y then
           println(s"$n times move A, $m times move B.")
+          tokens = tokens + 3 * n + m
         else
           println("Goal cannot be reached on this machine.")
 
-    0 //TODO!~
+    tokens
 
 // The problem to solve is a set of equations:
 //   n*ax + m*bx = x
@@ -59,7 +61,34 @@ class SolverDay13 {
 
 
   def solvePart2(lines: List[String]): Long =
-    ???
+    println("Starting part 2.")
+    val originalMachines = parseInput(lines)
+    val machines = for machine <- originalMachines yield
+      ClawMachine(machine.ax, machine.ay, machine.bx, machine.by, machine.x + 10000000000000L , machine.y + 10000000000000L)
+      //  10000000000000
+
+    var tokens: Long = 0
+    for machine <- machines do
+      machine.print()
+      //val r = // m = (ax * y - ay * x) / (ax * by - ay * bx)
+      val nominator = machine.ax * machine.y - machine.ay * machine.x
+      val denominator = machine.ax * machine.by - machine.ay * machine.bx
+      if denominator == 0 then
+        println("Goal cannot be reached on this machine.")
+      else
+        val m = nominator / denominator
+        val n = (machine.x - m* machine.bx) / machine.ax
+        // 'n' and 'm' are Long, not Double or Float. They've been rounded off.
+        // Now let's see if there's roundoff error:
+        val reachedX = n * machine.ax + m * machine.bx
+        val reachedY = n * machine.ay + m * machine.by
+        if reachedX == machine.x && reachedY == machine.y then
+          println(s"$n times move A, $m times move B.")
+          tokens = tokens + 3 * n + m
+        else
+          println("Goal cannot be reached on this machine.")
+
+    tokens
 
   case class ClawMachine(ax: Long, ay: Long, bx: Long, by: Long, x: Long, y: Long) {
     def print(): Unit =
