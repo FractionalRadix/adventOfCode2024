@@ -5,6 +5,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Success}
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
+//TODO!~ Put ALL the input functions in a "Using" block.
+
 @main
 def main(): Unit =
   //solveDay01()
@@ -18,8 +21,9 @@ def main(): Unit =
   //solveDay09()
   //solveDay10()
   //solveDay11()
-  solveDay12()
-  solveDay13()
+  //solveDay12()
+  //solveDay13()
+  solveDay14()
 
 def solveDay14(): Unit =
   val solver = SolverDay14()
