@@ -17,8 +17,8 @@ def main(): Unit =
   //solveDay09()
   //solveDay10()
   //solveDay11()
-  //solveDay12() //TODO!+ Solve part 2
-  solveDay13()
+  solveDay12() //TODO!+ Solve part 2
+  //solveDay13()
 
 def solveDay13(): Unit =
   val solver = SolverDay13()
@@ -30,11 +30,11 @@ def solveDay13(): Unit =
 
 def solveDay12(): Unit =
   val solver = SolverDay12()
-  val input = solver.parseDay12Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay12_sample1.txt")
+  val input = solver.parseDay12Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay12.txt")
   val solutionPart1 = solver.solvePart1(input)
   println(s"The total price is $solutionPart1.") // 1304764
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution to part 2 is $solutionPart2.")
+  println(s"The solution to part 2 is $solutionPart2.") // 811148
 
 def solveDay11(): Unit =
   val solver = SolverDay11()

@@ -89,6 +89,7 @@ class SolverDay12 {
   def solvePart2(grid: Grid[Char]): Long =
     val newGrid = uniqueRegions(grid)
     val regionIDs = newGrid.findDistinct()
+    var totalSum = 0
     println(s"Region IDs: ${regionIDs.mkString(",")}")
     for regionID <- regionIDs do
       val plots = newGrid.findCoordinatesOf(regionID).toList
@@ -97,11 +98,24 @@ class SolverDay12 {
       val sidesAbove = plotsSharingSideAbove(newGrid, regionID.head)
       println(s"  MAPPING:")
       for side <- sidesAbove do
-        println(s"${side._1} -> { ${side._2.mkString(",")} }")
+        println(s"     ${side._1} -> { ${side._2.mkString(",")} }")
+      println(s"     Sides above: ${sidesAbove.keys.size}")
 
+      val sidesBelow = plotsSharingSideBelow(newGrid, regionID.head)
+      println(s"     Sides below: ${sidesBelow.keys.size}")
 
+      val sidesLeft = plotsSharingLeftSide(newGrid, regionID.head)
+      println(s"     Sides left: ${sidesLeft.keys.size}")
 
+      val sidesRight = plotsSharingRightSide(newGrid, regionID.head)
+      println(s"     Sides right: ${sidesRight.keys.size}")
 
+      val sidesForRegion = sidesAbove.keys.size + sidesBelow.keys.size + sidesLeft.keys.size + sidesRight.keys.size
+      println(s"    Total nr of sides: $sidesForRegion")
+      val costForRegion = plots.size * sidesForRegion
+      println(s"    Cost for region: $costForRegion")
+
+      totalSum = totalSum + costForRegion
       // How about grouping all elements that have "sameSide[Above|Below|Left|Right]GoingInDirection[Left|Right|Left|Right|Above|Below|Above|Below]" ?
       // Note that there are 8 variants (Above-Leftward, Above-Rightward, Below-Leftward, Below-Rightward, Left-Upward, Left-Downward, Right-Upward, Right-Downward).
       // So we'd get 8 groups of groups.... The sum of these should be the total number of sides.
@@ -123,29 +137,24 @@ class SolverDay12 {
       println
        */
 
-
-    0 //TODO!~
+    totalSum
 
   /**
-   *
-   * @param newGrid
-   * @param regionID
+   * Identify the sides of a given region on the map.
+   * @param newGrid The map of plots, where each region has a unique ID instead of a letter.
+   * @param regionID The region ID whose sides we want to identify.
    * @return A mapping of all "above" sides for the given region. It maps side ID's to the plots that participate in
    *         each side.
    */
-  def plotsSharingSideAbove(newGrid: Grid[Option[Int]], regionID: Int): Map[Int, Set[Coor]] =
-    println("Plots sharing side above:")
+  private def plotsSharingSideAbove(newGrid: Grid[Option[Int]], regionID: Int): Map[Int, Set[Coor]] =
     val map = scala.collection.mutable.Map[Int, Set[Coor]]() // Map from Side ID's to the elements in them.
     val plots = newGrid
       .findCoordinatesOf(Some(regionID))
       .filter( elt => hasSideAbove(newGrid, elt))
-    println(s"...plots for regionID $regionID: ${plots.mkString(",")}")
     val plotsByRow = plots.groupBy(_.row)
+    var sideNr = 1
     for row <- plotsByRow.keys do
-      println(s"...row: $row")
       var orderedPlots = plotsByRow(row).sortBy(_.col)
-      println(s".......orderedPlots: ${orderedPlots.mkString(",")}")
-      var sideNr = 1
       while orderedPlots.nonEmpty do
         var cur = orderedPlots.head
         val set = scala.collection.mutable.Set[Coor]()
@@ -153,10 +162,8 @@ class SolverDay12 {
         // We might just use orderedPlots.drop(1) but this is more robust. Optimize later as necessary.
         set.add(cur)
         orderedPlots = orderedPlots.filter( elt => elt != cur )
-        //TODO?+ Singleton first plot is not added to map of sides?? (The "C" plant)
-        // OR is it OVERWRITTEN??
         while sameSideAboveGoingInDirection(newGrid, cur, regionID, rightward) do
-          val next = rightward(cur) //TODO?- Verify that "next" is in "orderedPlots" ?
+          val next = rightward(cur) //TODO?+ Verify that "next" is in "orderedPlots" ?
           // Add "next" to set, remove it from "orderedPlots".
           // Again we could use orderedPlots.drop(1) but choose, for now, to use a slower but more robust method.
           set.add(next)
@@ -165,6 +172,88 @@ class SolverDay12 {
         map(sideNr) = set.toSet
         sideNr = sideNr + 1
     map.toMap
+
+  private def plotsSharingSideBelow(newGrid: Grid[Option[Int]], regionID: Int): Map[Int, Set[Coor]] =
+    val map = scala.collection.mutable.Map[Int, Set[Coor]]()
+    val plots = newGrid
+      .findCoordinatesOf(Some(regionID))
+      .filter( elt => hasSideBelow(newGrid, elt) )
+    val plotsByRow = plots.groupBy(_.row) //TODO?- Do we even need this?
+    var sideNr = 1
+    for row <- plotsByRow.keys do
+      var orderedPlots = plotsByRow(row).sortBy(_.col)
+      while orderedPlots.nonEmpty do
+        var cur = orderedPlots.head
+        val set = scala.collection.mutable.Set[Coor]()
+        // Add "cur" to set, remove it from "orderedPlots".
+        // We might just use orderedPlots.drop(1) but this is more robust. Optimize later as necessary.
+        set.add(cur)
+        orderedPlots = orderedPlots.filter( elt => elt != cur )
+        while sameSideBelowGoingInDirection(newGrid, cur, regionID, rightward) do
+          val next = rightward(cur) //TODO?+ Verify that "next" is in "orderedPos" ?
+          // Add "next to set, remove it from "orderedPlots".
+          // Again we could use orderedPlots.drop(1) but choose, for now, to use a slower but more robust method.
+          set.add(next)
+          orderedPlots = orderedPlots.filter(elt => elt != next)
+          cur = next
+        map(sideNr) = set.toSet
+        sideNr = sideNr + 1
+    map.toMap
+
+  private def plotsSharingLeftSide(newGrid: Grid[Option[Int]], regionID: Int): Map[Int, Set[Coor]] =
+    val map = scala.collection.mutable.Map[Int, Set[Coor]]()
+    val plots = newGrid
+      .findCoordinatesOf(Some(regionID))
+      .filter( elt => hasSideLeft(newGrid, elt) )
+    val plotsByCol = plots.groupBy(_.col) //TODO?~ Do we need this?
+    var sideNr = 1
+    for col <- plotsByCol.keys do
+      var orderedPlots = plotsByCol(col).sortBy(_.row)
+      while orderedPlots.nonEmpty do
+        var cur = orderedPlots.head
+        val set = scala.collection.mutable.Set[Coor]()
+        // Add "cur" to set, remove it from "orderedPlots".
+        // We might just use orderedPlots.drop(1) but this is more robust. Optimize later as necessary.
+        set.add(cur)
+        orderedPlots = orderedPlots.filter(elt => elt != cur)
+        while sameSideLeftGoingInDirection(newGrid, cur, regionID, downward) do
+          val next = downward(cur)
+          // Add "next" to set, remove it from "orderedPlots".
+          // Again we could use orderedPlots.drop(1) but choose, for now, to use a slower but more robust method.
+          set.add(next)
+          orderedPlots = orderedPlots.filter(elt => elt != next)
+          cur = next
+        map(sideNr) = set.toSet
+        sideNr = sideNr + 1
+    map.toMap
+
+  private def plotsSharingRightSide(newGrid: Grid[Option[Int]], regionID: Int): Map[Int, Set[Coor]] =
+    val map = scala.collection.mutable.Map[Int, Set[Coor]]()
+    val plots = newGrid
+      .findCoordinatesOf(Some(regionID))
+      .filter( elt => hasSideRight(newGrid, elt) )
+    val plotsByCol = plots.groupBy(_.col) //TODO?~ Do we need this?
+    var sideNr = 1
+    for col <- plotsByCol.keys do
+      var orderedPlots = plotsByCol(col).sortBy(_.row)
+      while orderedPlots.nonEmpty do
+        var cur = orderedPlots.head
+        val set = scala.collection.mutable.Set[Coor]()
+        // Add "cur" to set, remove it from "orderedPlots".
+        // We might just use orderedPlots.drop(1) but this is more robust. Optimize later as necessary.
+        set.add(cur)
+        orderedPlots = orderedPlots.filter(elt => elt != cur)
+        while sameSideRightGoingInDirection(newGrid, cur, regionID, downward) do
+          val next = downward(cur)
+          // Add "next" to set, remove it from "orderedPlots".
+          // Again we could use orderedPlots.drop(1) but choose, for now, to use a slower but more robust method.
+          set.add(next)
+          orderedPlots = orderedPlots.filter(elt => elt != next)
+          cur = next
+        map(sideNr) = set.toSet
+        sideNr = sideNr + 1
+    map.toMap
+
 
   private def rightward: Coor => Coor =
     c => Coor(c.row, c.col + 1)
