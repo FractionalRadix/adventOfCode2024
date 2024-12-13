@@ -3,22 +3,24 @@ package com.cormontia.adventOfCode2024
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 import scala.math.abs
+import scala.util.{Try, Using}
 
 class SolverDay01 {
   
-  def parseDay01Input(filename: String): (ArrayBuffer[Int], ArrayBuffer[Int]) =
+  def parseDay01Input(filename: String): Try[(ArrayBuffer[Int], ArrayBuffer[Int])] =
     //TODO!~ See if we can use the "using" syntax which is more clean.
-    val source = Source.fromFile(filename)
-    val lines = source.getLines
-    val leftList: ArrayBuffer[Int] = ArrayBuffer()
-    val rightList: ArrayBuffer[Int] = ArrayBuffer()
-    lines.foreach(line => {
-      val parts = line.split("\\s+")
-      leftList += parts(0).toInt
-      rightList += parts(1).toInt
-    })
-    source.close()
-    (leftList, rightList)
+    Using (Source.fromFile(filename)) { source =>
+      val lines = source.getLines
+      val leftList: ArrayBuffer[Int] = ArrayBuffer()
+      val rightList: ArrayBuffer[Int] = ArrayBuffer()
+      lines.foreach(line => {
+        val parts = line.split("\\s+")
+        leftList += parts(0).toInt
+        rightList += parts(1).toInt
+      })
+      source.close()
+      (leftList, rightList)
+    }
 
   def day01Part1(leftList: ArrayBuffer[Int], rightList: ArrayBuffer[Int]): Int =
     val sortedLeftList = leftList.sorted

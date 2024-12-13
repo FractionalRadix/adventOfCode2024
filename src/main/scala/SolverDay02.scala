@@ -2,6 +2,7 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 import scala.annotation.tailrec
+import scala.util.{Try, Using}
 
 class SolverDay02 {
   def solveDay02Part2(reports: List[Array[Int]]): Int =
@@ -65,13 +66,15 @@ class SolverDay02 {
   def solveDay02Part1(reports: List[Array[Int]]): Int =
     reports.count(report => isSafe(report))
 
-  def parseDay02Input(filename: String): List[Array[Int]] =
-    val source = Source.fromFile(filename)
-    val lines = source.getLines
-    val reports = lines.map(line =>
-      line.split("\\s+").map(str => str.toInt)
-    ).toList
-    reports
+  def parseDay02Input(filename: String): Try[List[Array[Int]]] =
+    Using (Source.fromFile(filename)) { source =>
+      val source = Source.fromFile(filename)
+      val lines = source.getLines
+      val reports = lines.map(line =>
+        line.split("\\s+").map(str => str.toInt)
+      ).toList
+      reports
+    }
 
   private def isSafe(report: Array[Int]): Boolean =
     if isAscending(report) then

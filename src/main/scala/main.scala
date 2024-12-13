@@ -10,8 +10,8 @@ import scala.util.{Failure, Success}
 
 @main
 def main(): Unit =
-  //solveDay01()
-  //solveDay02()
+  solveDay01()
+  solveDay02()
   //solveDay03()
   //solveDay04()
   //solveDay05()
@@ -135,19 +135,23 @@ def solveDay03(): Unit =
 
 def solveDay02(): Unit =
   val solver = SolverDay02()
-  val reports = solver.parseDay02Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay02.txt")
-  val nrOfSafeReports = solver.solveDay02Part1(reports)
-  println(s"Number of safe reports: $nrOfSafeReports") // 639
-  val nrOfSafeReports2 = solver.solveDay02Part2(reports)
-  println(s"Nr of safe reports if a single level can be removed: $nrOfSafeReports2") // 674
+  val reportList = solver.parseDay02Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay02.txt")
+  reportList match
+    case Success(reports) =>
+      val nrOfSafeReports = solver.solveDay02Part1(reports)
+      println(s"Number of safe reports: $nrOfSafeReports") // 639
+      val nrOfSafeReports2 = solver.solveDay02Part2(reports)
+      println(s"Nr of safe reports if a single level can be removed: $nrOfSafeReports2") // 674
+    case Failure(_) => println("Failed to open the file.")
 
 def solveDay01(): Unit =
-  //TODO!~ Get it from the proper resources folder
-  //val bufferedSource = Source.fromResource("inputFiles\\AoCDay01_sample.txt")
-  //val firstPart = day01part1(bufferedSource)
   val solver01 = SolverDay01()
-  val (leftList, rightList) = solver01.parseDay01Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay01.txt")
-  val firstPart = solver01.day01Part1(leftList, rightList)
-  println(s"Solution to part 1: $firstPart") // 2031679
-  val secondPart = solver01.day01Part2(leftList, rightList)
-  println(s"Solution to part 2: $secondPart") // 19678534
+  //TODO!~ Get the input file from the proper resources folder
+  val tryLists = solver01.parseDay01Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay01.txt")
+  tryLists match
+    case Success(leftList, rightList) =>
+      val firstPart = solver01.day01Part1(leftList, rightList)
+      println(s"The total distance is: $firstPart") // 2031679
+      val secondPart = solver01.day01Part2(leftList, rightList)
+      println(s"The similarity score is: $secondPart") // 19678534
+    case Failure(_) => println("Failed to parse input file!")
