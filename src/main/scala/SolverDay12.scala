@@ -80,6 +80,12 @@ class SolverDay12 {
 
     knownCoordinates.toSet
 
+  // ALTERNATE IDEA:
+  // Create a new Grid, that also looks at the FENCES.
+  // It would be twice as wide and twice as high as the original Grid.
+  // Its contents would alternate between regionID's and booleans.
+  // A boolean `true` would indicate that that field was a fence, `false` would indicate that it was not.
+
   def solvePart2(grid: Grid[Char]): Long =
     val newGrid = uniqueRegions(grid)
     val regionIDs = newGrid.findDistinct()
@@ -88,19 +94,77 @@ class SolverDay12 {
       val plots = newGrid.findCoordinatesOf(regionID).toList
       println(s"Region $regionID (plant type ${grid.get(plots.head)}): ")
       println(s"  Area: ${plots.size}")
+      val sidesAbove = plotsSharingSideAbove(newGrid, regionID.head)
+      println(s"  MAPPING:")
+      for side <- sidesAbove do
+        println(s"${side._1} -> { ${side._2.mkString(",")} }")
+
+
+
+
+      // How about grouping all elements that have "sameSide[Above|Below|Left|Right]GoingInDirection[Left|Right|Left|Right|Above|Below|Above|Below]" ?
+      // Note that there are 8 variants (Above-Leftward, Above-Rightward, Below-Leftward, Below-Rightward, Left-Upward, Left-Downward, Right-Upward, Right-Downward).
+      // So we'd get 8 groups of groups.... The sum of these should be the total number of sides.
+
+      // Or maybe:
+      // * Give every side an ID. Plots that belong to the same side get grouped in the set for that ID.
+      //   (Keep in mind that a plot may participate in multiple sides, so the same plot may appear in multiple of these lists).
+      // * After finding all sides, it's a matter of counting...
+
+      /*
       val topRow = plots.minBy( coor => coor.row ).row
       val topLeftPlot = plots.filter( coor => coor.row == topRow ).minBy( coor => coor.col )
       var cur = topLeftPlot
       print(s"  Starting plot: $cur")
-      // How about grouping all elements that have "sameSide[Above|Below|Left|Right]GoingInDirection[Left|Right|Left|Right|Above|Below|Above|Below]" ?
-      // Note that there are 8 variants (Above-Leftward, Above-Rightward, Below-Leftward, Below-Rightward, Left-Upward, Left-Downward, Right-Upward, Right-Downward).
-      // So we'd get 8 groups of groups.... The sum of these should be the answer.
+
       while sameSideAboveGoingInDirection(newGrid, cur, regionID.head, rightward) do
         cur = Coor(cur.row, cur.col + 1)
         print(s" $cur")
       println
+       */
+
 
     0 //TODO!~
+
+  /**
+   *
+   * @param newGrid
+   * @param regionID
+   * @return A mapping of all "above" sides for the given region. It maps side ID's to the plots that participate in
+   *         each side.
+   */
+  def plotsSharingSideAbove(newGrid: Grid[Option[Int]], regionID: Int): Map[Int, Set[Coor]] =
+    println("Plots sharing side above:")
+    val map = scala.collection.mutable.Map[Int, Set[Coor]]() // Map from Side ID's to the elements in them.
+    val plots = newGrid
+      .findCoordinatesOf(Some(regionID))
+      .filter( elt => hasSideAbove(newGrid, elt))
+    println(s"...plots for regionID $regionID: ${plots.mkString(",")}")
+    val plotsByRow = plots.groupBy(_.row)
+    for row <- plotsByRow.keys do
+      println(s"...row: $row")
+      var orderedPlots = plotsByRow(row).sortBy(_.col)
+      println(s".......orderedPlots: ${orderedPlots.mkString(",")}")
+      var sideNr = 1
+      while orderedPlots.nonEmpty do
+        var cur = orderedPlots.head
+        val set = scala.collection.mutable.Set[Coor]()
+        // Add "cur" to set, remove it from "orderedPlots".
+        // We might just use orderedPlots.drop(1) but this is more robust. Optimize later as necessary.
+        set.add(cur)
+        orderedPlots = orderedPlots.filter( elt => elt != cur )
+        //TODO?+ Singleton first plot is not added to map of sides?? (The "C" plant)
+        // OR is it OVERWRITTEN??
+        while sameSideAboveGoingInDirection(newGrid, cur, regionID, rightward) do
+          val next = rightward(cur) //TODO?- Verify that "next" is in "orderedPlots" ?
+          // Add "next" to set, remove it from "orderedPlots".
+          // Again we could use orderedPlots.drop(1) but choose, for now, to use a slower but more robust method.
+          set.add(next)
+          orderedPlots = orderedPlots.filter( elt => elt != next )
+          cur = next
+        map(sideNr) = set.toSet
+        sideNr = sideNr + 1
+    map.toMap
 
   private def rightward: Coor => Coor =
     c => Coor(c.row, c.col + 1)

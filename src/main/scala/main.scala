@@ -17,7 +17,16 @@ def main(): Unit =
   //solveDay09()
   //solveDay10()
   //solveDay11()
-  solveDay12()
+  //solveDay12() //TODO!+ Solve part 2
+  solveDay13()
+
+def solveDay13(): Unit =
+  val solver = SolverDay13()
+  val input = solver.parseDay13Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13_sample.txt")
+  val solutionPart1 = solver.solvePart1(input)
+  println(s"The fewest amount of tokens needed to win all available prizes is $solutionPart1.")
+  //val solutionPart2 = solver.solvePart2(input)
+  //println(s"The answer to part 2 is $solutionPart2.")
 
 def solveDay12(): Unit =
   val solver = SolverDay12()
