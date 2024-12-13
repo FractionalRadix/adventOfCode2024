@@ -2,16 +2,17 @@ package com.cormontia.adventOfCode2024
 
 import java.time.{Duration, LocalDateTime}
 import scala.collection.mutable.ArrayBuffer
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 //TODO!~ Put ALL the input functions in a "Using" block.
+// --> This will be done automatically if we make every "SolverDayXX" a subclass of "Solver".
 
 @main
 def main(): Unit =
-  solveDay01()
-  solveDay02()
+  //solveDay01()
+  //solveDay02()
   //solveDay03()
   //solveDay04()
   //solveDay05()
@@ -21,31 +22,33 @@ def main(): Unit =
   //solveDay09()
   //solveDay10()
   //solveDay11()
-  //solveDay12()
-  //solveDay13()
+  solveDay12()
+  solveDay13()
   solveDay14()
 
+abstract class Solver {
+  def parseInput(filename: String): Try[List[String]]
+  def solvePart1(lines: List[String]): Long
+  def solvePart2(lines: List[String]): Long
+
+  def solve(filename: String): Unit =
+    val input = parseInput(filename)
+    input match
+      case Success(lines) =>
+        val solutionPart1 = solvePart1(lines)
+        println(s"The solution to Part 1 is $solutionPart1.")
+        val solutionPart2 = solvePart2(lines)
+        println(s"The solution to Part 2 is is $solutionPart2.")
+      case Failure(_)  => println("Failed to read input file!")
+}
+
 def solveDay14(): Unit =
-  val solver = SolverDay14()
-  val input = solver.parseDay14Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay14.txt")
-  input match
-    case Success(lines) =>
-      val solutionPart1 = solver.solvePart1(lines)
-      println(s"The solution to Part 1 is $solutionPart1.")
-      val solutionPart2 = solver.solvePart2(lines)
-      println(s"The solution to Part 2 is is $solutionPart2.")
-    case Failure(_) => println("Failed to read input file!")
+  SolverDay14().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay14.txt")
 
 def solveDay13(): Unit =
-  val solver = SolverDay13()
-  val input = solver.parseDay13Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13.txt")
-  input match
-    case Success(lines) =>
-      val solutionPart1 = solver.solvePart1(lines)
-      println(s"The fewest amount of tokens needed to win all available prizes is $solutionPart1.") // 38839
-      val solutionPart2 = solver.solvePart2(lines)
-      println(s"The fewest amount of tokens needed to winn all available prizes (at the new positions) is $solutionPart2.") // 75200131617108
-    case Failure(_) => println("Failed to read input file!")
+  // Part 1: 38839
+  // Part 2: 75200131617108
+  SolverDay13().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13.txt")
 
 def solveDay12(): Unit =
   val solver = SolverDay12()

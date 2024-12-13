@@ -3,16 +3,16 @@ package com.cormontia.adventOfCode2024
 import scala.io.Source
 import scala.util.{Try, Using}
 
-class SolverDay13 {
+class SolverDay13 extends Solver {
   //def parseDay13Input(filename: String): List[String] =
   //  val source = Source.fromFile(filename)
   //  source.getLines.toList
-  def parseDay13Input(filename: String): Try[List[String]] =
+  override def parseInput(filename: String): Try[List[String]] =
     Using(Source.fromFile(filename)) { source =>
       source.getLines.toList
     }
 
-  def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): Long =
     val machines = parseInput(lines)
     var tokens: Long = 0
     for machine <- machines do
@@ -65,7 +65,7 @@ class SolverDay13 {
 // m = (ax * y - ay * x) / (ax * by - ay * bx)
 // (And presumably, by analogy, m = (bx * y - by * x) / (bx * ay - by * ax) ....)
 
-  def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): Long =
     val originalMachines = parseInput(lines)
     val machines = for machine <- originalMachines yield
       ClawMachine(machine.ax, machine.ay, machine.bx, machine.by, machine.x + 10000000000000L , machine.y + 10000000000000L)
