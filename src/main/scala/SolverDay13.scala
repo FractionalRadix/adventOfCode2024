@@ -11,12 +11,13 @@ class SolverDay13 {
     val machines = parseInput(lines)
     var tokens: Long = 0
     for machine <- machines do
-      machine.print()
+      //machine.print()
       //val r = // m = (ax * y - ay * x) / (ax * by - ay * bx)
       val nominator = machine.ax * machine.y - machine.ay * machine.x
       val denominator = machine.ax * machine.by - machine.ay * machine.bx
       if denominator == 0 then
-        println("Goal cannot be reached on this machine.")
+        //println("Goal cannot be reached on this machine.")
+        ;
       else
         val m = nominator / denominator
         val n = (machine.x - m* machine.bx) / machine.ax
@@ -69,12 +70,12 @@ class SolverDay13 {
 
     var tokens: Long = 0
     for machine <- machines do
-      machine.print()
-      //val r = // m = (ax * y - ay * x) / (ax * by - ay * bx)
+      //machine.print()
       val nominator = machine.ax * machine.y - machine.ay * machine.x
       val denominator = machine.ax * machine.by - machine.ay * machine.bx
       if denominator == 0 then
-        println("Goal cannot be reached on this machine.")
+        //println("Goal cannot be reached on this machine.")
+        ;
       else
         val m = nominator / denominator
         val n = (machine.x - m* machine.bx) / machine.ax
@@ -99,7 +100,7 @@ class SolverDay13 {
       println(s"  Prize: $x $y")
   }
 
-  def parseInput(lines: List[String]): List[ClawMachine] =
+  private def parseInput(lines: List[String]): List[ClawMachine] =
     var result: List[ClawMachine] = Nil
     var ax: Long = 0
     var ay: Long = 0
