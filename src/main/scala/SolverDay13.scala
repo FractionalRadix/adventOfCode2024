@@ -25,10 +25,10 @@ class SolverDay13 {
         val reachedX = n * machine.ax + m * machine.bx
         val reachedY = n * machine.ay + m * machine.by
         if reachedX == machine.x && reachedY == machine.y then
-          println(s"$n times move A, $m times move B.")
+          //println(s"$n times move A, $m times move B.")
           tokens = tokens + 3 * n + m
-        else
-          println("Goal cannot be reached on this machine.")
+        //else
+        //  println("Goal cannot be reached on this machine.")
 
     tokens
 
@@ -83,10 +83,10 @@ class SolverDay13 {
         val reachedX = n * machine.ax + m * machine.bx
         val reachedY = n * machine.ay + m * machine.by
         if reachedX == machine.x && reachedY == machine.y then
-          println(s"$n times move A, $m times move B.")
+          //println(s"$n times move A, $m times move B.")
           tokens = tokens + 3 * n + m
-        else
-          println("Goal cannot be reached on this machine.")
+        //else
+        //  println("Goal cannot be reached on this machine.")
 
     tokens
 

@@ -26,7 +26,7 @@ def solveDay13(): Unit =
   val solutionPart1 = solver.solvePart1(input)
   println(s"The fewest amount of tokens needed to win all available prizes is $solutionPart1.") // 38839
   val solutionPart2 = solver.solvePart2(input)
-  println(s"The fewest amount of tokens needed to winn all available prizes (at the new positions) is $solutionPart2.")
+  println(s"The fewest amount of tokens needed to winn all available prizes (at the new positions) is $solutionPart2.") // 75200131617108
 
 def solveDay12(): Unit =
   val solver = SolverDay12()
