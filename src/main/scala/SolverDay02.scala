@@ -1,11 +1,15 @@
 package com.cormontia.adventOfCode2024
 
-import scala.io.Source
 import scala.annotation.tailrec
-import scala.util.{Try, Using}
 
-class SolverDay02 {
-  def solveDay02Part2(reports: List[Array[Int]]): Int =
+class SolverDay02 extends Solver {
+
+  override def solvePart1(lines: List[String]): Long =
+    val reports = parseReports(lines)
+    reports.count(report => isSafe(report))
+
+  override def solvePart2(lines: List[String]): Long =
+    val reports = parseReports(lines)
     //TODO?~ It would be more elegant to use a count(...) function.
     var count = 0
     reports.foreach(report =>
@@ -17,6 +21,12 @@ class SolverDay02 {
       if asc || desc then count = count + 1
     )
     count
+
+  private def parseReports(lines: List[String]): List[Array[Int]] =
+    val reports = lines.map(line =>
+      line.split("\\s+").map(str => str.toInt)
+    )
+    reports
 
   private def trySafeAscending(report: Array[Int]): Boolean =
     // Naive solution that works: for each level, try removing it.
@@ -62,19 +72,6 @@ class SolverDay02 {
         false // Difference is too large
       else
         isSafeDescending2(report.drop(1))
-
-  def solveDay02Part1(reports: List[Array[Int]]): Int =
-    reports.count(report => isSafe(report))
-
-  def parseDay02Input(filename: String): Try[List[Array[Int]]] =
-    Using (Source.fromFile(filename)) { source =>
-      val source = Source.fromFile(filename)
-      val lines = source.getLines
-      val reports = lines.map(line =>
-        line.split("\\s+").map(str => str.toInt)
-      ).toList
-      reports
-    }
 
   private def isSafe(report: Array[Int]): Boolean =
     if isAscending(report) then

@@ -3,6 +3,7 @@ package com.cormontia.adventOfCode2024
 import scala.io.Source
 import scala.util.matching.Regex
 
+//TODO!~ Inherit from "Solver" class and use that.
 class SolverDay03 {
   def solve(): Unit = {
     val input = readInput("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay03.txt")
@@ -62,6 +63,7 @@ class SolverDay03 {
       .map(m => m.toString())
     instructions
 
+  //TODO!~ Use a `Using`. Should happen automatically when we derive Solver03 from Solver.
   private def readInput(filename: String): String =
     val source = Source.fromFile(filename)
     val input = source.getLines().mkString

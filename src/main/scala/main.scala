@@ -1,8 +1,6 @@
 package com.cormontia.adventOfCode2024
 
 import java.time.{Duration, LocalDateTime}
-import scala.collection.mutable.ArrayBuffer
-import scala.util.{Failure, Success, Try}
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
@@ -11,10 +9,10 @@ import scala.util.{Failure, Success, Try}
 
 @main
 def main(): Unit =
-  //solveDay01()
-  //solveDay02()
-  //solveDay03()
-  //solveDay04()
+  solveDay01()
+  solveDay02()
+  solveDay03()
+  solveDay04()
   //solveDay05()
   //solveDay06()
   //solveDay07()
@@ -26,31 +24,19 @@ def main(): Unit =
   solveDay13()
   solveDay14()
 
-abstract class Solver {
-  def parseInput(filename: String): Try[List[String]]
-  def solvePart1(lines: List[String]): Long
-  def solvePart2(lines: List[String]): Long
-
-  def solve(filename: String): Unit =
-    val input = parseInput(filename)
-    input match
-      case Success(lines) =>
-        val solutionPart1 = solvePart1(lines)
-        println(s"The solution to Part 1 is $solutionPart1.")
-        val solutionPart2 = solvePart2(lines)
-        println(s"The solution to Part 2 is is $solutionPart2.")
-      case Failure(_)  => println("Failed to read input file!")
-}
-
 def solveDay14(): Unit =
+  println("Day 14:")
   SolverDay14().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay14.txt")
 
 def solveDay13(): Unit =
+  println("Day 13:")
   // Part 1: 38839
   // Part 2: 75200131617108
   SolverDay13().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13.txt")
 
 def solveDay12(): Unit =
+  //TODO!~ Derive SolverDay12 from Solver and let that thing do the work.
+  println("Day 12:")
   val solver = SolverDay12()
   val input = solver.parseDay12Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay12.txt")
   val solutionPart1 = solver.solvePart1(input)
@@ -59,6 +45,8 @@ def solveDay12(): Unit =
   println(s"The solution to part 2 is $solutionPart2.") // 811148
 
 def solveDay11(): Unit =
+  //TODO!~ Derive SolverDay11 from Solver and let that thing do the work.
+  println("Day 11:")
   val solver = SolverDay11()
   val input = solver.parseDay11Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay11.txt")
   val solutionPart1 = solver.solvePart1(input)
@@ -67,6 +55,8 @@ def solveDay11(): Unit =
   println(s"The number of stones after blinking 75 times is $solutionPart2.") // 235571309320764
 
 def solveDay10(): Unit =
+  //TODO!~ Derive SolverDay10 from Solver and let that thing do the work.
+  println("Day 10:")
   val solver = SolverDay10()
   val input = solver.parseDay10Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay10.txt")
   val solutionPart1 = solver.solvePart1(input)
@@ -75,6 +65,8 @@ def solveDay10(): Unit =
   println(s"The sum of ratings for all trailheads is $solutionPart2") // 1801
 
 def solveDay09(): Unit =
+  //TODO!~ Derive SolverDay09 from Solver and let that thing do the work.
+  println("Day 09:")
   val solver = SolverDay09()
   val input = solver.parseDay09Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09.txt")
 
@@ -93,6 +85,8 @@ def solveDay09(): Unit =
   println(s"It took: ${duration2.toSeconds} seconds.")
   
 def solveDay08(): Unit =
+  //TODO!~ Derive SolverDay08 from Solver and let that thing do the work.
+  println("Day 08:")
   val solver = SolverDay08()
   val input = solver.parseDay08Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay08.txt")
   val solutionPart1 = solver.solvePart1(input)
@@ -101,6 +95,8 @@ def solveDay08(): Unit =
   println(s"The number of anti-nodes, including resonant harmonics, is $solutionPart2.") // 1030
 
 def solveDay07(): Unit =
+  //TODO!~ Derive SolverDay07 from Solver and let that thing do the work.
+  println("Day 07:")
   val solver = SolverDay07()
   val input = solver.parseDay07Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay07.txt")
   val solutionPart1 = solver.solvePart1(input)
@@ -109,6 +105,8 @@ def solveDay07(): Unit =
   println(s"The corrected total calibration result is $solutionPart2") // 227615740238334
 
 def solveDay06(): Unit =
+  //TODO!~ Derive SolverDay06 from Solver and let that thing do the work.
+  println("Day 06:")
   val solver = SolverDay06()
   val input = solver.parseDay06Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06.txt")
   val solutionPart1 = solver.solvePart1(input)
@@ -117,6 +115,8 @@ def solveDay06(): Unit =
   println(s"The number of places where an obstacle leads to an infinite loop is $solutionPart2.") // 1586
 
 def solveDay05(): Unit =
+  //TODO!~ Derive SolverDay05 from Solver and let that thing do the work.
+  println("Day 05:")
   val solver = SolverDay05()
   val input = solver.parseDay05Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay05.txt")
   val solutionPart1 = solver.solvePart1(input)
@@ -125,36 +125,26 @@ def solveDay05(): Unit =
   println(s"The sum of middle pages of corrected updates is $solutionPart2.") // 6004
 
 def solveDay04(): Unit =
-  val solver = SolverDay04()
-  val input = solver.parseDay04Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay04.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The solution to part 1 is: $solutionPart1") // 2633
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution to part 2 is: $solutionPart2") // 1936
+  println("Day 04:")
+  // Part 1: 2633
+  // Part 2: 1936
+  SolverDay04().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay04.txt")
 
 def solveDay03(): Unit =
-  val solver = SolverDay03()
-  solver.solve()
+  println("Day 03:")
+  // Part 1: 173529487
+  // Part 2: 99532691
+  SolverDay03().solve()
 
 def solveDay02(): Unit =
-  val solver = SolverDay02()
-  val reportList = solver.parseDay02Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay02.txt")
-  reportList match
-    case Success(reports) =>
-      val nrOfSafeReports = solver.solveDay02Part1(reports)
-      println(s"Number of safe reports: $nrOfSafeReports") // 639
-      val nrOfSafeReports2 = solver.solveDay02Part2(reports)
-      println(s"Nr of safe reports if a single level can be removed: $nrOfSafeReports2") // 674
-    case Failure(_) => println("Failed to open the file.")
+  println("Day 02:")
+  // Part 1: 639
+  // Part 2: 674
+  SolverDay02().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay02.txt")
 
 def solveDay01(): Unit =
-  val solver01 = SolverDay01()
+  println("Day 01:")
+  // Part 1: 2031679
+  // Part 2: 19678534
   //TODO!~ Get the input file from the proper resources folder
-  val tryLists = solver01.parseDay01Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay01.txt")
-  tryLists match
-    case Success(leftList, rightList) =>
-      val firstPart = solver01.day01Part1(leftList, rightList)
-      println(s"The total distance is: $firstPart") // 2031679
-      val secondPart = solver01.day01Part2(leftList, rightList)
-      println(s"The similarity score is: $secondPart") // 19678534
-    case Failure(_) => println("Failed to parse input file!")
+  SolverDay01().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay01.txt")

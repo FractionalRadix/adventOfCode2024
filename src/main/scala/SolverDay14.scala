@@ -4,7 +4,7 @@ import scala.io.Source
 import scala.util.{Try, Using}
 
 class SolverDay14 extends Solver {
-  override def parseInput(filename: String): Try[List[String]] =
+  override def readInput(filename: String): Try[List[String]] =
     Using (Source.fromFile(filename)) { source =>
       source.getLines.toList
     }

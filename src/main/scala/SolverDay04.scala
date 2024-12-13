@@ -1,15 +1,10 @@
 package com.cormontia.adventOfCode2024
 
-import scala.io.Source
 import scala.util.matching.Regex
 
-class SolverDay04 {
-  def parseDay04Input(filename: String): List[String] = {
-    val source = Source.fromFile(filename)
-    source.getLines.toList
-  }
+class SolverDay04 extends Solver {
 
-  def solvePart1(lines: List[String]): Int = {
+  override def solvePart1(lines: List[String]): Long = {
     val block = CharacterBlock(lines)
 
     val horizontalMatches = countMatches(lines)
@@ -46,7 +41,7 @@ class SolverDay04 {
     sum
   }
   
-  def solvePart2(lines: List[String]): Int = {
+  override def solvePart2(lines: List[String]): Long = {
     val block = CharacterBlock(lines)
 
     // First, find every 'A' in the block.
