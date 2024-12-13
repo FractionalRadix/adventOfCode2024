@@ -9,10 +9,10 @@ import java.time.{Duration, LocalDateTime}
 
 @main
 def main(): Unit =
-  solveDay01()
-  solveDay02()
-  solveDay03()
-  solveDay04()
+  //solveDay01()
+  //solveDay02()
+  //solveDay03()
+  //solveDay04()
   //solveDay05()
   //solveDay06()
   //solveDay07()
@@ -20,8 +20,8 @@ def main(): Unit =
   //solveDay09()
   //solveDay10()
   //solveDay11()
-  solveDay12()
-  solveDay13()
+  //solveDay12()
+  //solveDay13()
   solveDay14()
 
 def solveDay14(): Unit =
@@ -30,19 +30,15 @@ def solveDay14(): Unit =
 
 def solveDay13(): Unit =
   println("Day 13:")
-  // Part 1: 38839
+  // Part 1:          38839
   // Part 2: 75200131617108
   SolverDay13().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay13.txt")
 
 def solveDay12(): Unit =
-  //TODO!~ Derive SolverDay12 from Solver and let that thing do the work.
   println("Day 12:")
-  val solver = SolverDay12()
-  val input = solver.parseDay12Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay12.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The total price is $solutionPart1.") // 1304764
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The solution to part 2 is $solutionPart2.") // 811148
+  // Part 1: 1304764
+  // Part 2:  811148
+  SolverDay12().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay12.txt")
 
 def solveDay11(): Unit =
   //TODO!~ Derive SolverDay11 from Solver and let that thing do the work.
@@ -133,7 +129,7 @@ def solveDay04(): Unit =
 def solveDay03(): Unit =
   println("Day 03:")
   // Part 1: 173529487
-  // Part 2: 99532691
+  // Part 2:  99532691
   SolverDay03().solve()
 
 def solveDay02(): Unit =
@@ -144,7 +140,7 @@ def solveDay02(): Unit =
 
 def solveDay01(): Unit =
   println("Day 01:")
-  // Part 1: 2031679
+  // Part 1:  2031679
   // Part 2: 19678534
   //TODO!~ Get the input file from the proper resources folder
   SolverDay01().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay01.txt")

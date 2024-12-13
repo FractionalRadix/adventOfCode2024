@@ -2,13 +2,10 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 
-class SolverDay12 {
-  def parseDay12Input(filename: String): Grid[Char] =
-    val source = Source.fromFile(filename)
-    val lines = source.getLines.toList
-    Grid[Char](lines, ch => ch)
+class SolverDay12 extends Solver {
 
-  def solvePart1(grid: Grid[Char]): Long =
+  override def solvePart1(lines: List[String]): Long =
+    val grid = Grid[Char](lines, ch => ch)
     // Let's create a second Grid, where each area has a unique number.
     val newGrid = Grid[Option[Int]](grid.nrOfRows, grid.nrOfCols)
     for rowIdx <- 0 until grid.nrOfRows do
@@ -31,9 +28,26 @@ class SolverDay12 {
           regionId = regionId + 1
     price
 
+  override def solvePart2(lines: List[String]): Long =
+    val grid = Grid[Char](lines, ch => ch)
+    val newGrid = uniqueRegions(grid)
+    val regionIDs = newGrid.findDistinct()
+    var totalSum = 0
+    for regionID <- regionIDs do
+      val plots = newGrid.findCoordinatesOf(regionID).toList
+      val sidesAbove = plotsSharingSideAbove(newGrid, regionID.head)
+      val sidesBelow = plotsSharingSideBelow(newGrid, regionID.head)
+      val sidesLeft = plotsSharingLeftSide(newGrid, regionID.head)
+      val sidesRight = plotsSharingRightSide(newGrid, regionID.head)
+      val sidesForRegion = sidesAbove.keys.size + sidesBelow.keys.size + sidesLeft.keys.size + sidesRight.keys.size
+      val costForRegion = plots.size * sidesForRegion
+      totalSum = totalSum + costForRegion
+    totalSum
+
   /**
    * The perimeter of a region is the sum of all sides that DON'T touch another plot in the region.
    * Note that the region may contain "holes", and that the sides of these holes count towards the total.
+ *
    * @param region A list of coordinates that span a region.
    * @return The sum of all sides that don't touch another plot in the region.
    */
@@ -86,24 +100,9 @@ class SolverDay12 {
   // Its contents would alternate between regionID's and booleans.
   // A boolean `true` would indicate that that field was a fence, `false` would indicate that it was not.
 
-  def solvePart2(grid: Grid[Char]): Long =
-    val newGrid = uniqueRegions(grid)
-    val regionIDs = newGrid.findDistinct()
-    var totalSum = 0
-    for regionID <- regionIDs do
-      val plots = newGrid.findCoordinatesOf(regionID).toList
-      val sidesAbove = plotsSharingSideAbove(newGrid, regionID.head)
-      val sidesBelow = plotsSharingSideBelow(newGrid, regionID.head)
-      val sidesLeft = plotsSharingLeftSide(newGrid, regionID.head)
-      val sidesRight = plotsSharingRightSide(newGrid, regionID.head)
-      val sidesForRegion = sidesAbove.keys.size + sidesBelow.keys.size + sidesLeft.keys.size + sidesRight.keys.size
-      val costForRegion = plots.size * sidesForRegion
-      totalSum = totalSum + costForRegion
-
-    totalSum
-
   /**
    * Identify the sides of a given region on the map.
+ *
    * @param newGrid The map of plots, where each region has a unique ID instead of a letter.
    * @param regionID The region ID whose sides we want to identify.
    * @return A mapping of all "above" sides for the given region. It maps side ID's to the plots that participate in
