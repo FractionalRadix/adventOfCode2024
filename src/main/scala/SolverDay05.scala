@@ -1,7 +1,5 @@
 package com.cormontia.adventOfCode2024
 
-import scala.io.Source
-
 class SolverDay05 extends Solver {
 
   def solvePart2(input: List[String]): Long = {
