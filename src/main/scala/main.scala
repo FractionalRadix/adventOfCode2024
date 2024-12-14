@@ -16,7 +16,7 @@ def main(): Unit =
   //solveDay05()
   //solveDay06()
   //solveDay07()
-  solveDay08()
+  //solveDay08()
   //solveDay09()
   //solveDay10()
   //solveDay11()
