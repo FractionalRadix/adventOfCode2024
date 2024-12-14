@@ -25,6 +25,8 @@ def main(): Unit =
   solveDay14()
 
 def solveDay14(): Unit =
+  // Part 1: 230686500
+  // Part 2:
   println("Day 14:")
   SolverDay14().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay14.txt")
 

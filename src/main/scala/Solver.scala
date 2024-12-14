@@ -23,4 +23,5 @@ abstract class Solver {
         val solutionPart2 = solvePart2(lines)
         println(s"The solution to part 2 is is $solutionPart2.")
       case Failure(_) => println("Failed to read input file!")
+
 }
