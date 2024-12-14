@@ -31,22 +31,21 @@ class SolverDay14 extends Solver {
     val width = 101
     val height = 103
 
-    var str = ""
-    while str.toUpperCase() != "Q" do //TODO!~  Better stop condition...
+    var found = false
+    while !found do
       robots = for robot <- robots
         yield nextRobot(robot, 1, width, height)
       count = count + 1
 
-      val r1 = robotsAlignedVertically(robots, 4)
-      val r2 = robotsAlignedHorizontally(robots, 4)
-      val candidate = robotsAlignedVertically(robots, 4) || robotsAlignedHorizontally(robots, 4)
-      if candidate then
+      // Hint from Reddit... the picture of a tree contains borders.
+      // So look for (arbitrarily large) ranges of subsequent robots.
+      found = robotsAlignedVertically(robots, 14) && robotsAlignedHorizontally(robots, 14)
+      if found then
         val grid = buildGrid(robots, width, height)
         printGrid(grid)
         println(s"That was at count: $count")
-        str = readLine()
 
-    0 //TODO!~
+    count
 
   private def buildGrid(robots: List[Robot], width: Int, height: Int): Grid[Char] =
     val grid = Grid[Char](height, width)
