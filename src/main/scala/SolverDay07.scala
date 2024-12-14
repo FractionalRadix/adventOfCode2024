@@ -1,17 +1,6 @@
 package com.cormontia.adventOfCode2024
 
-import scala.io.Source
-
 class SolverDay07 extends Solver {
-
-  /*
-  def parseDay07Input(filename: String): List[(Long, Array[Long])] = {
-    val source = Source.fromFile(filename)
-    val lines = source.getLines.toList
-    val equations = lines.map( line => parseLine(line) )
-    equations
-  }
-   */
 
   private def parseInput(lines: List[String]): List[(Long, Array[Long])] = {
     lines.map(line => parseLine(line))
@@ -84,7 +73,6 @@ class SolverDay07 extends Solver {
     var sum: Long = 0
     for equation <- equations do
       if eval(equation._1, 0, equation._2) then
-        //println(s"Found: ${equation._1}")
         sum = sum + equation._1
     sum
   }

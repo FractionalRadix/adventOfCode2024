@@ -1,31 +1,22 @@
 package com.cormontia.adventOfCode2024
 
-import scala.io.Source
+class SolverDay09 extends Solver {
 
-class SolverDay09 {
-  def parseDay09Input(filename: String): String =
-    val source = Source.fromFile(filename)
-    val lines = source.getLines.toList
-    lines.head
+  def parseInput(lines: List[String]): String = lines.head
 
   private def quickConvert(ch: Character): Int =
     ch - '0'
 
-  def solvePart1(input: String): Long =
+  override def solvePart1(lines: List[String]): Long =
+    val input = parseInput(lines)
     //TODO?~ It might be more elegant to use "None" for empty parts of the disk, rather than the sentinel value -1.
     // NOTE: Since file numbers are going to be larger than 9, we'll need a Map, not a String.
     val map2 = buildMap(input)
     moveBlocks(map2)
     calcChecksum(map2)
 
-  /**
-   * Structure to contain all the "file" elements.
-   * Note that, for convenience, gaps are also represented by `File` elements, whose fileId is None!
-   */
-  private var files = scala.collection.mutable.Set[File]()
-
-  def solvePart2(input: String): Long =
-    println(s"Input string has length ${input.length}.")
+  override def solvePart2(lines: List[String]): Long =
+    val input = parseInput(lines)
     files = stringToFileSet(input)
     if !allBlocksAccountedFor(files.toSet) then
       println("ERROR in the input!")
@@ -40,14 +31,14 @@ class SolverDay09 {
     val usedFileIDs = scala.collection.mutable.Set[Int]()
     var running = true
     while running do
-      val candidateFiles = files.filter(f => f.fileNr.isDefined).filter(f => !usedFileIDs.contains(f.fileNr.head) )
+      val candidateFiles = files.filter(f => f.fileNr.isDefined).filter(f => !usedFileIDs.contains(f.fileNr.head))
       if candidateFiles.isEmpty then
         running = false
       else
-        val currentFile = candidateFiles.maxBy( f => f.fileNr )
-        val fittingGaps = files.filter( f => f.fileNr.isEmpty && f.length >= currentFile.length )
+        val currentFile = candidateFiles.maxBy(f => f.fileNr)
+        val fittingGaps = files.filter(f => f.fileNr.isEmpty && f.length >= currentFile.length)
         if fittingGaps.nonEmpty then
-          val earliestFittingGap = fittingGaps.minBy( f => f.startPos )
+          val earliestFittingGap = fittingGaps.minBy(f => f.startPos)
           if (earliestFittingGap.startPos < currentFile.startPos)
             moveFileToGap(currentFile, earliestFittingGap)
             if !allBlocksAccountedFor(files.toSet) then
@@ -58,6 +49,11 @@ class SolverDay09 {
     val newMap = fileSetToMap(files)
     calcChecksum2(files.toSet)
 
+  /**
+   * Structure to contain all the "file" elements.
+   * Note that, for convenience, gaps are also represented by `File` elements, whose fileId is None!
+   */
+  private var files = scala.collection.mutable.Set[File]()
 
   /**
    * Update the "files" structure. Move the File named `file` to the gap named `gap`.
@@ -65,6 +61,7 @@ class SolverDay09 {
    * - leaves a new gap where the file came from, and
    * - makes the original gap smaller, or removes it entirely.
    * This method updates the "files" set.
+   *
    * @param file The file to move.
    * @param gap The gap to move it to.
    */
@@ -132,19 +129,7 @@ class SolverDay09 {
       for i <- 0 until file.length do
         result(file.startPos + i) = file.fileNr
     result
-
-  // PRE: File list is sorted by start position, ascending.
-  private def printFileList(files: List[File]): Unit =
-    println
-    for file <- files do
-      for block <- 0 until file.length do
-        if file.fileNr.isEmpty then
-          print(".")
-        else
-          print(file.fileNr)
-    println
-    //TODO!+
-
+  
   private def printFileList2(files: Set[File]): Unit =
     println
     val fileWithHighestNr = files.maxBy(f => f.startPos)

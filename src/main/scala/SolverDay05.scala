@@ -2,7 +2,7 @@ package com.cormontia.adventOfCode2024
 
 class SolverDay05 extends Solver {
 
-  def solvePart2(input: List[String]): Long = {
+  override def solvePart2(input: List[String]): Long = {
     val rules = parseRules(input)
     val pageLists = parsePageLists(input)
 
@@ -48,7 +48,7 @@ class SolverDay05 extends Solver {
     result
   }
 
-  def solvePart1(input: List[String]): Long = {
+  override def solvePart1(input: List[String]): Long = {
     val rules = parseRules(input)
     val pageLists = parsePageLists(input)
 

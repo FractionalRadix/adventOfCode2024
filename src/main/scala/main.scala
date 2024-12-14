@@ -13,13 +13,13 @@ def main(): Unit =
   //solveDay02()
   //solveDay03()
   //solveDay04()
-  //solveDay05()
-  //solveDay06()
+  solveDay05()
+  solveDay06()
   //solveDay07()
   //solveDay08()
   //solveDay09()
-  //solveDay10()
-  //solveDay11()
+  solveDay10()
+  solveDay11()
   //solveDay12()
   //solveDay13()
   //solveDay14()
@@ -60,35 +60,17 @@ def solveDay11(): Unit =
   println(s"The number of stones after blinking 75 times is $solutionPart2.") // 235571309320764
 
 def solveDay10(): Unit =
-  //TODO!~ Derive SolverDay10 from Solver and let that thing do the work.
   println("Day 10:")
-  val solver = SolverDay10()
-  val input = solver.parseDay10Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay10.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The sum of scores for all trailheads is $solutionPart1") // 822
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The sum of ratings for all trailheads is $solutionPart2") // 1801
+  // Part 1:  822
+  // Part 2: 1801
+  SolverDay10().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay10.txt")
 
 def solveDay09(): Unit =
-  //TODO!~ Derive SolverDay09 from Solver and let that thing do the work.
   println("Day 09:")
-  val solver = SolverDay09()
-  val input = solver.parseDay09Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09.txt")
+  // Part 1:  6344673854800
+  // Part 2:  6360363199987
+  SolverDay09().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay09.txt")
 
-  val startTime1 = LocalDateTime.now()
-  val solutionPart1 = solver.solvePart1(input)
-  val endTime1 = LocalDateTime.now()
-  val duration1 = Duration.between(startTime1, endTime1)
-  println(s"The checksum is $solutionPart1.") // 6344673854800
-  println(s"It took: ${duration1.toSeconds} seconds.")
-
-  val startTime2 = LocalDateTime.now()
-  val solutionPart2 = solver.solvePart2(input)
-  val endTime2 = LocalDateTime.now()
-  val duration2 = Duration.between(startTime2, endTime2)
-  println(s"The new checksum is $solutionPart2.") // 6360363199987
-  println(s"It took: ${duration2.toSeconds} seconds.")
-  
 def solveDay08(): Unit =
   println("Day 08:")
   // Part 1:  289

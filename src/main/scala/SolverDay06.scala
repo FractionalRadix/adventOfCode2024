@@ -1,11 +1,8 @@
 package com.cormontia.adventOfCode2024
 
-import scala.io.Source
-
 class SolverDay06 extends Solver {
 
-
-  def solvePart1(lines: List[String]): Long = {
+  override def solvePart1(lines: List[String]): Long = {
     val block = CharacterBlock(lines)
     val startPosition = block.findCoordinatesOf('^').head
 
@@ -70,7 +67,7 @@ class SolverDay06 extends Solver {
     }
   }
 
-  def solvePart2(lines: List[String]): Long = {
+  override def solvePart2(lines: List[String]): Long = {
     val block = CharacterBlock(lines)
     val startPosition = block.findCoordinatesOf('^').head
     markVisits(block, startPosition)
