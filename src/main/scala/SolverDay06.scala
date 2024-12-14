@@ -72,9 +72,7 @@ class SolverDay06 extends Solver {
     val startPosition = block.findCoordinatesOf('^').head
     markVisits(block, startPosition)
     val blockingPositions = block.findCoordinatesOf('X').toList.filter(pos => pos != startPosition)
-
     val freshBlock  = CharacterBlock(lines)
-    println()
     val loopingPositions = blockingPositions.map( position => resultsInLoop(CharacterBlock(freshBlock), position, startPosition))
     val answer = loopingPositions.count( elem => elem )
     answer

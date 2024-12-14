@@ -1,22 +1,33 @@
 package com.cormontia.adventOfCode2024
 
-import scala.io.Source
+class SolverDay11 extends Solver {
 
-class SolverDay11 {
-  def parseDay11Input(filename: String): List[Long] =
-    val source = Source.fromFile(filename)
-    val lines = source.getLines.toList
-    val line = lines.head
-    val numbers1 = line.split("\\s")
-    val numbers2 = numbers1.map( str => str.toLong )
-    numbers2.toList
+  def parseInput(lines: List[String]): List[Long] =
+    lines
+      .head
+      .split("\\s")
+      .map(str => str.toLong)
+      .toList
 
-
-  def solvePart1(stones: List[Long]): Long =
+  override def solvePart1(lines: List[String]): Long =
+    val stones = parseInput(lines)
     var newStones = stones
     for i <- 1 to 25 do
       newStones = blink1(newStones)
     newStones.length
+
+  override def solvePart2(lines: List[String]): Long =
+    val stones = parseInput(lines)
+    // Let's process the list once...
+    for engraving <- stones do
+      processEngraving(engraving)
+    for i <- 1 to 75 do
+      processAllValues()
+    // Now, for every value, we should also cache what value it yields for (up to) 75 iterations....
+    var count: Long = 0
+    for i <- stones do
+      count = count + followTransitionsAndCount2(i, 75)
+    count
 
   private def printList(stones: List[Long]): Unit =
     for stone <- stones do
@@ -133,17 +144,5 @@ class SolverDay11 {
           count = count + followTransitionsAndCount2(targets._2.head, n - 1)
         cache((engraving, n)) = count
         count
-  
-  def solvePart2(input: List[Long]): Long =
-    // Let's process the list once...
-    for engraving <- input do
-      processEngraving(engraving)
-    for i <- 1 to 75 do
-      processAllValues()
-    // Now, for every value, we should also cache what value it yields for (up to) 75 iterations....
-    println
-    var count: Long = 0
-    for i <- input do
-      count = count + followTransitionsAndCount2(i, 75)
-    count
+
 }

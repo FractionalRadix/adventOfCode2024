@@ -4,22 +4,19 @@ import java.time.{Duration, LocalDateTime}
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
-//TODO!~ Put ALL the input functions in a "Using" block.
-// --> This will be done automatically if we make every "SolverDayXX" a subclass of "Solver".
-
 @main
 def main(): Unit =
   //solveDay01()
   //solveDay02()
   //solveDay03()
   //solveDay04()
-  solveDay05()
-  solveDay06()
+  //solveDay05()
+  //solveDay06()
   //solveDay07()
   //solveDay08()
   //solveDay09()
-  solveDay10()
-  solveDay11()
+  //solveDay10()
+  //solveDay11()
   //solveDay12()
   //solveDay13()
   //solveDay14()
@@ -50,14 +47,10 @@ def solveDay12(): Unit =
   SolverDay12().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay12.txt")
 
 def solveDay11(): Unit =
-  //TODO!~ Derive SolverDay11 from Solver and let that thing do the work.
   println("Day 11:")
-  val solver = SolverDay11()
-  val input = solver.parseDay11Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay11.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The number of stones after blinking 25 times is $solutionPart1.") // 198075
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The number of stones after blinking 75 times is $solutionPart2.") // 235571309320764
+  // Part 1:          198075
+  // Part 2: 235571309320764
+  SolverDay11().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay11.txt")
 
 def solveDay10(): Unit =
   println("Day 10:")
