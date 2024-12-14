@@ -3,23 +3,16 @@ package com.cormontia.adventOfCode2024
 import scala.io.Source
 import scala.util.matching.Regex
 
-//TODO!~ Inherit from "Solver" class and use that.
-class SolverDay03 {
-  def solve(): Unit = {
-    val input = readInput("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay03.txt")
-    val sum = solvePart1(input)
-    println(s"The sum of the multiplications is $sum.")        // 173529487
-    val newSum = solvePart2(input)
-    println(s"The sum of enabled multiplications is $newSum.") //  99532691
-  }
+class SolverDay03 extends Solver {
 
-  private def solvePart1(input: String): Int =
-    val instructions = readInstructionsPart1(input)
+  override def solvePart1(lines: List[String]): Long = 
+    val instructions = readInstructionsPart1(lines.mkString)
     val pairs = integerPairs(instructions)
     pairs.map(pair => pair._1 * pair._2).sum
+  
 
-  private def solvePart2(input: String): Int =
-    val instructions2 = readInstructionsPart2(input)
+  override def solvePart2(lines: List[String]): Long = {
+    val instructions2 = readInstructionsPart2(lines.mkString)
     var enabled = true
     var sum = 0
     for instruction <- instructions2 do
@@ -32,6 +25,7 @@ class SolverDay03 {
         val pair = parseIntPair(arr)
         sum = sum + pair._1 * pair._2
     sum
+  }
 
   private def integerPairs(instructions: Iterator[String]) =
     instructions
@@ -62,11 +56,4 @@ class SolverDay03 {
       .findAllMatchIn(input)
       .map(m => m.toString())
     instructions
-
-  //TODO!~ Use a `Using`. Should happen automatically when we derive Solver03 from Solver.
-  private def readInput(filename: String): String =
-    val source = Source.fromFile(filename)
-    val input = source.getLines().mkString
-    source.close()
-    input
 }
