@@ -1,6 +1,8 @@
 package com.cormontia.adventOfCode2024
 
 import scala.annotation.tailrec
+import scala.util.boundary
+import scala.util.boundary.break
 
 class SolverDay02 extends Solver {
 
@@ -30,20 +32,28 @@ class SolverDay02 extends Solver {
 
   private def trySafeAscending(report: Array[Int]): Boolean =
     // Naive solution that works: for each level, try removing it.
-    for i <- report.indices do
-      val candidate = report.patch(i, Nil, 1)
-      if isSafeAscending2(candidate) then
-        // If the entire report is safe after removing a single level, then it is safe.
-        return true //TODO!+ Lookup "boundary" and "boundary.break"  in scala.util
-    false
+    var result = false
+    boundary {
+      for i <- report.indices do
+        val candidate = report.patch(i, Nil, 1)
+        if isSafeAscending2(candidate) then
+          // If the entire report is safe after removing a single level, then it is safe.
+          result = true
+          break()
+    }
+    result
 
   private def trySafeDescending(report: Array[Int]): Boolean =
-    for i <- report.indices do
-      val candidate = report.patch(i, Nil, 1)
-      if isSafeDescending2(candidate) then
-        // If the entire report is safe after removing a single level, then it is safe.
-        return true //TODO!+ Lookup "boundary" and "boundary.break"  in scala.util
-    false
+    var result = false
+    boundary {
+      for i <- report.indices do
+        val candidate = report.patch(i, Nil, 1)
+        if isSafeDescending2(candidate) then
+          // If the entire report is safe after removing a single level, then it is safe.
+          result = true
+          break()
+    }
+    result
 
   @tailrec
   private final def isSafeAscending2(report: Array[Int]): Boolean =

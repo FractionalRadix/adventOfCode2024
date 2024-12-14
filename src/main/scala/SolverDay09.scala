@@ -1,5 +1,8 @@
 package com.cormontia.adventOfCode2024
 
+import scala.util.boundary
+import scala.util.boundary.break
+
 class SolverDay09 extends Solver {
 
   def parseInput(lines: List[String]): String = lines.head
@@ -111,14 +114,15 @@ class SolverDay09 extends Solver {
     list = list.sortWith(_.startPos < _.startPos)
     var result = true
     val pairs = list.zip(list.tail)
-    for pair <- pairs do
-      //println(s"Pair: (${pair._1.fileNr}, ${pair._1.startPos}, ${pair._1.length}) - (${pair._2.fileNr}, ${pair._2.startPos}, ${pair._2.length})")
-      val expectedNextPos = pair._1.startPos + pair._1.length
-      val actualNextPos = pair._2.startPos
-      if actualNextPos != expectedNextPos then
-        println(s"Error pair: (${pair._1.fileNr}, ${pair._1.startPos}, ${pair._1.length}) - (${pair._2.fileNr}, ${pair._2.startPos}, ${pair._2.length})")
-        result = false
-        // Would like to break out of the loop at this point...
+    boundary {
+      for pair <- pairs do
+        val expectedNextPos = pair._1.startPos + pair._1.length
+        val actualNextPos = pair._2.startPos
+        if actualNextPos != expectedNextPos then
+          println(s"Error pair: (${pair._1.fileNr}, ${pair._1.startPos}, ${pair._1.length}) - (${pair._2.fileNr}, ${pair._2.startPos}, ${pair._2.length})")
+          result = false
+          break()
+    }
     result
 
   private def fileSetToMap(set: scala.collection.mutable.Set[File]): scala.collection.mutable.Map[Int, Option[Int]] =
