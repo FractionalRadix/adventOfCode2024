@@ -2,13 +2,9 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 
-class SolverDay05 {
-  def parseDay05Input(filename: String): List[String] = {
-    val source = Source.fromFile(filename)
-    source.getLines.toList
-  }
+class SolverDay05 extends Solver {
 
-  def solvePart2(input: List[String]): Int = {
+  def solvePart2(input: List[String]): Long = {
     val rules = parseRules(input)
     val pageLists = parsePageLists(input)
 
@@ -27,7 +23,6 @@ class SolverDay05 {
       sum = sum + middle
 
     sum
-
   }
 
   private def OLD_applyRule(pageList: Array[Int], rule: (Int, Int)): Array[Int] = {
@@ -55,7 +50,7 @@ class SolverDay05 {
     result
   }
 
-  def solvePart1(input: List[String]): Int = {
+  def solvePart1(input: List[String]): Long = {
     val rules = parseRules(input)
     val pageLists = parsePageLists(input)
 
@@ -118,8 +113,4 @@ class SolverDay05 {
     val numbers = parts.map( str => str.toInt )
     numbers
   }
-
-
-
-
 }

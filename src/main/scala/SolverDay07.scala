@@ -2,13 +2,19 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 
-class SolverDay07 {
+class SolverDay07 extends Solver {
 
+  /*
   def parseDay07Input(filename: String): List[(Long, Array[Long])] = {
     val source = Source.fromFile(filename)
     val lines = source.getLines.toList
     val equations = lines.map( line => parseLine(line) )
     equations
+  }
+   */
+
+  private def parseInput(lines: List[String]): List[(Long, Array[Long])] = {
+    lines.map(line => parseLine(line))
   }
 
   private def parseLine(line: String): (Long, Array[Long]) =
@@ -21,7 +27,11 @@ class SolverDay07 {
   // * If the product of all values is lower than the test value, it's an automatic fail.
   // * If the sum of all values is higher than the test value, it's an automatic fail.
 
-  def solvePart1(equations: List[(Long, Array[Long])]): Long = {
+  def solvePart1(lines: List[String]): Long =
+    val equations = parseInput(lines)
+    solvePart1_aux(equations)
+
+  private def solvePart1_aux(equations: List[(Long, Array[Long])]): Long = {
     var totalCalibration: Long = 0
     for equation <- equations do
       val nrOfOperands = equation._2.length
@@ -66,7 +76,11 @@ class SolverDay07 {
         case '1' => result = result * operands(i)
     result
 
-  def solvePart2(equations: List[(Long, Array[Long])]): Long = {
+  def solvePart2(lines: List[String]): Long =
+    val equations = parseInput(lines)
+    solvePart2_aux(equations)
+
+  private def solvePart2_aux(equations: List[(Long, Array[Long])]): Long = {
     var sum: Long = 0
     for equation <- equations do
       if eval(equation._1, 0, equation._2) then

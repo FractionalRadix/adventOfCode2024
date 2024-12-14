@@ -16,17 +16,24 @@ def main(): Unit =
   //solveDay05()
   //solveDay06()
   //solveDay07()
-  //solveDay08()
+  solveDay08()
   //solveDay09()
   //solveDay10()
   //solveDay11()
   //solveDay12()
   //solveDay13()
-  solveDay14()
+  //solveDay14()
+  solveDay15()
+
+def solveDay15(): Unit =
+  // Part 1: ???
+  // Part 2: ???
+  println("Day 15:")
+  SolverDay15().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay15_sample.txt")
 
 def solveDay14(): Unit =
   // Part 1: 230686500
-  // Part 2:
+  // Part 2:      7672
   println("Day 14:")
   SolverDay14().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay14.txt")
 
@@ -83,44 +90,28 @@ def solveDay09(): Unit =
   println(s"It took: ${duration2.toSeconds} seconds.")
   
 def solveDay08(): Unit =
-  //TODO!~ Derive SolverDay08 from Solver and let that thing do the work.
   println("Day 08:")
-  val solver = SolverDay08()
-  val input = solver.parseDay08Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay08.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The number of anti-nodes is $solutionPart1.") // 289
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The number of anti-nodes, including resonant harmonics, is $solutionPart2.") // 1030
+  // Part 1:  289
+  // Part 2: 1030
+  SolverDay08().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay08.txt")
 
 def solveDay07(): Unit =
-  //TODO!~ Derive SolverDay07 from Solver and let that thing do the work.
   println("Day 07:")
-  val solver = SolverDay07()
-  val input = solver.parseDay07Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay07.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The total calibration result is $solutionPart1") // 4122618559853
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The corrected total calibration result is $solutionPart2") // 227615740238334
+  // Part 1:   4122618559853
+  // Part 2: 227615740238334
+  SolverDay07().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay07.txt")
 
 def solveDay06(): Unit =
-  //TODO!~ Derive SolverDay06 from Solver and let that thing do the work.
   println("Day 06:")
-  val solver = SolverDay06()
-  val input = solver.parseDay06Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The number of unique positions visited is $solutionPart1.") // 4776
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The number of places where an obstacle leads to an infinite loop is $solutionPart2.") // 1586
+  // Part 1: 4776
+  // Part 2: 1586
+  SolverDay06().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay06.txt")
 
 def solveDay05(): Unit =
-  //TODO!~ Derive SolverDay05 from Solver and let that thing do the work.
   println("Day 05:")
-  val solver = SolverDay05()
-  val input = solver.parseDay05Input("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay05.txt")
-  val solutionPart1 = solver.solvePart1(input)
-  println(s"The sum of middle pages of correctly printed updates is $solutionPart1.") // 4774
-  val solutionPart2 = solver.solvePart2(input)
-  println(s"The sum of middle pages of corrected updates is $solutionPart2.") // 6004
+  // Part 1: 4774
+  // Part 2: 6004
+  SolverDay05().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay05.txt")
 
 def solveDay04(): Unit =
   println("Day 04:")

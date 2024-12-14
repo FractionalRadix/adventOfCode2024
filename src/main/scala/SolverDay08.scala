@@ -2,7 +2,7 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 
-class SolverDay08 {
+class SolverDay08 extends Solver {
   def parseDay08Input(filename: String): List[String] =
     val source = Source.fromFile(filename)
     val lines = source.getLines.toList
@@ -36,7 +36,7 @@ class SolverDay08 {
 
   //TODO?~ Find a more efficient algorithm. We're likely to need this repeatedly in part 2.
   // PRE: List should have at least 2 elements.
-  def makePairs[A](l: List[A]): List[(A,A)] =
+  private def makePairs[A](l: List[A]): List[(A,A)] =
     if l.length == 2 then
       List((l.head, l.tail.head))
     else
@@ -75,7 +75,7 @@ class SolverDay08 {
       val antenna2 = pair._2
       val rowDiff = antenna1.row - antenna2.row
       val colDiff = antenna1.col - antenna2.col
-      println(s"Pair: $antenna1, $antenna2")
+      //println(s"Pair: $antenna1, $antenna2")
       // "Forward" nodes:
       var pos = antenna1
       testBlock.setCharAt(pos.row, pos.col, '#')
@@ -89,7 +89,7 @@ class SolverDay08 {
         if (block.withinBounds(pos) /* && pos != antenna1 && pos != antenna2 */)
           testBlock.setCharAt(pos.row, pos.col, '#')
           
-    testBlock.print()
+    //testBlock.print()
     val antiNodes = testBlock.findCoordinatesOf('#').toList.length
     antiNodes
 }

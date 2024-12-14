@@ -2,15 +2,10 @@ package com.cormontia.adventOfCode2024
 
 import scala.io.Source
 
-class SolverDay06 {
+class SolverDay06 extends Solver {
 
-  def parseDay06Input(filename: String): List[String] = {
-    val source = Source.fromFile(filename)
-    val lines = source.getLines.toList
-    lines
-  }
 
-  def solvePart1(lines: List[String]): Int = {
+  def solvePart1(lines: List[String]): Long = {
     val block = CharacterBlock(lines)
     val startPosition = block.findCoordinatesOf('^').head
 
@@ -75,7 +70,7 @@ class SolverDay06 {
     }
   }
 
-  def solvePart2(lines: List[String]): Int = {
+  def solvePart2(lines: List[String]): Long = {
     val block = CharacterBlock(lines)
     val startPosition = block.findCoordinatesOf('^').head
     markVisits(block, startPosition)
@@ -88,7 +83,6 @@ class SolverDay06 {
     answer
   }
 
-  //private def resultsInLoop(lines: List[String], blockedPosition: (Int, Int), startPosition: (Int, Int)): Boolean = {
   private def resultsInLoop(block: CharacterBlock, blockedPosition: (Int, Int), startPosition: (Int, Int)): Boolean = {
     //println(s"Blocking position (${blockedPosition._1}, ${blockedPosition._2}).")
     var direction = Direction.Up
