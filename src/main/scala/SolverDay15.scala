@@ -69,7 +69,7 @@ class SolverDay15 extends Solver {
         case _ => println("OOPS, invalid instruction!")
 
     val boxes = grid.findCoordinatesOf('O').toList
-    //TODO!~ Find a nice way to do this with a fold.
+    //TODO?~ Find a nice way to do this with a fold.
     //val sum = boxes.fold(0)((acc: Int, coor) => acc + 100 * coor.row + coor.col)
     boxes.map( coor => 100 * coor.row + coor.col ).sum
 
@@ -103,63 +103,151 @@ class SolverDay15 extends Solver {
       endCoor = move(endCoor)
     endCoor
 
+  private def rowOfBigBoxes(grid: Grid[Char], firstBox: Coor, move: Coor => Coor) =
+    var endCoor = firstBox
+    while "[]".contains(grid.get(endCoor)) do
+      endCoor = move(endCoor)
+    endCoor
+
   override def solvePart2(lines: List[String]): Long =
     val (grid0, directions0) = gridAndMovementsPart2(lines)
     grid = grid0
     directions = directions0
+    robotPos = grid.findCoordinatesOf('@').head
     grid.print()
+    for ch <- directions do
+      ch match
+        case '<' => moveLeft()
+        case '>' => moveRight()
+        case '^' => moveUp()
+        case 'v' => moveDown()
+        case _ => println("NOT YET IMPLEMENTED.")
+      grid.print()
     0 //TODO!~
 
-  /**
-   * Can a set of boxes be moved vertically?
-   * @param grid The grid to inspect
-   * @param robotPos Position of the robot that moves the boxes. Or of a box being pushed BY the robot, directly or indirectly.
-   * @param direction The direction in which to move - upwards (-1) or downwards (+1)
-   * @return <code>true</code> if and only if the boxes can be moved in the given direction.
-   */
-  private def canPyramidMove(grid: Grid[Char], robotPos: Coor, direction: Int): Boolean =
-    val aboveRobot = Coor(robotPos.row + direction, robotPos.col)
-    var result = false
-    if grid.get(aboveRobot) == '[' then {
+  private def moveUp(): Unit =
+    println("Trying to move up.")
+    val nextPos = Coor(robotPos.row - 1, robotPos.col)
+    if grid.get(nextPos) == '.' then
+      grid.set(nextPos, '@')
+      grid.set(robotPos, '.')
+      robotPos = nextPos
+    else if grid.get(nextPos) == '#' then
+      ; // Do nothing
+    else if canPyramidMove(grid, robotPos, -1) then
+      grid = movePyramidVertically(grid, robotPos, -1)
 
-      var case1 = false
-      val aboveAbove1 = Coor(aboveRobot.row + direction, aboveRobot.col)
-      if grid.get(aboveAbove1) == '.' then
-        case1 = true
-      else
-        case1 = canPyramidMove(grid, aboveAbove1, direction)
+  private def moveDown(): Unit =
+    println("Trying to move down.")
+    val nextPos = Coor(robotPos.row + 1, robotPos.col)
+    if grid.get(nextPos) == '.' then
+      grid.set(nextPos, '@')
+      grid.set(robotPos, '.')
+      robotPos = nextPos
+    else if grid.get(nextPos) == '#' then
+      ; // Do nothing
+    else if canPyramidMove(grid, robotPos, + 1) then
+      grid = movePyramidVertically(grid, robotPos, +1)
 
-      var case2 = false
-      val aboveAbove2 = Coor(aboveRobot.row + direction, aboveRobot.col + 1)
-      if grid.get(aboveAbove2) == '.' then
-        case2 = true
-      else
-        case2 = canPyramidMove(grid, aboveAbove2, direction)
+  private def movePyramidVertically(grid: Grid[Char], startPos: Coor, direction: Int): Grid[Char] =
+    val newGrid = Grid(grid)
+    // Look at the next row in the "old" grid.
+    // Find all boxes that will be pushed up/down.
+    // Move them up/down in the NEW grid.
+    var row = startPos.row
+    var cols = List(startPos.col)
+    while cols.nonEmpty do
+      // Move all relevant boxes up.
+      //println(s"Row = $row Affected Columns = ${cols.mkString(",")}")
+      //newGrid.print()
+      for col <- cols do
+        val toMove = grid.get(row,col)
+        val belowToMove = grid.get(row - direction, col)
+        //TODO?+ if belowToMove=='#' then belowToMove='.'
+        newGrid.set(row, col, belowToMove)
+        newGrid.set(row + direction, col, toMove)
+      // Determine the columns for the next round.
+      var newCols: List[Int] = Nil
+      for col <- cols do
+        val positionAbove = Coor(row + direction, col)
+        if grid.get(positionAbove) == '[' then
+          newCols = col :: (col + 1) :: newCols
+        else if grid.get(positionAbove) == ']' then
+          newCols = (col - 1) :: col :: newCols
+      // Ready for the next iteration.
+      cols = newCols
+      row = row + direction
+    newGrid.set(robotPos, '.')
+    newGrid.set(robotPos.row + direction, robotPos.col, '@')
+    robotPos = Coor(robotPos.row + direction, robotPos.col)
+    newGrid
 
-      result = case1 && case2
-    }
-    else if grid.get(aboveRobot) == ']' then {
-      var case1 = false
-      val aboveAbove1 = Coor(aboveRobot.row + direction, aboveRobot.col)
-      if grid.get(aboveAbove1) == '.' then
-        case1 = true
-      else
-        case1 = canPyramidMove(grid, aboveAbove1, direction)
-
-      var case2 = false
-      val aboveAbove2 = Coor(aboveRobot.row + direction, aboveRobot.col - 1)
-      if grid.get(aboveAbove2) == '.' then
-        case2 = true
-      else
-        case2 = canPyramidMove(grid, aboveAbove2, direction)
-      var result = case1 && case2
-    }
-    else if grid.get(aboveRobot) == '.' then
-      result = true
-    else if grid.get(aboveRobot) == '#' then
-      result = false
+  private def moveLeft(): Unit =
+    println("Trying to move left.")
+    val nextPos = Coor(robotPos.row, robotPos.col - 1)
+    if grid.get(nextPos) == '.' then
+      grid.set(robotPos, '.')
+      grid.set(nextPos, '@')
+      robotPos = nextPos
+    else if grid.get(nextPos) == '#' then
+      ; // Do nothing
     else
-      println(s"ERROR! Grid position contains unexpected value: ${grid.get(aboveRobot)}")
-      result = false
+      val spaceBehindBoxes = rowOfBigBoxes(grid, nextPos, coor => Coor(coor.row, coor.col - 1))
+      if grid.get(spaceBehindBoxes) == '.' then
+        val leftmostColumn = spaceBehindBoxes.col
+        val rightmostColumn = nextPos.col
+        // Move the entire row.
+        for col <- leftmostColumn to rightmostColumn do
+          val neighbour = grid.get(nextPos.row, col + 1)
+          grid.set(nextPos.row, col, neighbour)
+        grid.set(robotPos, '.')
+        grid.set(nextPos, '@')
+        robotPos = nextPos
+
+  private def moveRight(): Unit =
+    println("Trying to move right.")
+    val nextPos = Coor(robotPos.row, robotPos.col + 1)
+    if grid.get(nextPos) == '.' then
+      grid.set(robotPos, '.')
+      grid.set(nextPos, '@')
+      robotPos = nextPos
+    else if grid.get(nextPos) == '#' then
+      ; // Do nothing
+    else
+      val spaceBehindBoxes = rowOfBigBoxes(grid, nextPos, coor => Coor(coor.row, coor.col + 1))
+      if grid.get(spaceBehindBoxes) == '.' then
+        val leftmostColumn = nextPos.col
+        val rightmostColumn = spaceBehindBoxes.col
+        // Move the entire row.
+        for col <- rightmostColumn to leftmostColumn by -1 do
+          val neighbour = grid.get(nextPos.row, col - 1)
+          grid.set(nextPos.row, col, neighbour)
+        grid.set(robotPos, '.')
+        grid.set(nextPos, '@')
+        robotPos = nextPos
+
+  private def canPyramidMove(grid: Grid[Char], robotPos: Coor, direction: Int): Boolean =
+    canPyramidMove(grid, robotPos.row, Set(robotPos.col), direction)
+
+  private def canPyramidMove(grid: Grid[Char], row: Int, affectedColumns: Set[Int], direction: Int): Boolean =
+    val newColumns = scala.collection.mutable.Set[Int]()
+    var result = true
+    for col <- affectedColumns do
+      val above = Coor(row + direction, col)
+      val contentsAbove = grid.get(above)
+      contentsAbove match
+        case '.' =>
+          result = result
+        case '#' =>
+          result = false
+        case '[' =>
+          newColumns.add(col)
+          newColumns.add(col + 1)
+          result = result && canPyramidMove(grid, row + direction, newColumns.toSet, direction)
+        case ']' =>
+          newColumns.add(col)
+          newColumns.add(col + 1)
+          result = result && canPyramidMove(grid, row + direction, newColumns.toSet, direction)
     result
+
 }
