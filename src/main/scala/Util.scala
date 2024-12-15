@@ -35,4 +35,9 @@ object Util {
         return true
     false
 
+  def charGridToSvg(grid: Grid[Char]): String =
+    val start = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n</head>\n<body>\n  <svg width=\"200\" height=\"200\">"
+    val end = "  </svg>\n</body>\n</html>"
+    val middle = "" //TODO!~
+    start ++ middle ++ end
 }
