@@ -109,4 +109,57 @@ class SolverDay15 extends Solver {
     directions = directions0
     grid.print()
     0 //TODO!~
+
+  /**
+   * Can a set of boxes be moved vertically?
+   * @param grid The grid to inspect
+   * @param robotPos Position of the robot that moves the boxes. Or of a box being pushed BY the robot, directly or indirectly.
+   * @param direction The direction in which to move - upwards (-1) or downwards (+1)
+   * @return <code>true</code> if and only if the boxes can be moved in the given direction.
+   */
+  private def canPyramidMove(grid: Grid[Char], robotPos: Coor, direction: Int): Boolean =
+    val aboveRobot = Coor(robotPos.row + direction, robotPos.col)
+    var result = false
+    if grid.get(aboveRobot) == '[' then {
+
+      var case1 = false
+      val aboveAbove1 = Coor(aboveRobot.row + direction, aboveRobot.col)
+      if grid.get(aboveAbove1) == '.' then
+        case1 = true
+      else
+        case1 = canPyramidMove(grid, aboveAbove1, direction)
+
+      var case2 = false
+      val aboveAbove2 = Coor(aboveRobot.row + direction, aboveRobot.col + 1)
+      if grid.get(aboveAbove2) == '.' then
+        case2 = true
+      else
+        case2 = canPyramidMove(grid, aboveAbove2, direction)
+
+      result = case1 && case2
+    }
+    else if grid.get(aboveRobot) == ']' then {
+      var case1 = false
+      val aboveAbove1 = Coor(aboveRobot.row + direction, aboveRobot.col)
+      if grid.get(aboveAbove1) == '.' then
+        case1 = true
+      else
+        case1 = canPyramidMove(grid, aboveAbove1, direction)
+
+      var case2 = false
+      val aboveAbove2 = Coor(aboveRobot.row + direction, aboveRobot.col - 1)
+      if grid.get(aboveAbove2) == '.' then
+        case2 = true
+      else
+        case2 = canPyramidMove(grid, aboveAbove2, direction)
+      var result = case1 && case2
+    }
+    else if grid.get(aboveRobot) == '.' then
+      result = true
+    else if grid.get(aboveRobot) == '#' then
+      result = false
+    else
+      println(s"ERROR! Grid position contains unexpected value: ${grid.get(aboveRobot)}")
+      result = false
+    result
 }
