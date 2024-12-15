@@ -1,5 +1,8 @@
 package com.cormontia.adventOfCode2024
 
+import scala.util.boundary
+import scala.util.boundary.break
+
 class Util {
 }
 
@@ -29,11 +32,15 @@ object Util {
   def containsContiguousChunk(list: List[Long], n: Int): Boolean =
     val sortedList = list.sorted // Sort is ascending by default.
     val windows = sortedList.sliding(n)
-    for window <- windows do
-      var expected = window.head
-      if Util.subsequentNumbers(window) then
-        return true
-    false
+    var result = false
+    boundary {
+      for window <- windows do
+        var expected = window.head
+        if Util.subsequentNumbers(window) then
+          result = true
+          break()
+    }
+    result
 
   def charGridToSvg(grid: Grid[Char]): String =
     val start = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n</head>\n<body>\n  <svg width=\"200\" height=\"200\">"
