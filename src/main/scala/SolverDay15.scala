@@ -12,11 +12,6 @@ class SolverDay15 extends Solver {
       else
         gridLines = line :: gridLines
     val grid = Grid[Char](gridLines.reverse, ch => ch)
-
-    println("GRID:")
-    grid.print()
-    println("INSTRUCTIONS:")
-    println(directions)
     (grid, directions)
 
   private def gridAndMovementsPart2(lines: List[String]): (Grid[Char], String) =
@@ -29,11 +24,6 @@ class SolverDay15 extends Solver {
       else
         gridLines = doubleLine(line) :: gridLines
     val grid = Grid[Char](gridLines.reverse, ch => ch)
-
-    println("GRID:")
-    grid.print()
-    println("INSTRUCTIONS:")
-    println(directions)
     (grid, directions)
 
   private def doubleLine(line: String): String =
@@ -114,25 +104,19 @@ class SolverDay15 extends Solver {
     grid = grid0
     directions = directions0
     robotPos = grid.findCoordinatesOf('@').head
-    grid.print()
-    var counter = 0
     for ch <- directions do
-      counter = counter + 1
-      println(s"Move $counter.")
       ch match
         case '<' => moveLeft()
         case '>' => moveRight()
         case '^' => moveUp()
         case 'v' => moveDown()
-        case _ => println("NOT YET IMPLEMENTED.")
-      //grid.print()
+        case _ => println(s"ERROR: Unexpected symbol in input: $ch.")
     val boxes = grid.findCoordinatesOf('[').toList
     //TODO?~ Find a nice way to do this with a fold.
     //val sum = boxes.fold(0)((acc: Int, coor) => acc + 100 * coor.row + coor.col)
     boxes.map( coor => 100 * coor.row + coor.col ).sum
 
   private def moveUp(): Unit =
-    println("Trying to move up.")
     val nextPos = Coor(robotPos.row - 1, robotPos.col)
     if grid.get(nextPos) == '.' then
       grid.set(nextPos, '@')
@@ -141,11 +125,9 @@ class SolverDay15 extends Solver {
     else if grid.get(nextPos) == '#' then
       ; // Do nothing
     else if canPyramidMove(grid, robotPos, -1) then
-      println(s"Pyramid can move. robotPos=$robotPos")
       grid = movePyramidVertically(grid, robotPos, -1)
 
   private def moveDown(): Unit =
-    println("Trying to move down.")
     val nextPos = Coor(robotPos.row + 1, robotPos.col)
     if grid.get(nextPos) == '.' then
       grid.set(nextPos, '@')
@@ -167,8 +149,6 @@ class SolverDay15 extends Solver {
     val affectedPositions = scala.collection.mutable.Set[Coor]()
     while cols.nonEmpty do
       // Move all relevant boxes up.
-      println(s"Row = $row Affected Columns = ${cols.mkString(",")}")
-      //newGrid.print()
       for col <- cols do
         val toMove = grid.get(row,col)
         affectedPositions.add(Coor(row, col))
@@ -187,9 +167,6 @@ class SolverDay15 extends Solver {
       row = row + direction
 
     // Now we should have all positions to move...
-    println(s"Boxes to move at: ${affectedPositions.mkString(",")}")
-    println(s"...${affectedPositions.toList.map( c => grid.get(c) ) }")
-    // Let's do some moving.
     affectedPositions.foreach( c => newGrid.set(c.row, c.col, '.'))
     affectedPositions.foreach( c => newGrid.set(c.row + direction, c.col, grid.get(c)))
 
@@ -199,7 +176,6 @@ class SolverDay15 extends Solver {
     newGrid
 
   private def moveLeft(): Unit =
-    println("Trying to move left.")
     val nextPos = Coor(robotPos.row, robotPos.col - 1)
     if grid.get(nextPos) == '.' then
       grid.set(robotPos, '.')
@@ -221,7 +197,6 @@ class SolverDay15 extends Solver {
         robotPos = nextPos
 
   private def moveRight(): Unit =
-    println("Trying to move right.")
     val nextPos = Coor(robotPos.row, robotPos.col + 1)
     if grid.get(nextPos) == '.' then
       grid.set(robotPos, '.')

@@ -1,8 +1,5 @@
 package com.cormontia.adventOfCode2024
 
-import java.time.{Duration, LocalDateTime}
-import scala.util.{Failure, Success}
-
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 @main
@@ -25,7 +22,7 @@ def main(): Unit =
 
 def solveDay15(): Unit =
   // Part 1: 1552879
-  // Part 2: ???
+  // Part 2: 1561175
   println("Day 15:")
   SolverDay15().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay15.txt")
 
