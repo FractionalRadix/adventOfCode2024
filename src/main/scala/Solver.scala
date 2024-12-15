@@ -11,7 +11,7 @@ abstract class Solver {
       val source = Source.fromFile(filename)
       source.getLines.toList
     }
-
+  
   def solvePart1(lines: List[String]): Long
 
   def solvePart2(lines: List[String]): Long

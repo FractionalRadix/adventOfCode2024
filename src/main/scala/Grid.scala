@@ -109,6 +109,9 @@ class Grid[T: ClassTag] {
   def set(rowIdx: Int, colIdx: Int, elt: T): Unit =
     arr(rowIdx)(colIdx) = elt
 
+  def set(coor: Coor, elt: T): Unit =
+    arr(coor.row)(coor.col) = elt
+  
   /**
    * Find the distinct elements in the grid.
    * For example, if the grid consisted of the rows 'zzA', 'zAz', and 'zzA', it would return {'z', 'A'}.
