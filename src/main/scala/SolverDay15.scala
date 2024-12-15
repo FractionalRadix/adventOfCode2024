@@ -19,6 +19,37 @@ class SolverDay15 extends Solver {
     println(directions)
     (grid, directions)
 
+  private def gridAndMovementsPart2(lines: List[String]): (Grid[Char], String) =
+    var directions = ""
+    var gridLines = List[String]()
+    for line <- lines if line.nonEmpty do
+      val firstChar = line(0)
+      if "<v>^".contains(firstChar) then
+        directions = directions ++ line
+      else
+        gridLines = doubleLine(line) :: gridLines
+    val grid = Grid[Char](gridLines.reverse, ch => ch)
+
+    println("GRID:")
+    grid.print()
+    println("INSTRUCTIONS:")
+    println(directions)
+    (grid, directions)
+
+  private def doubleLine(line: String): String =
+    var res: String = ""
+    for ch <- line do
+      res = res + doubleChar(ch)
+    res
+
+  private def doubleChar(ch: Char): String =
+    ch match
+      case '#' => "##"
+      case 'O' => "[]"
+      case '@' => "@."
+      case '.' => ".."
+      case _ => println("ERROR IN INPUT!"); "??"
+
   private var robotPos: Coor = Coor(0,0) // Temporary initial value
   private var grid: Grid[Char] = Grid[Char]()
   private var directions = ""
@@ -73,5 +104,9 @@ class SolverDay15 extends Solver {
     endCoor
 
   override def solvePart2(lines: List[String]): Long =
+    val (grid0, directions0) = gridAndMovementsPart2(lines)
+    grid = grid0
+    directions = directions0
+    grid.print()
     0 //TODO!~
 }
