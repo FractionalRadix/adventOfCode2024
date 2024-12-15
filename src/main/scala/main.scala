@@ -24,10 +24,10 @@ def main(): Unit =
   solveDay15()
 
 def solveDay15(): Unit =
-  // Part 1: ???
+  // Part 1: 1552879
   // Part 2: ???
   println("Day 15:")
-  SolverDay15().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay15_sample2.txt")
+  SolverDay15().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay15.txt")
 
 def solveDay14(): Unit =
   // Part 1: 230686500
