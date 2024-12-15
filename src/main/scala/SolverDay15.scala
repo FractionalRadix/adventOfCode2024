@@ -115,15 +115,21 @@ class SolverDay15 extends Solver {
     directions = directions0
     robotPos = grid.findCoordinatesOf('@').head
     grid.print()
+    var counter = 0
     for ch <- directions do
+      counter = counter + 1
+      println(s"Move $counter.")
       ch match
         case '<' => moveLeft()
         case '>' => moveRight()
         case '^' => moveUp()
         case 'v' => moveDown()
         case _ => println("NOT YET IMPLEMENTED.")
-      grid.print()
-    0 //TODO!~
+      //grid.print()
+    val boxes = grid.findCoordinatesOf('[').toList
+    //TODO?~ Find a nice way to do this with a fold.
+    //val sum = boxes.fold(0)((acc: Int, coor) => acc + 100 * coor.row + coor.col)
+    boxes.map( coor => 100 * coor.row + coor.col ).sum
 
   private def moveUp(): Unit =
     println("Trying to move up.")
@@ -135,6 +141,7 @@ class SolverDay15 extends Solver {
     else if grid.get(nextPos) == '#' then
       ; // Do nothing
     else if canPyramidMove(grid, robotPos, -1) then
+      println(s"Pyramid can move. robotPos=$robotPos")
       grid = movePyramidVertically(grid, robotPos, -1)
 
   private def moveDown(): Unit =
@@ -153,19 +160,19 @@ class SolverDay15 extends Solver {
     val newGrid = Grid(grid)
     // Look at the next row in the "old" grid.
     // Find all boxes that will be pushed up/down.
-    // Move them up/down in the NEW grid.
+    // Add these to the list of things to move.
+    // Then move these up in the new grid: first make them "."  in the new grid, then move them up.
     var row = startPos.row
     var cols = List(startPos.col)
+    val affectedPositions = scala.collection.mutable.Set[Coor]()
     while cols.nonEmpty do
       // Move all relevant boxes up.
-      //println(s"Row = $row Affected Columns = ${cols.mkString(",")}")
+      println(s"Row = $row Affected Columns = ${cols.mkString(",")}")
       //newGrid.print()
       for col <- cols do
         val toMove = grid.get(row,col)
-        val belowToMove = grid.get(row - direction, col)
-        //TODO?+ if belowToMove=='#' then belowToMove='.'
-        newGrid.set(row, col, belowToMove)
-        newGrid.set(row + direction, col, toMove)
+        affectedPositions.add(Coor(row, col))
+
       // Determine the columns for the next round.
       var newCols: List[Int] = Nil
       for col <- cols do
@@ -174,9 +181,18 @@ class SolverDay15 extends Solver {
           newCols = col :: (col + 1) :: newCols
         else if grid.get(positionAbove) == ']' then
           newCols = (col - 1) :: col :: newCols
+
       // Ready for the next iteration.
       cols = newCols
       row = row + direction
+
+    // Now we should have all positions to move...
+    println(s"Boxes to move at: ${affectedPositions.mkString(",")}")
+    println(s"...${affectedPositions.toList.map( c => grid.get(c) ) }")
+    // Let's do some moving.
+    affectedPositions.foreach( c => newGrid.set(c.row, c.col, '.'))
+    affectedPositions.foreach( c => newGrid.set(c.row + direction, c.col, grid.get(c)))
+
     newGrid.set(robotPos, '.')
     newGrid.set(robotPos.row + direction, robotPos.col, '@')
     robotPos = Coor(robotPos.row + direction, robotPos.col)
@@ -246,7 +262,7 @@ class SolverDay15 extends Solver {
           result = result && canPyramidMove(grid, row + direction, newColumns.toSet, direction)
         case ']' =>
           newColumns.add(col)
-          newColumns.add(col + 1)
+          newColumns.add(col - 1)
           result = result && canPyramidMove(grid, row + direction, newColumns.toSet, direction)
     result
 
