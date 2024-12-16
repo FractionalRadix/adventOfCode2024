@@ -17,25 +17,16 @@ class SolverDay16 extends Solver {
     val endPos = maze.findCoordinatesOf('E').head
     val maxScore = move_iterative(maze, startPos) // The answer to part 1 (!)
     val foundPaths = find_paths(maze, startPos, maxScore)
-    println(s"Found ${foundPaths.size} paths.")
-
-    for path <- foundPaths do
-      println(s"${path._1} : ${path._2.size} elements.")
 
     val lowestCost = foundPaths.map( p => p._1 ).min
-    println(s"lowest score=$lowestCost")
     val shortestPaths = foundPaths
       .filter( p => p._1 == lowestCost )
       .filter( p => p._2.contains( endPos ) )
-    println(s"...${shortestPaths.size} have the lowest cost.")
 
     val seats = scala.collection.mutable.Set[Coor]()
     for path <- shortestPaths do
-      //printSeats(maze, path._2.toSet)
       for pos <- path._2 do
         seats.add(pos)
-    //println(s"${seats.mkString(",")}")
-    //printSeats(maze, seats.toSet)
     seats.size
 
   private var lowestScore: Option[Long] = None
@@ -96,7 +87,6 @@ class SolverDay16 extends Solver {
     lowestScore.get
 
   // New version of Stack Element that also keeps track of the path taken.
-  //TODO?~ Does this work given the necessary optimization of keeping track of the lowest value for any position on the maze?
   private case class StackElement2(
     position: Coor,
     direction: Direction,
@@ -115,6 +105,13 @@ class SolverDay16 extends Solver {
 
     val result = scala.collection.mutable.Set[(Long, List[Coor])]()
 
+    // For every position, keep track of the lowest score when going in a specific direction.
+    val lowestScores = Grid[scala.collection.mutable.Map[Direction, Long]](maze.nrOfRows, maze.nrOfCols)
+    for row <- 0 until lowestScores.nrOfRows do
+      for col <- 0 until lowestScores.nrOfCols do
+        lowestScores.set(row, col, scala.collection.mutable.Map[Direction, Long]())
+
+
     val stack = mutable.Stack[StackElement2]()
     val start = StackElement2(startPos, Direction.Right, 0, Nil)
 
@@ -124,11 +121,27 @@ class SolverDay16 extends Solver {
       val currentPos = currentState.position
       val currentDir = currentState.direction
 
-      val shouldProcess = currentState.score < maxScore // + 1001
+      var shouldProcess = currentState.score < maxScore // + 1001
+
+      val lowestScoresHere = lowestScores.get(currentPos)
+      if lowestScoresHere.contains(currentDir) then {
+        // Have we already been here, in the same direction, with a better score? Then stop.
+        val lowestScoreSoFar = lowestScoresHere.get(currentDir).head
+        if lowestScoreSoFar < currentState.score then {
+          shouldProcess = false
+        } else {
+          lowestScoresHere.put(currentDir, currentState.score)
+          lowestScores.set(currentPos, lowestScoresHere)
+        }
+      } else {
+        lowestScoresHere.put(currentDir, currentState.score)
+        lowestScores.set(currentPos, lowestScoresHere)
+      }
+
 
       if shouldProcess then
 
-        print(s"$currentPos ")
+        //print(s"$currentPos ")
         // Use the "availableNeighbours" that increases the cost the fastest.
         // This way we cut off search paths early.
         val nextPositions = availableNeighbours(currentPos, currentDir)
