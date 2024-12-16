@@ -20,6 +20,11 @@ def main(): Unit =
   //solveDay14()
   //solveDay15()
   solveDay16()
+  solveDay17()
+  
+def solveDay17():Unit =
+  println("Day 17:")
+  SolverDay17().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay17_sample.txt")
 
 def solveDay16(): Unit =
   println("Day 16:")

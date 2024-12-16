@@ -128,7 +128,10 @@ class SolverDay16 extends Solver {
 
       if shouldProcess then
 
-        val nextPositions = availableNeighbours3(currentPos, currentDir)
+        print(s"$currentPos ")
+        // Use the "availableNeighbours" that increases the cost the fastest.
+        // This way we cut off search paths early.
+        val nextPositions = availableNeighbours(currentPos, currentDir)
 
         for nextPosAndDir <- nextPositions do
           val contents = maze.get(nextPosAndDir.position)
