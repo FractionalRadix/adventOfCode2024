@@ -17,7 +17,6 @@ class SolverDay16 extends Solver {
     println
     answer
 
-
   private var lowestScore: Option[Long] = None
 
   private case class StackElement(
@@ -36,7 +35,7 @@ class SolverDay16 extends Solver {
       print(s"${stack.size} ")
       val currentState = stack.pop()
       val currentPosAndDir = currentState.current
-      var nextPositions = availableNeighbours(currentPosAndDir.position, currentPosAndDir.direction)
+      var nextPositions = availableNeighbours2(currentPosAndDir.position, currentPosAndDir.direction)
       nextPositions = nextPositions.filter( pd => !currentState.visited.contains(pd) )
       for nextPosAndDir <- nextPositions do
         val contents = maze.get(nextPosAndDir.position)
@@ -62,7 +61,7 @@ class SolverDay16 extends Solver {
    * @param v2 The possibly empty second value to compare
    * @return The minimum of v1 and v2, if v2 is defined; v1 otherwise.
    */
-  def optionMin(v1: Long, v2: Option[Long]): Long =
+  private def optionMin(v1: Long, v2: Option[Long]): Long =
     if v2.isEmpty then v1 else math.min(v1, v2.get)
 
   def move(maze: Grid[Char], pos: Coor, direction: Direction, visited: Set[PositionAndDirection], score: Long, recursiveDepth: Int): Long =
@@ -98,8 +97,36 @@ class SolverDay16 extends Solver {
     }
     score
 
+  // Like `availableNeighbours(...)`, but we always try to go to the right first, up second, down third, left last.
+  private def availableNeighbours2(pos: Coor, direction: Direction) = {
+    val nextPositions: List[PositionAndDirection] =
+      direction match
+        case Down => List(
+          PositionAndDirection(neighbour(pos, Right), Right),
+          PositionAndDirection(neighbour(pos, Down), Down),
+          PositionAndDirection(neighbour(pos, Left), Left),
+        )
+        case Up => List(
+          PositionAndDirection(neighbour(pos, Right), Right),
+          PositionAndDirection(neighbour(pos, Up), Up),
+          PositionAndDirection(neighbour(pos, Left), Left),
+        )
+        case Left => List(
+          PositionAndDirection(neighbour(pos, Up), Up),
+          PositionAndDirection(neighbour(pos, Down), Down),
+          PositionAndDirection(neighbour(pos, Left), Left),
+        )
+        case Right => List(
+          PositionAndDirection(neighbour(pos, Right), Right),
+          PositionAndDirection(neighbour(pos, Up), Up),
+          PositionAndDirection(neighbour(pos, Down), Down)
+        )
+    nextPositions
+
+  }
+
   private def availableNeighbours(pos: Coor, direction: Direction) = {
-    var nextPositions: List[PositionAndDirection] =
+    val nextPositions: List[PositionAndDirection] =
       direction match
         case Down => List(
           PositionAndDirection(neighbour(pos, Down), Down),
@@ -125,7 +152,6 @@ class SolverDay16 extends Solver {
   }
 
   case class PositionAndDirection(position: Coor, direction: Direction)
-
 
   /**
    * Given a position and a direction, determine the next position in that direction.
