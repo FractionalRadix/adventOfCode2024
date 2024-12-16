@@ -2,7 +2,6 @@ package com.cormontia.adventOfCode2024
 
 import scala.reflect.ClassTag
 
-//class Grid[T](using m: ClassTag[T]) {
 class Grid[T: ClassTag] {
 
   /**

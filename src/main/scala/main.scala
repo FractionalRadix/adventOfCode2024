@@ -23,8 +23,11 @@ def main(): Unit =
 
 def solveDay16(): Unit =
   println("Day 16:")
-  //SolverDay16().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay16_sample1.txt")
-  //SolverDay16().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay16_sample2.txt")
+  // Part 1: 78428
+  // Part 2:   429 is TOO LOW.
+  SolverDay16().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay16_sample1.txt")
+  SolverDay16().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay16_sample2.txt")
+  //SolverDay16().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay16_sampleFromReddit1.txt") // 21148 , 149
   SolverDay16().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay16.txt")
 
 def solveDay15(): Unit =
