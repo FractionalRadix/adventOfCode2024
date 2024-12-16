@@ -153,7 +153,7 @@ class SolverDay16 extends Solver {
 
           if contents == 'E' then
             //lowestScore = Some(optionMin(newScore, lowestScore))
-            val pathAndScore = (newScore, nextPosAndDir.position :: currentState.position :: currentState.path)
+            val pathAndScore = (newScore, nextPosAndDir.position :: currentPos :: currentState.path)
             result.add(pathAndScore)
           else if contents == '.' then
             val pathSoFar = currentPos :: currentState.path
