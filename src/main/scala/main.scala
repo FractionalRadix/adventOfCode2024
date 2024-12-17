@@ -25,7 +25,7 @@ def main(): Unit =
 def solveDay17():Unit =
   println("Day 17:")
   // Part 1: 6,5,4,7,1,6,0,3,1
-  SolverDay17().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay17_sample5.txt")
+  SolverDay17().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay17.txt")
 
 def solveDay16(): Unit =
   println("Day 16:")

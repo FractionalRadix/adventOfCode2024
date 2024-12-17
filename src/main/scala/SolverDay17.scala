@@ -34,7 +34,7 @@ class SolverDay17 extends Solver {
     val regC = strippedLines(2).toLong
     val instructions = strippedLines(4).split(",").map( str => str.toInt )
 
-    val useNaive = true
+    val useNaive = false
     val result: Long = if useNaive then
       NAIVE_solvePart2(instructions, regA, regB, regC)
     else
@@ -43,20 +43,53 @@ class SolverDay17 extends Solver {
     result
 
   private def SPECIFIC_solvePart2(instructions: Array[Int], regA: Long, regB: Long, regC: Long): Long =
-    val desiredResult: Array[Int] = instructions
-    val desiredResultXor3: Array[Int] = instructions.map( instr => instr ^ 3 )
-    var multiplier: Long = 1
-    var result: Long = 0
-    for elt <- desiredResultXor3 do
-      result = result + elt * multiplier
-      multiplier = multiplier * 8
+    // The requested output is 16 elements long. There is only one "OUT" instruction, so this should be called 16 times.
+    // The values in the registers always decrease, unless they are taken (via XOR) from another register.
+    // This means the value in any register is capped by the highest input value.
 
-    println(s"Result is $result")
+    // Our output ends in 5,5,3,0.
+    // Let's find the combinations of 6 octal digits that result in a list ending with (5,5,3,0).
+    val resultsIn5530 = findListsThatResultIn5530(instructions, regB, regC)
+    println(s"${resultsIn5530.length} combinations.")
+    // To be on the safe side, strip the most significant octal digits.
+    // Then iterate over 4 more octal digits: 4 "fresh" ones followed by the elements from this List.
+    val truncatedResultsIn5530 = for list <- resultsIn5530 yield list.takeRight(4)
+    //TODO!+ De-duplicate the truncated list!
+    for i0 <- 0L to 7L do
+      for i1 <- 0L to 7L do
+        for i2 <- 0L to 7L do
+          for i3 <- 0L to 7L do
+            var octals7to4: Long = 8 * 8 * 8 * i0 +  8 * 8 * i1 +  8 * i2 + i3
+            octals7to4 = octals7to4 * (8*8*8*8)
+            for octals3to0List <- truncatedResultsIn5530 do
+              val octals3to0 = 8*8*8*octals3to0List(0) + 8*8*octals3to0List(1) + 8*octals3to0List(2) + octals3to0List(3)
+              val octals7to0 = octals7to4 + octals3to0
+              val output = executeProgram2(instructions, octals7to0, regB, regC)
+              if output.takeRight(6) == List(4,2,5,5,3,0) then
+                println(s"FOUND ONE! $i0 $i1 $i2 $i3 ${octals3to0List(0)} ${octals3to0List(1)} ${octals3to0List(2)} ${octals3to0List(3)} $output")
 
-    NAIVE_solvePart2(instructions, regA, regB, regC)
 
 
-  //def NAIVE_solvePart2(lines: List[String]): Long =
+    println(s"Expected output: ${instructions.mkString(",")}")
+
+    0 //TODO!~
+
+  private def findListsThatResultIn5530(instructions: Array[Int], regB: Long, regC: Long ): List[List[Long]] =
+    // Find the octals that will result in a computation ending on (5,5,3,0).
+    var result: List[List[Long]] = Nil
+    for i0 <- 0L to 7L do
+      for i1 <- 0L to 7L do
+        for i2 <- 0L to 7L do
+          for i3 <- 0L to 7L do
+            for i4 <- 0L to 7L do
+              for i5 <- 0L to 7L do
+                val a = 8 * 8 * 8 * 8 * 8 * i0 + 8 * 8 * 8 * 8 * i1 + 8 * 8 * 8 * i2 + 8 * 8 * i3 + 8 * i4 + i5
+                val output = executeProgram2(instructions, a, regB, regC)
+                if output.takeRight(4) == List[Long](5, 5, 3, 0) then
+                  //println(s"FOUND! $i0 $i1 $i2 $i3 $i4 $i5 $output")
+                  result = List(i0,i1,i2,i3,i4,i5) :: result
+    result
+
   private def NAIVE_solvePart2(instructions: Array[Int], regA: Long, regB: Long, regC: Long): Long =
     println(s"Registers: $regA $regB $regC")
     println(s"Instructions: [${instructions.mkString(" .. ")}]")
@@ -64,8 +97,10 @@ class SolverDay17 extends Solver {
 
     //var init_regA: Long = 22537800000L // Earlier things have already been tried
     //var init_regA: Long = 34740700000L // Earlier things have already been tried
-    //var init_regA: Long = 72935900000L // Earlier things have already been tried
-    var init_regA = 0L
+    var init_regA: Long = 72935900000L // Earlier things have already been tried
+
+    //var init_regA: Long = 67523687193987L // Not the solution...
+    //var init_regA: Long = 0
 
     var found = false
     while !found do
@@ -112,12 +147,10 @@ class SolverDay17 extends Solver {
     var regC = param_regC
     var ip = 0
     var output: List[Long] = Nil
-    //println("--------------------------------------------------")
     while ip < instructions.length do
-      //println(s"$regA $regB $regC")
+      //println(s"ip=$ip A=$regA B=$regB C=$regC")
       instructions(ip) match
         case 0 => // ADV
-          //println(s"ADV")
           val operand = combo(instructions(ip + 1))
           regA = regA >> operand
           ip = ip + 2
@@ -139,8 +172,9 @@ class SolverDay17 extends Solver {
           ip = ip + 2
         case 5 => // OUT
           val operand = combo(instructions(ip + 1)) % 8
-          if operand != instructions(output.length) then
-            ip = ip + instructions.length // Force break
+          //TODO?+
+          //if operand != instructions(output.length) then
+          //  ip = ip + instructions.length // Force break
 
           output = output :+ operand
           ip = ip + 2
