@@ -35,10 +35,10 @@ class SolverDay17 extends Solver {
     println(s"Registers: $regA $regB $regC")
     println(s"Instructions: [${instructions.mkString(" .. ")}]")
 
-    var init_regA = 0
+    var init_regA: Long = 0
     var found = false
     while !found do
-      if init_regA % 10000 == 0 then
+      if init_regA % 100000 == 0 then
         print(s"$init_regA ")
       regA = init_regA
       val output = executeProgram2(instructions, regA, regB, regC)
