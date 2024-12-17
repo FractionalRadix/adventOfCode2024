@@ -2,12 +2,16 @@ package com.cormontia.adventOfCode2024
 
 class SolverDay17 extends Solver {
   override def solvePart1(lines: List[String]): Long =
-    var regA = lines(0).dropWhile( ch => ch != ':').drop(2).toLong
-    var regB = lines(1).dropWhile( ch => ch != ':').drop(2).toLong
-    var regC = lines(2).dropWhile( ch => ch != ':').drop(2).toLong
-    val instructions = lines(4).dropWhile( ch => ch != ':').drop(2).split(",").map( str => str.toInt )
+
+    val strippedLines = for line <- lines yield
+      line.dropWhile( ch => ch != ':').drop(2)
+    var regA = strippedLines(0).toLong
+    var regB = strippedLines(1).toLong
+    var regC = strippedLines(2).toLong
+    val instructions = strippedLines(4).split(",").map( str => str.toInt )
     println(s"Registers: $regA $regB $regC")
-    println(s"Instructions: [${instructions.mkString(" .. ")}")
+    println(s"Instructions: [${instructions.mkString(" .. ")}]")
+
     var ip = 0
     var output: List[Long] = Nil
     while ip < instructions.length do
@@ -15,14 +19,10 @@ class SolverDay17 extends Solver {
         case 0 => // ADV
           println(s"ADV")
           val operand = combo(instructions(ip + 1))
-          println(s"...combo operand=$operand")
           val numerator = regA
           val denominator = math.pow(2, operand)
-          println(s"...num/denom==$numerator/$denominator")
           regA = truncate(numerator / denominator)
-          println(s"...reg A contains $regA")
           ip = ip + 2
-          println(s"...next IP value: $ip")
         case 1 => // BXL
           println(s"BXL")
           val operand = instructions(ip + 1)
@@ -77,7 +77,14 @@ class SolverDay17 extends Solver {
                     0
 
     println(s"OUTPUT: ${output.mkString(",")}")
-    0 //TODO!~
+    println(s"A: $regA, B: $regB, C: $regC")
+    val str = output.mkString
+    if str.isEmpty then
+      println("No output.")
+    else
+      println(str)
+
+    if str.isEmpty then 0 else str.toLong
 
 
   private def truncate(x: Double): Long =
