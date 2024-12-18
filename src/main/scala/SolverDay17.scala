@@ -38,9 +38,80 @@ class SolverDay17 extends Solver {
     val result: Long = if useNaive then
       NAIVE_solvePart2(instructions, regA, regB, regC)
     else
-      SPECIFIC_solvePart2(instructions, regA, regB, regC)
+      SPECIFIC_solvePart2_take2(instructions, regB, regC)
 
     result.toString
+
+  private def SPECIFIC_solvePart2_take2(instructions: Array[Int], regB: Long, regC: Long): Long = {
+    // The output must be 16 octal digits long.
+    // First, let's create inputs that vary the lowest four octal digits, then filter the ones that yield "2,4".
+    var aFor24 = List[List[Long]]()
+    for i0 <- 0 to 7 do
+      for i1 <- 0 to 7 do
+        for i2 <- 0 to 7 do
+          for i3 <- 0 to 7 do
+            val aAsList = List[Long](i0, i1, i2, i3)
+            val res = executeProgram2(instructions, octalListToLong(aAsList), regB, regC)
+            if res.startsWith(List(2,4)) then
+              //println(s"$a -> ${res.mkString(",")}")
+              //aFor24.add(a)
+              aFor24 = aAsList :: aFor24
+
+
+    // Each time, we take the last two octal digits:
+    val lastTwoFor24 = aFor24.map( l => l.takeRight(2) ).distinct
+    var resultsStartWith2415 = loop6OctalDigitsPlusTails(lastTwoFor24, instructions, regB, regC, List(2,4,1,5))
+    resultsStartWith2415 = resultsStartWith2415.map( l => l.takeRight(4) ).distinct
+    var resultsStartWith241575 = loop6OctalDigitsPlusTails(resultsStartWith2415, instructions, regB, regC, List(2,4,1,5,7,5))
+    resultsStartWith241575 = resultsStartWith241575.map( l => l.takeRight(6) ).distinct
+    var resultsStartWith24157516 = loop6OctalDigitsPlusTails(resultsStartWith241575, instructions, regB, regC, List(2,4,1,5,7,5,1,6))
+    resultsStartWith24157516 = resultsStartWith24157516.map( l => l.takeRight(8) ).distinct
+    var resultsStartWith2415751603 = loop6OctalDigitsPlusTails(resultsStartWith24157516, instructions, regB, regC, List(2,4,1,5,7,5,1,6,0,3))
+    resultsStartWith2415751603 = resultsStartWith2415751603.map( l => l.takeRight(10) ).distinct
+    var resultsStartWith241575160342 = loop6OctalDigitsPlusTails( resultsStartWith2415751603, instructions, regB, regC, List(2,4,1,5,7,5,1,6,0,3,4,2))
+    resultsStartWith241575160342 = resultsStartWith241575160342.map( l => l.takeRight(12) ).distinct
+    var resultsStartWith24157516034255 = loop6OctalDigitsPlusTails( resultsStartWith241575160342, instructions, regB,regC, List(2,4,1,5,7,5,1,6,0,3,4,2, 5, 5))
+    resultsStartWith24157516034255 = resultsStartWith24157516034255.map( l => l.takeRight(14) ).distinct
+
+
+    // Lowest result is 108285406718362 , which is higher than the previous too-high result...
+
+    val possibleA = scala.collection.mutable.Set[Long]()
+    for i0 <- 0L to 7L do
+      for i1 <- 0L to 7L do
+        for tail <- resultsStartWith24157516034255 do
+          val aAsList = i0 :: i1 :: tail
+          val aAsLong = octalListToLong(aAsList)
+          val result = executeProgram2(instructions, aAsLong, regB, regC)
+          if result == List(2,4,1,5,7,5,1,6,0,3,4,2, 5, 5, 3, 0) then
+            println(s"$aAsLong ($aAsList)")
+            possibleA.add(aAsLong)
+    possibleA.min
+  }
+
+  private def loop6OctalDigitsPlusTails(
+                                         tails: List[List[Long]],
+                                         instructions: Array[Int],
+                                         regB: Long,
+                                         regC: Long,
+                                         shouldStartWith: List[Long]
+                                       ): List[List[Long]] = {
+    var res = List[List[Long]]()
+    for i0 <- 0L to 7L do
+      for i1 <- 0L to 7L do
+        for i2 <- 0L to 7L do
+          for i3 <- 0L to 7L do
+            for i4 <- 0L to 7L do
+              for i5 <- 0L to 7L do
+                for tail <- tails do
+                  val inputList = List(i0, i1, i2, i3, i4, i5) ++ tail
+                  val input = octalListToLong( inputList )
+                  val output = executeProgram2(instructions, input, regB, regC)
+                  if output.startsWith(shouldStartWith) then
+                    res = inputList :: res
+    res
+  }
+
 
   private def SPECIFIC_solvePart2(instructions: Array[Int], regA: Long, regB: Long, regC: Long): Long = {
     // The requested output is 16 elements long. There is only one "OUT" instruction, so this should be called 16 times.
@@ -109,7 +180,6 @@ class SolverDay17 extends Solver {
         acc = 8 * acc + octalDigit
       acc
   }
-
 
   /**
    * Given a value, return a list that contains the octal digits that build up this value.
