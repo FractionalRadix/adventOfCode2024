@@ -25,7 +25,7 @@ def main(): Unit =
 
 def solveDay18(): Unit =
   println("Day 18:")
-  // Part 1: 299 is TOO HIGH
+  // Part 1: 298
   SolverDay18().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay18.txt")
 
 def solveDay17():Unit =
