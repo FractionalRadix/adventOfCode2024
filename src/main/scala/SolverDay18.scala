@@ -5,7 +5,6 @@ import scala.collection.mutable
 class SolverDay18 extends Solver {
   override def solvePart1(lines: List[String]): Long =
     val grid = determineMaze(lines)
-    //grid.print()
 
     // Build a grid to keep track of the shortest route to any point.
     val minimalDistances = Grid[Option[Int]](grid.nrOfRows, grid.nrOfCols)
@@ -25,24 +24,6 @@ class SolverDay18 extends Solver {
       move(cur.position, Direction.Down, grid, minimalDistances, end, stack)
       move(cur.position, Direction.Up, grid, minimalDistances, end, stack)
       move(cur.position, Direction.Left, grid, minimalDistances, end, stack)
-
-    //minimalDistances.print()
-    for row <- 0 until grid.nrOfRows do
-      for col <- 0 until grid.nrOfCols do
-        if grid.get(row, col) == '#' then
-          print("####")
-        else
-          val minDist = minimalDistances.get(row, col)
-          if minDist.isDefined
-            then
-              if minDist.head < 10 then
-                print(" ")
-              end if
-              print(s" ${minDist.head} ")
-          else // minDist empty
-            print("-No-")
-          end if
-      println()
 
     minimalDistances.get(end).head
 
