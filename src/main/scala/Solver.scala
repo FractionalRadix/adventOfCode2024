@@ -12,9 +12,9 @@ abstract class Solver {
       source.getLines.toList
     }
   
-  def solvePart1(lines: List[String]): Long
+  def solvePart1(lines: List[String]): String
 
-  def solvePart2(lines: List[String]): Long
+  def solvePart2(lines: List[String]): String
 
   def solve(filename: String): Unit =
     val input = readInput(filename)

@@ -2,7 +2,7 @@ package com.cormontia.adventOfCode2024
 
 class SolverDay06 extends Solver {
 
-  override def solvePart1(lines: List[String]): Long = {
+  override def solvePart1(lines: List[String]): String = {
     val block = CharacterBlock(lines)
     val startPosition = block.findCoordinatesOf('^').head
 
@@ -11,7 +11,7 @@ class SolverDay06 extends Solver {
     val list = for (rowIdx <- 0 until block.getNrOfRows; colIdx <- 0 until block.getNrOfColumns; if block.getCharAt(rowIdx, colIdx).contains('X'))
       yield 1
     val uniquePositionsVisited = list.sum()
-    uniquePositionsVisited
+    uniquePositionsVisited.toString
   }
 
   private def markVisits(input: CharacterBlock, startPosition: (Int, Int)): Unit = {
@@ -67,7 +67,7 @@ class SolverDay06 extends Solver {
     }
   }
 
-  override def solvePart2(lines: List[String]): Long = {
+  override def solvePart2(lines: List[String]): String = {
     val block = CharacterBlock(lines)
     val startPosition = block.findCoordinatesOf('^').head
     markVisits(block, startPosition)
@@ -75,7 +75,7 @@ class SolverDay06 extends Solver {
     val freshBlock  = CharacterBlock(lines)
     val loopingPositions = blockingPositions.map( position => resultsInLoop(CharacterBlock(freshBlock), position, startPosition))
     val answer = loopingPositions.count( elem => elem )
-    answer
+    answer.toString
   }
 
   private def resultsInLoop(block: CharacterBlock, blockedPosition: (Int, Int), startPosition: (Int, Int)): Boolean = {

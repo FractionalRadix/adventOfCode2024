@@ -16,9 +16,9 @@ class SolverDay07 extends Solver {
   // * If the product of all values is lower than the test value, it's an automatic fail.
   // * If the sum of all values is higher than the test value, it's an automatic fail.
 
-  def solvePart1(lines: List[String]): Long =
+  def solvePart1(lines: List[String]): String =
     val equations = parseInput(lines)
-    solvePart1_aux(equations)
+    solvePart1_aux(equations).toString
 
   private def solvePart1_aux(equations: List[(Long, Array[Long])]): Long = {
     var totalCalibration: Long = 0
@@ -65,9 +65,9 @@ class SolverDay07 extends Solver {
         case '1' => result = result * operands(i)
     result
 
-  def solvePart2(lines: List[String]): Long =
+  def solvePart2(lines: List[String]): String =
     val equations = parseInput(lines)
-    solvePart2_aux(equations)
+    solvePart2_aux(equations).toString
 
   private def solvePart2_aux(equations: List[(Long, Array[Long])]): Long = {
     var sum: Long = 0

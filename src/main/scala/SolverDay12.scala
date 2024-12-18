@@ -4,7 +4,7 @@ import scala.io.Source
 
 class SolverDay12 extends Solver {
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val grid = Grid[Char](lines, ch => ch)
     // Let's create a second Grid, where each area has a unique number.
     val newGrid = Grid[Option[Int]](grid.nrOfRows, grid.nrOfCols)
@@ -26,9 +26,9 @@ class SolverDay12 extends Solver {
           for coor <- region do
             newGrid.set(coor.row, coor.col, Some(regionId))
           regionId = regionId + 1
-    price
+    price.toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val grid = Grid[Char](lines, ch => ch)
     val newGrid = uniqueRegions(grid)
     val regionIDs = newGrid.findDistinct()
@@ -42,7 +42,7 @@ class SolverDay12 extends Solver {
       val sidesForRegion = sidesAbove.keys.size + sidesBelow.keys.size + sidesLeft.keys.size + sidesRight.keys.size
       val costForRegion = plots.size * sidesForRegion
       totalSum = totalSum + costForRegion
-    totalSum
+    totalSum.toString
 
   /**
    * The perimeter of a region is the sum of all sides that DON'T touch another plot in the region.

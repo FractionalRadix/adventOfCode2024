@@ -9,14 +9,14 @@ class SolverDay11 extends Solver {
       .map(str => str.toLong)
       .toList
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val stones = parseInput(lines)
     var newStones = stones
     for i <- 1 to 25 do
       newStones = blink1(newStones)
-    newStones.length
+    newStones.length.toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val stones = parseInput(lines)
     // Let's process the list once...
     for engraving <- stones do
@@ -27,7 +27,7 @@ class SolverDay11 extends Solver {
     var count: Long = 0
     for i <- stones do
       count = count + followTransitionsAndCount2(i, 75)
-    count
+    count.toString
 
   private def printList(stones: List[Long]): Unit =
     for stone <- stones do

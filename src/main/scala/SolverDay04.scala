@@ -4,7 +4,7 @@ import scala.util.matching.Regex
 
 class SolverDay04 extends Solver {
 
-  override def solvePart1(lines: List[String]): Long = {
+  override def solvePart1(lines: List[String]): String = {
     val block = CharacterBlock(lines)
 
     val horizontalMatches = countMatches(lines)
@@ -14,7 +14,8 @@ class SolverDay04 extends Solver {
     val backwardDiagonals = block.getBackwardsDiagonals
     val backwardDiagonalMatches = countMatches(backwardDiagonals)
 
-    horizontalMatches + verticalMatches + forwardDiagonalMatches + backwardDiagonalMatches
+    val allMatches = horizontalMatches + verticalMatches + forwardDiagonalMatches + backwardDiagonalMatches
+    allMatches.toString
   }
 
   /**
@@ -41,7 +42,7 @@ class SolverDay04 extends Solver {
     sum
   }
   
-  override def solvePart2(lines: List[String]): Long = {
+  override def solvePart2(lines: List[String]): String = {
     val block = CharacterBlock(lines)
 
     // First, find every 'A' in the block.
@@ -56,7 +57,7 @@ class SolverDay04 extends Solver {
         if center.contains('A') then
           if surroundedByMS(block, rowIdx, colIdx) then
             count = count + 1
-    count
+    count.toString
   }
 
   private def surroundedByMS(block: CharacterBlock, rowIdx: Int, colIdx: Int): Boolean = {

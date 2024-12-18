@@ -10,15 +10,15 @@ class SolverDay09 extends Solver {
   private def quickConvert(ch: Character): Int =
     ch - '0'
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val input = parseInput(lines)
     //TODO?~ It might be more elegant to use "None" for empty parts of the disk, rather than the sentinel value -1.
     // NOTE: Since file numbers are going to be larger than 9, we'll need a Map, not a String.
     val map2 = buildMap(input)
     moveBlocks(map2)
-    calcChecksum(map2)
+    calcChecksum(map2).toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val input = parseInput(lines)
     files = stringToFileSet(input)
     if !allBlocksAccountedFor(files.toSet) then
@@ -50,7 +50,7 @@ class SolverDay09 extends Solver {
         usedFileIDs.add(currentFile.fileNr.head)
 
     val newMap = fileSetToMap(files)
-    calcChecksum2(files.toSet)
+    calcChecksum2(files.toSet).toString
 
   /**
    * Structure to contain all the "file" elements.

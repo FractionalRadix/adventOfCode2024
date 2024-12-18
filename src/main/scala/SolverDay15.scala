@@ -44,7 +44,7 @@ class SolverDay15 extends Solver {
   private var grid: Grid[Char] = Grid[Char]()
   private var directions = ""
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val (grid0, directions0) = gridAndMovements(lines)
     grid = grid0
     directions = directions0
@@ -61,7 +61,7 @@ class SolverDay15 extends Solver {
     val boxes = grid.findCoordinatesOf('O').toList
     //TODO?~ Find a nice way to do this with a fold.
     //val sum = boxes.fold(0)((acc: Int, coor) => acc + 100 * coor.row + coor.col)
-    boxes.map( coor => 100 * coor.row + coor.col ).sum
+    boxes.map( coor => 100 * coor.row + coor.col ).sum.toString
 
 
   private def moveRobot(move: Coor => Coor): Unit =
@@ -99,7 +99,7 @@ class SolverDay15 extends Solver {
       endCoor = move(endCoor)
     endCoor
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val (grid0, directions0) = gridAndMovementsPart2(lines)
     grid = grid0
     directions = directions0
@@ -114,7 +114,7 @@ class SolverDay15 extends Solver {
     val boxes = grid.findCoordinatesOf('[').toList
     //TODO?~ Find a nice way to do this with a fold.
     //val sum = boxes.fold(0)((acc: Int, coor) => acc + 100 * coor.row + coor.col)
-    boxes.map( coor => 100 * coor.row + coor.col ).sum
+    boxes.map( coor => 100 * coor.row + coor.col ).sum.toString
 
   private def moveUp(): Unit =
     val nextPos = Coor(robotPos.row - 1, robotPos.col)

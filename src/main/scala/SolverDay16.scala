@@ -5,13 +5,13 @@ import Direction.{Down, Left, Right, Up}
 import scala.collection.mutable
 
 class SolverDay16 extends Solver {
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val maze = Grid[Char](lines, ch => ch)
     val startPos = maze.findCoordinatesOf('S').head
     val answer = move_iterative(maze, startPos)
-    answer
+    answer.toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val maze = Grid[Char](lines, ch => ch)
     val startPos = maze.findCoordinatesOf('S').head
     val endPos = maze.findCoordinatesOf('E').head
@@ -27,7 +27,7 @@ class SolverDay16 extends Solver {
     for path <- shortestPaths do
       for pos <- path._2 do
         seats.add(pos)
-    seats.size
+    seats.size.toString
 
   private var lowestScore: Option[Long] = None
 

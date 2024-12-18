@@ -2,7 +2,7 @@ package com.cormontia.adventOfCode2024
 
 class SolverDay05 extends Solver {
 
-  override def solvePart2(input: List[String]): Long = {
+  override def solvePart2(input: List[String]): String = {
     val rules = parseRules(input)
     val pageLists = parsePageLists(input)
 
@@ -20,7 +20,7 @@ class SolverDay05 extends Solver {
       val middle = correctedList(idx)
       sum = sum + middle
 
-    sum
+    sum.toString
   }
 
   private def OLD_applyRule(pageList: Array[Int], rule: (Int, Int)): Array[Int] = {
@@ -48,7 +48,7 @@ class SolverDay05 extends Solver {
     result
   }
 
-  override def solvePart1(input: List[String]): Long = {
+  override def solvePart1(input: List[String]): String = {
     val rules = parseRules(input)
     val pageLists = parsePageLists(input)
 
@@ -62,7 +62,7 @@ class SolverDay05 extends Solver {
           val middle = pageList(idx)
           sum = sum + middle
 
-    sum
+    sum.toString
   }
 
   private def validate(pageList: Array[Int], rules: List[(Int, Int)]): Boolean = {

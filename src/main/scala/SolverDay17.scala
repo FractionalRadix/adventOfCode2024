@@ -1,7 +1,7 @@
 package com.cormontia.adventOfCode2024
 
 class SolverDay17 extends Solver {
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
 
     val strippedLines = for line <- lines yield
       line.dropWhile( ch => ch != ':').drop(2)
@@ -23,9 +23,9 @@ class SolverDay17 extends Solver {
     else
       println(str)
 
-    if str.isEmpty then 0 else str.toLong
+    str
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
 
     val strippedLines = for line <- lines yield
       line.dropWhile( ch => ch != ':').drop(2)
@@ -40,7 +40,7 @@ class SolverDay17 extends Solver {
     else
       SPECIFIC_solvePart2(instructions, regA, regB, regC)
 
-    result
+    result.toString
 
   private def SPECIFIC_solvePart2(instructions: Array[Int], regA: Long, regB: Long, regC: Long): Long =
     // The requested output is 16 elements long. There is only one "OUT" instruction, so this should be called 16 times.

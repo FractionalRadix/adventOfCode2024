@@ -6,11 +6,11 @@ import scala.util.boundary.break
 
 class SolverDay02 extends Solver {
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val reports = parseReports(lines)
-    reports.count(report => isSafe(report))
+    reports.count(report => isSafe(report)).toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val reports = parseReports(lines)
     //TODO?~ It would be more elegant to use a count(...) function.
     var count = 0
@@ -22,7 +22,7 @@ class SolverDay02 extends Solver {
         desc = trySafeDescending(report)
       if asc || desc then count = count + 1
     )
-    count
+    count.toString
 
   private def parseReports(lines: List[String]): List[Array[Int]] =
     val reports = lines.map(line =>

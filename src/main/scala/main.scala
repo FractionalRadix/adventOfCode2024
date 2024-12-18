@@ -20,8 +20,8 @@ def main(): Unit =
   //solveDay14()
   //solveDay15()
   //solveDay16()
-  //solveDay17() //TODO!+
-  solveDay18()
+  solveDay17() //TODO!+
+  //solveDay18()
 
 def solveDay18(): Unit =
   println("Day 18:")

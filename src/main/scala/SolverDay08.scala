@@ -8,7 +8,7 @@ class SolverDay08 extends Solver {
     val lines = source.getLines.toList
     lines
 
-  def solvePart1(lines: List[String]): Long =
+  def solvePart1(lines: List[String]): String =
     val block = CharacterBlock2(lines)
     val testBlock = CharacterBlock2(block)
 
@@ -32,7 +32,7 @@ class SolverDay08 extends Solver {
       if block.withinBounds(antiNode2) then
         testBlock.setCharAt(antiNode2_row, antiNode2_col, '#')
     val antiNodes = testBlock.findCoordinatesOf('#').toList.length
-    antiNodes
+    antiNodes.toString
 
   //TODO?~ Find a more efficient algorithm. We're likely to need this repeatedly in part 2.
   // PRE: List should have at least 2 elements.
@@ -66,7 +66,7 @@ class SolverDay08 extends Solver {
 
   private def pairToCoor(pair: (Int, Int)): Coor = Coor(pair._1, pair._2)
 
-  def solvePart2(lines: List[String]): Long =
+  def solvePart2(lines: List[String]): String =
     val block = CharacterBlock2(lines)
     val testBlock = CharacterBlock2(block)
     val pairs = findAntennaePairs2(block)
@@ -91,5 +91,5 @@ class SolverDay08 extends Solver {
           
     //testBlock.print()
     val antiNodes = testBlock.findCoordinatesOf('#').toList.length
-    antiNodes
+    antiNodes.toString
 }

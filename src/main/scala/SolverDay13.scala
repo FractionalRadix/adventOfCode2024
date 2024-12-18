@@ -12,7 +12,7 @@ class SolverDay13 extends Solver {
       source.getLines.toList
     }
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val machines = parseInput(lines)
     var tokens: Long = 0
     for machine <- machines do
@@ -36,7 +36,7 @@ class SolverDay13 extends Solver {
         //else
         //  println("Goal cannot be reached on this machine.")
 
-    tokens
+    tokens.toString
 
 // The problem to solve is a set of equations:
 //   n*ax + m*bx = x
@@ -65,7 +65,7 @@ class SolverDay13 extends Solver {
 // m = (ax * y - ay * x) / (ax * by - ay * bx)
 // (And presumably, by analogy, m = (bx * y - by * x) / (bx * ay - by * ax) ....)
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val originalMachines = parseInput(lines)
     val machines = for machine <- originalMachines yield
       ClawMachine(machine.ax, machine.ay, machine.bx, machine.by, machine.x + 10000000000000L , machine.y + 10000000000000L)
@@ -90,7 +90,7 @@ class SolverDay13 extends Solver {
         //else
         //  println("Goal cannot be reached on this machine.")
 
-    tokens
+    tokens.toString
 
   private case class ClawMachine(ax: Long, ay: Long, bx: Long, by: Long, x: Long, y: Long) {
     def print(): Unit =

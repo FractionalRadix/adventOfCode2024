@@ -12,7 +12,7 @@ class SolverDay10 extends Solver {
   def parseInput(lines: List[String]): CharacterBlock2 =
     CharacterBlock2(lines)
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val grid = parseInput(lines)
     val trailheads = grid.findCoordinatesOf2('0')
     //println(s"Trailheads: ${trailheads.mkString(",")}")
@@ -23,9 +23,9 @@ class SolverDay10 extends Solver {
       val trails = countTrails(grid, trailhead, visited)
       //println(s" $trails")
       sum = sum + trails
-    sum
+    sum.toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val grid = parseInput(lines)
     val trailheads = grid.findCoordinatesOf2('0')
     //println(s"Trailheads: ${trailheads.mkString(",")}")
@@ -33,7 +33,7 @@ class SolverDay10 extends Solver {
     for trailhead <- trailheads do
       val trails = countTrails2(grid, trailhead)
       sum = sum + trails
-    sum
+    sum.toString
 
   private def countTrails(grid: CharacterBlock2, startPos: Coor, visited: scala.collection.mutable.Set[Coor]): Int =
     var sum = 0

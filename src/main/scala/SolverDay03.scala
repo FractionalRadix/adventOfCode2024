@@ -5,13 +5,13 @@ import scala.util.matching.Regex
 
 class SolverDay03 extends Solver {
 
-  override def solvePart1(lines: List[String]): Long = 
+  override def solvePart1(lines: List[String]): String = 
     val instructions = readInstructionsPart1(lines.mkString)
     val pairs = integerPairs(instructions)
-    pairs.map(pair => pair._1 * pair._2).sum
+    pairs.map(pair => pair._1 * pair._2).sum.toString
   
 
-  override def solvePart2(lines: List[String]): Long = {
+  override def solvePart2(lines: List[String]): String = {
     val instructions2 = readInstructionsPart2(lines.mkString)
     var enabled = true
     var sum = 0
@@ -24,7 +24,7 @@ class SolverDay03 extends Solver {
         val arr = instruction.drop(4).dropRight(1).split(",")
         val pair = parseIntPair(arr)
         sum = sum + pair._1 * pair._2
-    sum
+    sum.toString
   }
 
   private def integerPairs(instructions: Iterator[String]) =

@@ -1,11 +1,9 @@
 package com.cormontia.adventOfCode2024
 
 import scala.collection.mutable
-import scala.util.boundary
-import scala.util.boundary.break
 
 class SolverDay18 extends Solver {
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val blocks = parseLines(lines)
     val grid = buildGrid(blocks)
     if grid.nrOfRows > 7 then
@@ -14,27 +12,24 @@ class SolverDay18 extends Solver {
       dropBlocks(grid, blocks.take(12))
 
     val (minimalDistances: Grid[Option[Int]], end: Coor) = findShortestPath(grid)
-    minimalDistances.get(end).head
+    minimalDistances.get(end).head.toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     val corrupted = parseLines(lines)
     val grid = buildGrid(corrupted)
-    var first = if grid.nrOfRows > 7 then 1024 else 12
-    // Naive solution! Just try it out. (If  this is inefficient, as I expect, let's try binary search next).
-    boundary { //TODO?~ Use a WHILE loop?
-      for size <- first to lines.size do
-        print(s"Iteration $size / ${lines.size}")
-        dropBlocks(grid, corrupted.take(size))
-        val (minimalDistances: Grid[Option[Int]], end: Coor) = findShortestPath(grid)
-        if minimalDistances.get(end).isEmpty then
-          println()
-          print("FOUND! ")
-          val coor = corrupted(size-1)
-          println(s"Coordinate: ${coor.col}, ${coor.row}")
-          break()
-        println(s" ...end=${minimalDistances.get(end)}")
-    }
-    0 //TODO!~
+    val first = if grid.nrOfRows > 7 then 1024 else 12
+    // Sequentially try all options. This is an inefficient solution.
+    // To speed it up, one might consider using binary search.
+    var result: Option[Coor] = None
+    var size = first - 1
+    while result.isEmpty do
+      size = size + 1
+      dropBlocks(grid, corrupted.take(size))
+      val (minimalDistances: Grid[Option[Int]], end: Coor) = findShortestPath(grid)
+      if minimalDistances.get(end).isEmpty then
+        val coor = corrupted(size-1)
+        result = Some(corrupted(size - 1))
+    s"${result.head.col},${result.head.row}"
 
   private def parseLines(lines: List[String]): List[Coor] =
     // Parse the input to a list of coordinates.
@@ -95,7 +90,6 @@ class SolverDay18 extends Solver {
                 stack.push(neighbour)
   }
 
-  //TODO?~ Maybe we should extract the part that determines the grid size, and pass grid size as a parameter?
   /**
    * Build the grid, but do not yet fill in the "corrupted" spaces.
    * We do pass them to determine how big the grid is.
@@ -126,5 +120,4 @@ class SolverDay18 extends Solver {
   private def dropBlocks(grid: Grid[Char], blocks: Seq[Coor]): Unit =
     for block <- blocks do
       grid.set(block, '#')
-
 }

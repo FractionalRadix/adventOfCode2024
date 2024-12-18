@@ -6,7 +6,7 @@ import scala.util.{Try, Using}
 
 class SolverDay14 extends Solver {
 
-  override def solvePart1(lines: List[String]): Long =
+  override def solvePart1(lines: List[String]): String =
     val robots = parseInput(lines)
 
     val width = 101
@@ -23,9 +23,9 @@ class SolverDay14 extends Solver {
     val robotsIn4thQuadrant = newRobots.count { robot => robot.px > xHalf && robot.py > yHalf}
     val solution = robotsIn1stQuadrant * robotsIn2ndQuadrant * robotsIn3thQuadrant * robotsIn4thQuadrant
 
-    solution
+    solution.toString
 
-  override def solvePart2(lines: List[String]): Long =
+  override def solvePart2(lines: List[String]): String =
     var robots = parseInput(lines)
     var count = 0
     val width = 101
@@ -42,10 +42,10 @@ class SolverDay14 extends Solver {
       found = robotsAlignedVertically(robots, 14) && robotsAlignedHorizontally(robots, 14)
       if found then
         val grid = buildGrid(robots, width, height)
-        printGrid(grid)
-        println(s"That was at count: $count")
+        // To see the picture of a Christmas tree, uncomment the following line:
+        //printGrid(grid)
 
-    count
+    count.toString
 
   private def buildGrid(robots: List[Robot], width: Int, height: Int): Grid[Char] =
     val grid = Grid[Char](height, width)
