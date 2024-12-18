@@ -42,7 +42,7 @@ class SolverDay17 extends Solver {
 
     result.toString
 
-  private def SPECIFIC_solvePart2(instructions: Array[Int], regA: Long, regB: Long, regC: Long): Long =
+  private def SPECIFIC_solvePart2(instructions: Array[Int], regA: Long, regB: Long, regC: Long): Long = {
     // The requested output is 16 elements long. There is only one "OUT" instruction, so this should be called 16 times.
     // The values in the registers always decrease, unless they are taken (via XOR) from another register.
     // This means the value in any register is capped by the highest input value.
@@ -53,28 +53,116 @@ class SolverDay17 extends Solver {
     println(s"${resultsIn5530.length} combinations.")
     // To be on the safe side, strip the most significant octal digits.
     // Then iterate over 4 more octal digits: 4 "fresh" ones followed by the elements from this List.
-    val truncatedResultsIn5530 = for list <- resultsIn5530 yield list.takeRight(4)
-    //TODO!+ De-duplicate the truncated list!
-    for i0 <- 0L to 7L do
-      for i1 <- 0L to 7L do
-        for i2 <- 0L to 7L do
-          for i3 <- 0L to 7L do
-            var octals7to4: Long = 8 * 8 * 8 * i0 +  8 * 8 * i1 +  8 * i2 + i3
-            octals7to4 = octals7to4 * (8*8*8*8)
-            for octals3to0List <- truncatedResultsIn5530 do
-              val octals3to0 = 8*8*8*octals3to0List(0) + 8*8*octals3to0List(1) + 8*octals3to0List(2) + octals3to0List(3)
-              val octals7to0 = octals7to4 + octals3to0
-              val output = executeProgram2(instructions, octals7to0, regB, regC)
-              if output.takeRight(6) == List(4,2,5,5,3,0) then
-                println(s"FOUND ONE! $i0 $i1 $i2 $i3 ${octals3to0List(0)} ${octals3to0List(1)} ${octals3to0List(2)} ${octals3to0List(3)} $output")
+    var truncatedResultsIn5530 = for list <- resultsIn5530 yield list.takeRight(4)
+    truncatedResultsIn5530 = truncatedResultsIn5530.distinct
 
+    val resultsIn425530 = findInputsThatResultIn(instructions, truncatedResultsIn5530, regB, regC, List(4, 2, 5, 5, 3, 0))
+    // Again, to be on the safe side, we strip the most significant octal digits.
+    val truncatedResultsIn425530 = resultsIn425530.map(l => l.takeRight(6)).distinct
 
+    println(s"Found ${truncatedResultsIn425530.size} candidates for 6 digits.")
+
+    val resultsIn034325530 = findInputsThatResultIn(instructions, truncatedResultsIn425530, regB, regC, List(0, 3, 4, 2, 5, 5, 3, 0))
+    val truncatedResultsIn03425530 = resultsIn034325530.map(l => l.takeRight(8)).distinct
+
+    println(s"Found ${truncatedResultsIn03425530.size} candidates for 8 digits")
+
+    val resultsIn1603425530 = findInputsThatResultIn(instructions, truncatedResultsIn03425530, regB, regC, List(1, 6, 0, 3, 4, 2, 5, 5, 3, 0))
+    val truncatedResultsIn1603425530 = resultsIn1603425530.map(l => l.takeRight(10)).distinct
+
+    println(s"Found ${truncatedResultsIn1603425530.size} candidates for 10 digits")
+
+    val resultsWith12Digits = findInputsThatResultIn(instructions, truncatedResultsIn1603425530, regB, regC, List(7, 5, 1, 6, 0, 3, 4, 2, 5, 5, 3, 0))
+    val truncatedResultsWith12Digits = resultsWith12Digits.map(l => l.takeRight(12)).distinct
+
+    println(s"Found ${truncatedResultsWith12Digits.size} candidates for 12 digits")
+
+    val resultsWith14Digits = findInputsThatResultIn(instructions, truncatedResultsWith12Digits, regB, regC, List(1, 5, 7, 5, 1, 6, 0, 3, 4, 2, 5, 5, 3, 0))
+    val truncatedResultsWith14Digits = resultsWith14Digits.map(l => l.takeRight(14)).distinct
+
+    println(s"Found ${truncatedResultsWith14Digits.size} candidates for 14 digits.")
+
+    val solutions = findInputsThatResultIn(instructions, truncatedResultsWith14Digits, regB, regC, List(2, 4, 1, 5, 7, 5, 1, 6, 0, 3, 4, 2, 5, 5, 3, 0))
+    println(s"Found ${solutions.size} solutions..")
+    for solution <- solutions do
+      println("Solution: $solution")
+
+    // 2 .. 4 .. 1 .. 5 .. 7 .. 5 .. 1 .. 6 .. 0 .. 3 .. 4 .. 2 .. 5 .. 5 .. 3 .. 0
 
     println(s"Expected output: ${instructions.mkString(",")}")
 
     0 //TODO!~
+  }
 
-  private def findListsThatResultIn5530(instructions: Array[Int], regB: Long, regC: Long ): List[List[Long]] =
+  /**
+   * Given a list of octal Digits, return the value it represents.
+   * For example, List(2L, 3L) should result in 19 (2*(8 exp 1)+3*(8 exp 0))
+   * @param l A list of octal digits; in other words the values should range from 0 to 7 inclusive.
+   * @return The value represented by the list.
+   */
+  private def octalListToLong(l: List[Long]): Long = {
+    if l.isEmpty then
+      0L
+    else
+      var acc = 0L
+      for octalDigit <- l do
+        acc = 8 * acc + octalDigit
+      acc
+  }
+
+
+  /**
+   * Given a value, return a list that contains the octal digits that build up this value.
+   * For example, 83 in octal is 123, so this method would return [1,2,3].
+   * @param l The value to convert
+   * @return A list of octal digits representing the given value.
+   */
+  private def longToOctalList(l: Long): List[Long] = {
+    if l == 0 then
+      List(0L)
+    else
+      var result: List[Long] = Nil
+      var l1 = l
+      while l1 > 0 do
+        val last = l1 & 7
+        result = last :: result
+        l1 = l1 >> 3
+      result
+  }
+
+  /**
+   * Given the instructions and a set of possible values for A, try out the prepending this list with the
+   * octal values (0000)-(7777).
+   * From these numbers, select those for which the program ends in the given list.
+   * @param instructions The instructions to the Chrono-spatial Computer.
+   * @param listRegA The list of values we try for register A, represented as lists of octal digits.
+   * @param regB The value for register B.
+   * @param regC The value for register C.
+   * @param desiredEnding The desired ending of the output.
+   * @return The list of inputs that result in a sequence that ends with the "desired ending", represented as lists
+   *         of octal digits.
+   */
+  private def findInputsThatResultIn(instructions: Array[Int], listRegA: List[List[Long]], regB: Long, regC: Long, desiredEnding: List[Long]): List[List[Long]] = {
+    var result: List[List[Long]] = Nil
+
+    for i0 <- 0L to 7L do
+      for i1 <- 0L to 7L do
+        for i2 <- 0L to 7L do
+          println(s"(i0,i1,i2)==($i0,$i1,$i2)")
+          for i3 <- 0L to 7L do
+            for i4 <- 0L to 7L do
+              for i5 <- 0L to 7L do
+                for i6 <- 0L to 7L do
+                for tailRegA <- listRegA do
+                  val aAsList: List[Long] = List(i0, i1, i2, i3, i4, i5, i6) ++ tailRegA
+                  val regA = octalListToLong(aAsList)
+                  val output = executeProgram2(instructions, regA, regB, regC)
+                  if output.takeRight(desiredEnding.length) == desiredEnding then
+                    result = aAsList :: result
+    result
+  }
+
+  private def findListsThatResultIn5530(instructions: Array[Int], regB: Long, regC: Long): List[List[Long]] =
     // Find the octals that will result in a computation ending on (5,5,3,0).
     var result: List[List[Long]] = Nil
     for i0 <- 0L to 7L do
