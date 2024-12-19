@@ -26,8 +26,8 @@ def main(): Unit =
 
 def solveDay19(): Unit =
   println("Day 19:")
-  // Part 1: ???
-  // Part 2: ???
+  // Part 1:             296
+  // Part 2: 619970556776002
   SolverDay19().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay19.txt")
 
 def solveDay18(): Unit =

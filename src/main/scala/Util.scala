@@ -1,5 +1,6 @@
 package com.cormontia.adventOfCode2024
 
+import scala.reflect.ClassTag
 import scala.util.boundary
 import scala.util.boundary.break
 
@@ -47,4 +48,32 @@ object Util {
     val end = "  </svg>\n</body>\n</html>"
     val middle = "" //TODO!~
     start ++ middle ++ end
+
+  //TODO!+ Add unit tests! This one has not yet been tested!
+  /**
+   * Given an array and an "interspersed" value, returns a copy of the array with the "interspersed" elements between
+   * the values.
+   * For example, intersperse([2,1,4],8) returns [2,8,1,8,4].
+   * For example, intersperse(["Do","not","stop","coding"], "!!") returns ["Do", "!!", "not", "!!", "stop", "!!",
+   * "coding"]
+   * An empty array will result in an empty array: intersperse([], "x") returns [].
+   * A singleton array will result in the same singleton array: intersperse(["Hi"],"world") will return ["Hi"].
+   * @param arr The array to intersperse.
+   * @param elt T The element to put between the array elements.
+   * @tparam T The type of the array and the interspersed element.
+   * @return A copy of the original array, where the new element is interspersed between the other elements.
+   */
+  private def intersperse[T: ClassTag](arr: Array[T], elt: T): Array[T] = {
+    if arr.isEmpty then
+      new Array[T](0) // Array of zero elements.
+    else
+      val len = 2 * arr.length - 1
+      val result = new Array[T](len)
+      for i <- 0 to arr.length do
+        result(2 * i) = arr(i)
+        if 2 * i + 1 < len then
+          result(2 * i + 1) = elt
+      result
+  }
+
 }
