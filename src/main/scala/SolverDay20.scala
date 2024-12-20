@@ -2,8 +2,6 @@ package com.cormontia.adventOfCode2024
 
 import scala.collection.mutable
 import scala.math.abs
-import scala.util.boundary
-import scala.util.boundary.break
 
 class SolverDay20 extends Solver {
   override def solvePart1(lines: List[String]): String = {
@@ -76,29 +74,6 @@ class SolverDay20 extends Solver {
 
   //TODO?~ Move to Util?
   private def manhattanDistance(pos1: Coor, pos2: Coor): Long = abs(pos1.row - pos2.row) + abs(pos1.col - pos2.col)
-
-  private def wallPath(maze: Grid[Char], start: Coor, end: Coor, visited: mutable.Set[Coor], maxMoves: Int): Boolean = {
-    if start == end then
-      return true
-    if maxMoves == 0 then
-      return false
-
-    val nextMoves = directNeighbours(start)
-      .filter( pos => maze.withinBounds(pos) )
-      .filter( pos => maze.get(pos) == '#' || pos == end)
-      .filter( pos => !visited.contains(pos) ) // Avoid endless loops.
-
-      var found = false
-      boundary {
-        for move <- nextMoves do
-          val success = wallPath(maze, move, end, visited + start, maxMoves - 1)
-
-          if success then
-            found = true
-            break()
-      }
-      found
-  }
 
   private def printDistanceMap(distanceMap: Grid[Option[Long]]): Unit = {
     //FOR DEBUGGING...
