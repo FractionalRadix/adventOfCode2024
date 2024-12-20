@@ -1,6 +1,9 @@
 package com.cormontia.adventOfCode2024
 
 import scala.collection.mutable
+import scala.math.abs
+import scala.util.boundary
+import scala.util.boundary.break
 
 class SolverDay20 extends Solver {
   override def solvePart1(lines: List[String]): String = {
@@ -45,63 +48,82 @@ class SolverDay20 extends Solver {
   override def solvePart2(lines: List[String]): String = {
     val maze = Grid[Char](lines, ch => ch)
     val (baseCost, distanceMap) = runMaze(maze)
-
-    // Approach: for every element on the path, find the '#' paths that lead to up to 10 blocks away.
     val trackPositions = distanceMap.findAll(pos => distanceMap.get(pos).isDefined)
 
+    var pairs = List[(Coor, Coor)]()
+    for startPos <- trackPositions do
+      val startValue = distanceMap.get(startPos).head
+      for endPos <- trackPositions do
+        val endValue = distanceMap.get(endPos).head
+        if endValue > startValue /*&& manhattanDistance(startPos, endPos) <= 120*/ then
+          pairs = (startPos, endPos) :: pairs
+
     var allCheats = List[(Coor, Coor, Long)]()
+    for pair <- pairs do
+      val originalCost = distanceMap.get(pair._2).head - distanceMap.get(pair._1).head
+      val newCost = manhattanDistance(pair._1, pair._2)
+      if newCost <= 20 then
+        allCheats = (pair._1, pair._2, originalCost - newCost) :: allCheats
 
-    for trackPosition <- trackPositions do
-      val walls = allWallsWithinNsteps(maze, trackPosition, 5) //TODO!~ N should be 9 (off-by-one thing makes it 10). Set to a lower value for debugging.
+    // For verification. Note that in the example, the maximum cost of 20 was NOT considered...
+    // You have to remove the "newCost <= 20" to get the values shown in the example....
+    //for exactCost <- List(50,52,54,56,58,60,62,64,66,68,70,72,74,76) do
+    //  println(s"Nr of cheats that save exactly $exactCost picoseconds: ${allCheats.count((_, _, cost) => cost == exactCost)}")
 
-      //TODO!- FOR DEBUGGING.
-      if trackPosition == Coor(3,1) then
-        println(s"Walls surrounding $trackPosition: ${walls.mkString(",")}")
-        val copyGrid = Grid(maze)
-        for row <- 0 until copyGrid.nrOfRows; col <- 0 until copyGrid.nrOfCols do
-          copyGrid.set(row,col,'_')
-        for coor <- walls do
-          copyGrid.set(coor, 'O')
-        copyGrid.print()
+    val answer = allCheats.count((_,_,saved) => saved >= 100)
+    answer.toString
+  }
 
-      // First, find the direct neighbours of the track position that contain a '#'.
-      // These are the start points for our cheat.
-      val cheatStarts = directNeighbours(trackPosition)
-        .filter( pos => maze.safeGet(pos).contains('#') )
+  //TODO?~ Move to Util?
+  private def manhattanDistance(pos1: Coor, pos2: Coor): Long = abs(pos1.row - pos2.row) + abs(pos1.col - pos2.col)
 
-      //println(s"Cheat starts: $cheatStarts")
-      //println(s"That's ${cheatStarts.size} candidates.")
+  private def wallPath(maze: Grid[Char], start: Coor, end: Coor, visited: mutable.Set[Coor], maxMoves: Int): Boolean = {
+    if start == end then
+      return true
+    if maxMoves == 0 then
+      return false
 
-      // Second, find the endpoints of our cheats.
-      // For this, look at the "wall" elements we found.
-      // If any of them has a neighbour that is part of the track, that NEIGHBOUR is an endpoint.
-      val cheatEnds = walls
-        .flatMap( elt => directNeighbours(elt) )
-        .filter( elt => trackPositions.contains(elt) )
+    val nextMoves = directNeighbours(start)
+      .filter( pos => maze.withinBounds(pos) )
+      .filter( pos => maze.get(pos) == '#' || pos == end)
+      .filter( pos => !visited.contains(pos) ) // Avoid endless loops.
 
-      //println(s"Cheat ends: $cheatEnds")
-      //println(s"That's ${cheatEnds.size} candidates.")
+      var found = false
+      boundary {
+        for move <- nextMoves do
+          val success = wallPath(maze, move, end, visited + start, maxMoves - 1)
 
-      for cheatStart <- cheatStarts do
-        for cheatEnd <- cheatEnds do
-          //println(s"Checking: $cheatStart - $cheatEnd")
-          val gain = timeBetween(distanceMap, trackPosition, cheatEnd)
-          if gain.isDefined then
-            allCheats = (cheatStart, cheatEnd, gain.head) :: allCheats
+          if success then
+            found = true
+            break()
+      }
+      found
+  }
 
-    // FOR DEBUGGING...
-    for cheat <- allCheats do
-      if cheat._1 == Coor(4,1) && cheat._2 == Coor(7,3) then
-        println(s"Cheat: $cheat")
+  private def printDistanceMap(distanceMap: Grid[Option[Long]]): Unit = {
+    //FOR DEBUGGING...
+    for row <- 0 until distanceMap.nrOfRows do
+      println()
+      for col <- 0 until distanceMap.nrOfCols do
+        if distanceMap.get(row, col).isDefined then
+          print(String.format("%02d|", distanceMap.get(row, col).head))
+        else
+          print("__|")
+  }
 
-    //println(s"${allCheats.mkString(",")}")
-    val atLeast50 = allCheats.filter((_,_,picoseconds) => picoseconds >= 50)
-    atLeast50.length.toString
-    // "" //TODO!+
+  private def printFoundWalls(maze: Grid[Char], trackPosition: Coor, walls: Set[Coor]): Unit = {
+    println(s"Walls surrounding $trackPosition: ${walls.mkString(",")}")
+    val copyGrid = Grid(maze)
+    for row <- 0 until copyGrid.nrOfRows; col <- 0 until copyGrid.nrOfCols do
+      copyGrid.set(row, col, '_')
+    for coor <- walls do
+      copyGrid.set(coor, 'O')
+    copyGrid.print()
   }
 
   /**
    * Given a coordinate, give its direct horizontal and vertical neighbours.
+   *
    * @param pos A coordinate (row, column) on a grid.
    * @return A list containing the lower neighbour, upper neighbour, left neighbour, and right neighbour.
    */
@@ -112,30 +134,6 @@ class SolverDay20 extends Solver {
       Coor(pos.row, pos.col - 1),
       Coor(pos.row, pos.col + 1)
     )
-
-
-  private def allWallsWithinNsteps(maze: Grid[Char], pos: Coor, nrOfSteps: Int): Set[Coor] = {
-
-    var initialSet = mutable.Set[Coor]()
-    initialSet.add(pos)
-
-    for i <- 1 to nrOfSteps do
-      //println(s"Iteration: $i")
-      val nextSet = mutable.Set[Coor]()
-      //println(s"Size of `initialSet` is ${initialSet.size}")
-      for pos <- initialSet do
-        val neighbourList = directNeighbours(pos)
-          .filter( neighbour => maze.withinBounds(neighbour) )
-          .filter( neighbour => !initialSet.contains(neighbour) )
-          .filter( neighbour => maze.get(neighbour) == '#')
-        //println(s"Neighbours for $pos are ${neighbourList.mkString(",")}")
-        nextSet.addAll(neighbourList)
-
-      //initialSet = nextSet
-      initialSet.addAll(nextSet)
-
-    initialSet.toSet
-  }
 
   private def timeSaved(maze: Grid[Char], distanceMap: Grid[Option[Long]], curPos: Coor, direction: Direction): Option[Long] = {
     val (n1, n2) = direction match
@@ -156,18 +154,6 @@ class SolverDay20 extends Solver {
         val timeSaved = nextValue - posValue - 2
         //println(s"Cheat found: $curPos, $n2 saves $timeSaved")
         return Some(timeSaved)
-    None
-  }
-
-  private def timeBetween(distanceMap: Grid[Option[Long]], from: Coor, to: Coor): Option[Long] = {
-    if !distanceMap.withinBounds(from) || !distanceMap.withinBounds(to) then
-      return None
-    val n1 = distanceMap.get(from)
-    val n2 = distanceMap.get(to)
-    if n1.isDefined && n2.isDefined then
-      val diff = n2.head - n1.head
-      if diff > 0 then
-        return Some(diff - 2)
     None
   }
 
@@ -196,12 +182,12 @@ class SolverDay20 extends Solver {
       if maze.get(elt.pos) == 'E' then
         return (elt.cost, distances)
       else
-        val moves = neighbours(maze, pos).filter( x => !visited.contains(x)) //TODO?+ Keep track of where you've already been?
+        val moves = neighbours(maze, pos).filter( x => !visited.contains(x))
         for move <- moves do
           stack.push(StackElement(move, elt.cost + 1L))
     }
 
-    (0L, distances) //TODO?~ Should never reach here...
+    (0L, distances) // Should never reach here...
   }
 
   private case class StackElement(pos: Coor, cost: Long)
