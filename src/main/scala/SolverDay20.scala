@@ -56,12 +56,14 @@ class SolverDay20 extends Solver {
         if endValue > startValue /*&& manhattanDistance(startPos, endPos) <= 120*/ then
           pairs = (startPos, endPos) :: pairs
 
-    var allCheats = List[(Coor, Coor, Long)]()
+    //var allCheats = List[(Coor, Coor, Long)]()
+    var allCheats = mutable.Set[(Coor, Coor, Long)]()
     for pair <- pairs do
       val originalCost = distanceMap.get(pair._2).head - distanceMap.get(pair._1).head
       val newCost = manhattanDistance(pair._1, pair._2)
       if newCost <= 20 then
-        allCheats = (pair._1, pair._2, originalCost - newCost) :: allCheats
+        //allCheats = (pair._1, pair._2, originalCost - newCost) :: allCheats
+        allCheats.add((pair._1, pair._2, originalCost - newCost))
 
     // For verification. Note that in the example, the maximum cost of 20 was NOT considered...
     // You have to remove the "newCost <= 20" to get the values shown in the example....
