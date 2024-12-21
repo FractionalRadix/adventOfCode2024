@@ -10,7 +10,6 @@ class SolverDay21 extends Solver {
   override def solvePart1(lines: List[String]): String = {
     var totalComplexity = 0
 
-
     for line <- lines do
       println(line)
 
@@ -28,7 +27,9 @@ class SolverDay21 extends Solver {
         println("Y")
         secondRobotPaths = secondRobotPaths :+ secondRobotPaths_i
       val secondRobotPathsFlattened = explodeListOfLists[String](secondRobotPaths, (str1, str2) => str1 + str2, "")
-      println(secondRobotPathsFlattened)
+
+      if (line=="029A") then
+        println(secondRobotPathsFlattened.distinct)
 
 
 
@@ -75,9 +76,11 @@ class SolverDay21 extends Solver {
     pad: Map[Char,Coor],
     paths: Map[(Coor,Coor), List[String]]
   ): List[String] = {
+    println(s"allPathsThatResultIn($instructions,...)")
     var curPos = startPos
     var firstRobotPaths = List[List[String]]()
     for ch <- instructions do
+      print(s" curPos==$curPos")
       val nextPos = pad(ch)
       val validPaths = paths((curPos, nextPos)).distinct
       firstRobotPaths = firstRobotPaths :+ validPaths
@@ -164,14 +167,16 @@ class SolverDay21 extends Solver {
     val map = collection.mutable.Map[(Coor,Coor), List[String]]()
     for startPos <- positions do
       for endPos <- positions do
-        if startPos != endPos then {
+        //if startPos != endPos then {
           val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
           // Generate all variants of this sequence, but filter the ones that hit (3,0).
           val sequences = permutations(availableMoves)
-          val validSequences = sequences.filter(sequence => avoidsPosition(startPos, sequence, Coor(3, 0)))
+          val validSequences = sequences
+            .filter(sequence => avoidsPosition(startPos, sequence, Coor(3, 0)))
+            .map(str => str + "A")
           map((startPos, endPos)) = validSequences
           //println(s"Mapping: from $startPos to $endPos: $sequences")
-        }
+        //}
     map.toMap
   }
 
@@ -188,14 +193,16 @@ class SolverDay21 extends Solver {
     val map = collection.mutable.Map[(Coor,Coor), List[String]]()
     for startPos <- positions do
       for endPos <- positions do
-        if startPos != endPos then {
+        //if startPos != endPos then {
           val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
           // Generate all variants of this sequence, but filter the ones that hit (3,0).
           val sequences = permutations(availableMoves)
-          val validSequences = sequences.filter( sequence => avoidsPosition(startPos, sequence, Coor(3,0)) )
+          val validSequences = sequences
+            .filter( sequence => avoidsPosition(startPos, sequence, Coor(3,0)) )
+            .map(str => str + "A")
           map((startPos, endPos)) = validSequences
           //println(s"Mapping: from $startPos to $endPos: $sequences")
-        }
+        //}
     map.toMap
   }
 
