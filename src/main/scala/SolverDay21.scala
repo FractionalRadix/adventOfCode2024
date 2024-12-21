@@ -3,38 +3,34 @@ package com.cormontia.adventOfCode2024
 import scala.collection.immutable
 
 class SolverDay21 extends Solver {
+
+  private val numericPaths = generateNumericPadSequences()
+  private val directionalPaths = generateDirectionalPadSequences()
+
   override def solvePart1(lines: List[String]): String = {
     var totalComplexity = 0
 
-    val numericPaths = generateNumericPadSequences()
-    val directionalPaths = generateDirectionalPadSequences()
 
     for line <- lines do
       println(line)
 
-      val powder: List[List[String]] = List(List("a", "b"), List("c", "d"), List("e", "f"))
-      val boom = explodeListOfLists[String](powder, (str1,str2) => str1 + str2 , "")
-      println(boom)
+      //val powder: List[List[String]] = List(List("a", "b"), List("c", "d"), List("e", "f"))
+      //val boom = explodeListOfLists[String](powder, (str1,str2) => str1 + str2 , "")
+      //println(boom)
 
       // First robot instructions:
-      var curPos = Coor(3,2)
-      var firstRobotPaths = List[List[String]]()
-      for ch <- line do
-        val nextPos = numericPad(ch)
-        val validPaths = numericPaths((curPos, nextPos)).distinct
-        firstRobotPaths = firstRobotPaths :+ validPaths
-        curPos = nextPos
-      println(firstRobotPaths)
-      val firstRobotPathsBoom = explodeListOfLists[String](firstRobotPaths, (str1,str2) => str1 + str2, "")
-      println(firstRobotPathsBoom)
+      val firstRobotPaths = allPathsThatResultIn(Coor(3,2), line, numericPad, numericPaths)
 
-/*
-      // Second robot instructions:
-      curPos = Coor(0, 2)
-      for line <- firstRobotPaths do
-        ;
+      var secondRobotPaths = List[List[String]]()
+      for firstRobotPath <- firstRobotPaths do
+        println("X")
+        val secondRobotPaths_i = allPathsThatResultIn(Coor(0,2), firstRobotPath, directionalPad, directionalPaths)
+        println("Y")
+        secondRobotPaths = secondRobotPaths :+ secondRobotPaths_i
+      val secondRobotPathsFlattened = explodeListOfLists[String](secondRobotPaths, (str1, str2) => str1 + str2, "")
+      println(secondRobotPathsFlattened)
 
-       */
+
 
 
       /*
@@ -63,6 +59,33 @@ class SolverDay21 extends Solver {
 
        */
     totalComplexity.toString
+  }
+
+  /**
+   * Given a set of instructions and a starting position, determine all paths that could lead to executing these instructions.
+   * @param startPos
+   * @param instructions
+   * @param pad
+   * @param path
+   * @return
+   */
+  private def allPathsThatResultIn(
+    startPos: Coor,
+    instructions: String,
+    pad: Map[Char,Coor],
+    paths: Map[(Coor,Coor), List[String]]
+  ): List[String] = {
+    var curPos = startPos
+    var firstRobotPaths = List[List[String]]()
+    for ch <- instructions do
+      val nextPos = pad(ch)
+      val validPaths = paths((curPos, nextPos)).distinct
+      firstRobotPaths = firstRobotPaths :+ validPaths
+      curPos = nextPos
+    println(firstRobotPaths)
+    val firstRobotPathsBoom = explodeListOfLists[String](firstRobotPaths, (str1, str2) => str1 + str2, "")
+    println(firstRobotPathsBoom)
+    firstRobotPathsBoom
   }
 
   /**
