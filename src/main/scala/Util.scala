@@ -76,4 +76,28 @@ object Util {
       result
   }
 
+  /**
+   * Given a String, return all permutations of the characters in that string.
+   * For example, "ABC" will yield ["ABC", "ACB", "BAC", "BCA", "CAB", "CBA"].
+   * If characters occur twice, each occurrence will count.
+   * For example, "ABB" will yield ["ABB", "BAB", "BBA"].
+   * Note that this method has factorial complexity!!
+   *
+   * @param str A string.
+   * @return All permutations of the input string.
+   */
+  def permutations(str: String): List[String] = {
+    if str.isEmpty then
+      List("")
+    else
+      var result = List[String]()
+      // For every character in the string, yield: that character plus all permutations of the rest.
+      for i <- str.indices do
+        val remainingCharacters = str.take(i) + str.drop(i + 1)
+        val list0 = permutations(remainingCharacters)
+        val list1 = list0.map(x => str(i).toString + x)
+        result = result ++ list1
+      result.distinct
+  }
+
 }

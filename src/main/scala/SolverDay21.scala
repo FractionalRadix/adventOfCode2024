@@ -1,16 +1,56 @@
 package com.cormontia.adventOfCode2024
 
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 
 class SolverDay21 extends Solver {
 
+  private val numericPad = Map[Char,Coor](
+    '7' -> Coor(0,0),
+    '8' -> Coor(0,1),
+    '9' -> Coor(0,2),
+    '4' -> Coor(1,0),
+    '5' -> Coor(1,1),
+    '6' -> Coor(1,2),
+    '1' -> Coor(2,0),
+    '2' -> Coor(2,1),
+    '3' -> Coor(2,2),
+    '0' -> Coor(3,1),
+    'A' -> Coor(3,2)
+  )
+
+  private val directionalPad = Map[Char, Coor](
+    '^' -> Coor(0, 1),
+    'A' -> Coor(0, 2),
+    '<' -> Coor(1, 0),
+    'v' -> Coor(1, 1),
+    '>' -> Coor(1, 2)
+  )
+
   private val numericPaths = generateNumericPadSequences()
+
   private val directionalPaths = generateDirectionalPadSequences()
+
+  class PossiblePaths(private val paths: List[List[String]]) {
+    // A possible path is defined by taking one string from the first list,
+    // followed by taking one from the second list,
+    // followed by taking one form the third list... and so on.
+    // Let's call these things sections: first list is the first section, second list is the second section,
+    // and so on.
+    def nrOfComponents: Int = paths.size
+    def nrOfPossiblePaths: Long = paths.map( list => list.length ).product
+    def print(): Unit = {
+      val sectionsAsString = paths.map( l => showSection(l) )
+      println(sectionsAsString.mkString(" * "))
+    }
+    private def showSection(l: List[String]): String = l.map( s => "\"" + s + "\"").mkString("[", ",", "]")
+
+  }
 
   override def solvePart1(lines: List[String]): String = {
     var totalComplexity = 0
 
-    for line <- lines do
+
+    for line <- List("029A") /* should be: lines */ do
       println(line)
 
       //val powder: List[List[String]] = List(List("a", "b"), List("c", "d"), List("e", "f"))
@@ -18,8 +58,53 @@ class SolverDay21 extends Solver {
       //println(boom)
 
       // First robot instructions:
-      val firstRobotPaths = allPathsThatResultIn(Coor(3,2), line, numericPad, numericPaths)
+      var firstRobotPaths = allPathsThatResultIn(Coor(3,2), line, numericPad, numericPaths)
+      val shortestLength = firstRobotPaths.map( l => l.length ).min
+      firstRobotPaths = firstRobotPaths.filter( l => l.length == shortestLength )
+      println(firstRobotPaths)
 
+      // With the first robot paths and the directional sequences determined,
+      // we can incrementally generate a new mapping from "directional keypad button" to "directional keypad button".
+      // In this mapping we only keep the shortest distances.
+      for firstRobotPath <- firstRobotPaths do
+        println(firstRobotPath)
+
+        // The memoized instructions that you should type on a directional pad,
+        // to direct a robot to type on a further directional pad.
+        val directionalPadToDirectionalPad = mutable.Map[(Coor,Coor), List[String]]()
+
+        var secondRobotSequences = List[List[String]]()
+        var curPos = Coor(0,2)
+        for ch <- firstRobotPath do
+          val nextPos = directionalPad(ch)
+          val sequences = directionalPaths(curPos, nextPos)
+          directionalPadToDirectionalPad((curPos, nextPos)) = sequences
+          secondRobotSequences = secondRobotSequences :+ sequences
+          curPos = nextPos
+        //println(secondRobotSequences)
+
+        // The NAIVE thing to do is to explode the "secondRobotSequences".
+        // Instead, we generate the "thirdRobotSequences" NOT for all "secondRobotSequences", but for the COMPONENTS of "secondRobotSequences".
+        // And we memoize them while we're at it.
+        // THEN we can use that memoized map to look find the shortest third-robot-sequences.
+        // Note that for these third-robot-sequences, we DON'T need to calculate the sequences themselves! Only the length of the shortest ones.
+
+        val possiblePaths = PossiblePaths(secondRobotSequences)
+        possiblePaths.print()
+
+        // So now we have the list of components for making the second robot work.
+        //
+
+
+
+      //for startPos <- directionalPad.values do
+      //  for endPos <- directionalPad.values do
+      //    // This time, we want to know what the SECOND robot needs to type to let the FIRST go from "startPos" to "endPos".
+
+
+
+
+      /*
       var secondRobotPaths = List[List[String]]()
       for firstRobotPath <- firstRobotPaths do
         println("X")
@@ -30,6 +115,7 @@ class SolverDay21 extends Solver {
 
       if (line=="029A") then
         println(secondRobotPathsFlattened.distinct)
+*/
 
 
 
@@ -59,6 +145,7 @@ class SolverDay21 extends Solver {
       totalComplexity += complexity
 
        */
+
     totalComplexity.toString
   }
 
@@ -76,18 +163,18 @@ class SolverDay21 extends Solver {
     pad: Map[Char,Coor],
     paths: Map[(Coor,Coor), List[String]]
   ): List[String] = {
-    println(s"allPathsThatResultIn($instructions,...)")
+    //println(s"allPathsThatResultIn($instructions,...)")
     var curPos = startPos
     var firstRobotPaths = List[List[String]]()
     for ch <- instructions do
-      print(s" curPos==$curPos")
+      //print(s" curPos==$curPos")
       val nextPos = pad(ch)
       val validPaths = paths((curPos, nextPos)).distinct
       firstRobotPaths = firstRobotPaths :+ validPaths
       curPos = nextPos
-    println(firstRobotPaths)
+    //println(firstRobotPaths)
     val firstRobotPathsBoom = explodeListOfLists[String](firstRobotPaths, (str1, str2) => str1 + str2, "")
-    println(firstRobotPathsBoom)
+    //println(firstRobotPathsBoom)
     firstRobotPathsBoom
   }
 
@@ -115,28 +202,6 @@ class SolverDay21 extends Solver {
       result
   }
 
-  private val numericPad = Map[Char,Coor](
-    '7' -> Coor(0,0),
-    '8' -> Coor(0,1),
-    '9' -> Coor(0,2),
-    '4' -> Coor(1,0),
-    '5' -> Coor(1,1),
-    '6' -> Coor(1,2),
-    '1' -> Coor(2,0),
-    '2' -> Coor(2,1),
-    '3' -> Coor(2,2),
-    '0' -> Coor(3,1),
-    'A' -> Coor(3,2)
-  )
-
-  private val directionalPad = Map[Char, Coor](
-    '^' -> Coor(0, 1),
-    'A' -> Coor(0, 2),
-    '<' -> Coor(1, 0),
-    'v' -> Coor(1, 1),
-    '>' -> Coor(1, 2)
-  )
-
   private def performInstructions(instructions: String, startPos: Coor, forbiddenPos: Coor): Unit = {
     var curPos = startPos
     for instruction <- instructions do
@@ -157,6 +222,7 @@ class SolverDay21 extends Solver {
   }
 
 
+
   /**
    * Generate all the shortest sequences from one position to another on the directional keypad.
    * But remove those sequences that visit the forbidden position (0,0).
@@ -167,16 +233,13 @@ class SolverDay21 extends Solver {
     val map = collection.mutable.Map[(Coor,Coor), List[String]]()
     for startPos <- positions do
       for endPos <- positions do
-        //if startPos != endPos then {
-          val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
-          // Generate all variants of this sequence, but filter the ones that hit (3,0).
-          val sequences = permutations(availableMoves)
-          val validSequences = sequences
-            .filter(sequence => avoidsPosition(startPos, sequence, Coor(3, 0)))
-            .map(str => str + "A")
-          map((startPos, endPos)) = validSequences
-          //println(s"Mapping: from $startPos to $endPos: $sequences")
-        //}
+        val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
+        // Generate all variants of this sequence, but filter the ones that hit (3,0).
+        val sequences = Util.permutations(availableMoves)
+        val validSequences = sequences
+          .filter(sequence => avoidsPosition(startPos, sequence, Coor(3, 0)))
+          .map(str => str + "A")
+        map((startPos, endPos)) = validSequences
     map.toMap
   }
 
@@ -196,7 +259,7 @@ class SolverDay21 extends Solver {
         //if startPos != endPos then {
           val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
           // Generate all variants of this sequence, but filter the ones that hit (3,0).
-          val sequences = permutations(availableMoves)
+          val sequences = Util.permutations(availableMoves)
           val validSequences = sequences
             .filter( sequence => avoidsPosition(startPos, sequence, Coor(3,0)) )
             .map(str => str + "A")
@@ -218,19 +281,6 @@ class SolverDay21 extends Solver {
     true
   }
 
-  private def permutations(str: String): List[String] = {
-    if str.isEmpty then
-      List("")
-    else
-      var result = List[String]()
-      // For every character in the string, yield: that character plus all permutations of the rest.
-      for i <- str.indices do
-        val remainingCharacters = str.take(i) + str.drop(i+1)
-        val list0 = permutations(remainingCharacters)
-        val list1 = list0.map( x => str(i).toString + x )
-        result = result ++ list1
-      result
-  }
 
   private def generateVariants(curPos: Coor, moves: String, forbiddenPos: Coor): List[String] = {
     if curPos == forbiddenPos then
@@ -300,7 +350,6 @@ class SolverDay21 extends Solver {
   }
 
   //TODO!-
-
   /**
    * Safe paths on the directional keypad
    */
