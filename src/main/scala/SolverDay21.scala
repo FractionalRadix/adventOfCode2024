@@ -5,15 +5,39 @@ import scala.collection.immutable
 class SolverDay21 extends Solver {
   override def solvePart1(lines: List[String]): String = {
     var totalComplexity = 0
+
+    val numericPaths = generateNumericPadSequences()
+    val directionalPaths = generateDirectionalPadSequences()
+
     for line <- lines do
-      print(line + " ")
+      println(line)
+
+      val powder: List[List[String]] = List(List("a", "b"), List("c", "d"), List("e", "f"))
+      val boom = explodeListOfLists[String](powder, (str1,str2) => str1 + str2 , "")
+      println(boom)
 
       // First robot instructions:
       var curPos = Coor(3,2)
-      //for ch <- line do
-      //  val nextPos = pad.g
+      var firstRobotPaths = List[List[String]]()
+      for ch <- line do
+        val nextPos = numericPad(ch)
+        val validPaths = numericPaths((curPos, nextPos)).distinct
+        firstRobotPaths = firstRobotPaths :+ validPaths
+        curPos = nextPos
+      println(firstRobotPaths)
+      val firstRobotPathsBoom = explodeListOfLists[String](firstRobotPaths, (str1,str2) => str1 + str2, "")
+      println(firstRobotPathsBoom)
+
+/*
+      // Second robot instructions:
+      curPos = Coor(0, 2)
+      for line <- firstRobotPaths do
+        ;
+
+       */
 
 
+      /*
       val firstRobotInstructions = generateFirstSequence(line)
       //println(firstRobotInstructions)
       val secondRobotInstructions = generateDirectionalKeypadSequence(firstRobotInstructions)
@@ -36,7 +60,33 @@ class SolverDay21 extends Solver {
       generateNumericPadSequences()
 
       totalComplexity += complexity
+
+       */
     totalComplexity.toString
+  }
+
+  /**
+   * Given a list of lists of elements, find all combinations that preserve the order.
+   * For example, [["a","b"],["c","d"],["e","f"]] yields ["ace","acf", "ade", "adf", "bce","bcf", "bde", "bdf"].
+   * @param l The list of lists.
+   * @param f The function to combine two elements. For example, if we have a list of list of String, this would be
+   *          the String concatenation operation.
+   * @param nil The identity element for the element. For example, if we have a list of list of String, this would be
+   *            the empty String.
+   * @return All permutations of l that maintain the original order.
+   */
+  private def explodeListOfLists[T](l: List[List[T]], f: (T,T) => T, nil: T): List[T] = {
+    if l.isEmpty then
+      List(nil)
+    else
+      var result = List[T]()
+      // Assume that l is: [["a", "b"],["c","d"],["e","f"]].
+      val headList = l.head  // Then headList is ["a"].
+      val tailList = explodeListOfLists(l.tail,f, nil) // Our tailList is ["ce", "cf", "de", "df"].
+      for headElt <- headList do
+        val newList = tailList.map( str => f(headElt,str) ) // ["ace", "acf", "ade", "adf"] or ["bce", "bcf", "bde", "bdf"]
+        result = result ++ newList
+      result
   }
 
   private val numericPad = Map[Char,Coor](
@@ -53,6 +103,14 @@ class SolverDay21 extends Solver {
     'A' -> Coor(3,2)
   )
 
+  private val directionalPad = Map[Char, Coor](
+    '^' -> Coor(0, 1),
+    'A' -> Coor(0, 2),
+    '<' -> Coor(1, 0),
+    'v' -> Coor(1, 1),
+    '>' -> Coor(1, 2)
+  )
+
   private def performInstructions(instructions: String, startPos: Coor, forbiddenPos: Coor): Unit = {
     var curPos = startPos
     for instruction <- instructions do
@@ -61,22 +119,12 @@ class SolverDay21 extends Solver {
         println("Kaboom!")
   }
 
+  //TODO?-
   private def generateDirectionalKeypadSequence(input: String) = {
-    val pad = Map[Char, Coor](
-      '^' -> Coor(0,1),
-      'A' -> Coor(0,2),
-      '<' -> Coor(1,0),
-      'v' -> Coor(1,1),
-      '>' -> Coor(1,2)
-    )
     var curPos = Coor(0,2)
     var result = ""
     for ch <- input do
-      val nextPos = pad(ch)
-      // For now, let's ignore the "forbidden" area because we only look at distance travelled.
-      //val horizontalMoves = moveHorizontally(curPos, nextPos)
-      //val verticalMoves = moveVertically(curPos, nextPos)
-      //result = result + horizontalMoves + verticalMoves + "A"
+      val nextPos = directionalPad(ch)
       result = result + safePath(curPos, nextPos) + "A"
       curPos = nextPos
     result
