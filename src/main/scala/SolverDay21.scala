@@ -30,20 +30,50 @@ class SolverDay21 extends Solver {
 
   private val directionalPaths = generateDirectionalPadSequences()
 
-  class PossiblePaths(private val paths: List[List[String]]) {
+  class PossiblePaths(private val pathSections: List[List[String]]) {
     // A possible path is defined by taking one string from the first list,
     // followed by taking one from the second list,
     // followed by taking one form the third list... and so on.
     // Let's call these things sections: first list is the first section, second list is the second section,
     // and so on.
-    def nrOfComponents: Int = paths.size
-    def nrOfPossiblePaths: Long = paths.map( list => list.length ).product
+    def nrOfSections: Int = pathSections.size
+    def getSection(i: Int): List[String] = pathSections(i)
+    def nrOfPossiblePaths: Long = pathSections.map( list => list.length ).product
     def print(): Unit = {
-      val sectionsAsString = paths.map( l => showSection(l) )
+      val sectionsAsString = pathSections.map( l => showSection(l) )
       println(sectionsAsString.mkString(" * "))
     }
+    def lengthOfShortestPath(): Long = {
+      var minLength = 0L
+      for section <- pathSections do
+        val minLen = section.map( l => l.length ).min
+        minLength += minLen
+      minLength
+    }
     private def showSection(l: List[String]): String = l.map( s => "\"" + s + "\"").mkString("[", ",", "]")
+  }
 
+  /**
+   * The memoized instructions that you should type on a directional pad,
+   * to direct a robot to type on a further directional pad.
+   */
+  private val directionalPadToDirectionalPad = mutable.Map[(Coor, Coor), List[String]]()
+
+  /**
+   * Given the path that a robot should follow, give the possible ways to generate them.
+   * @param firstRobotPath A path to follow, such as ">>A"
+   * @return The sequences that will result in ">>A", assuming you start at (0,2).
+   */
+  private def determineDirectionalPadToDirectionalPad(firstRobotPath: String): PossiblePaths = {
+    var secondRobotSequences = List[List[String]]()
+    var curPos = Coor(0, 2)
+    for ch <- firstRobotPath do
+      val nextPos = directionalPad(ch)
+      val sequences = directionalPaths(curPos, nextPos)
+      directionalPadToDirectionalPad((curPos, nextPos)) = sequences
+      secondRobotSequences = secondRobotSequences :+ sequences
+      curPos = nextPos
+    PossiblePaths(secondRobotSequences)
   }
 
   override def solvePart1(lines: List[String]): String = {
@@ -69,19 +99,10 @@ class SolverDay21 extends Solver {
       for firstRobotPath <- firstRobotPaths do
         println(firstRobotPath)
 
-        // The memoized instructions that you should type on a directional pad,
-        // to direct a robot to type on a further directional pad.
-        val directionalPadToDirectionalPad = mutable.Map[(Coor,Coor), List[String]]()
 
-        var secondRobotSequences = List[List[String]]()
-        var curPos = Coor(0,2)
-        for ch <- firstRobotPath do
-          val nextPos = directionalPad(ch)
-          val sequences = directionalPaths(curPos, nextPos)
-          directionalPadToDirectionalPad((curPos, nextPos)) = sequences
-          secondRobotSequences = secondRobotSequences :+ sequences
-          curPos = nextPos
-        //println(secondRobotSequences)
+
+        val secondRobotSequences = determineDirectionalPadToDirectionalPad(firstRobotPath)
+        secondRobotSequences.print()
 
         // The NAIVE thing to do is to explode the "secondRobotSequences".
         // Instead, we generate the "thirdRobotSequences" NOT for all "secondRobotSequences", but for the COMPONENTS of "secondRobotSequences".
@@ -89,8 +110,27 @@ class SolverDay21 extends Solver {
         // THEN we can use that memoized map to look find the shortest third-robot-sequences.
         // Note that for these third-robot-sequences, we DON'T need to calculate the sequences themselves! Only the length of the shortest ones.
 
-        val possiblePaths = PossiblePaths(secondRobotSequences)
-        possiblePaths.print()
+        // We start at "A" (0,2). (We always do, every sequence should end there).
+
+
+        //
+
+        var len = 0L
+        for i <- 0 until secondRobotSequences.nrOfSections do
+          val currentSection = secondRobotSequences.getSection(i) // This is a List[String].
+          println(s"Current section: ${currentSection.mkString(",")}")
+          for currentOptionOfCurrentSection <- currentSection do
+            // "currentOptionOFFirstSection" is a String. A sequence of instructions that will end in 'A'.
+            println(s"Current option in current section = $currentOptionOfCurrentSection")
+            val waysToDoCurrentOptionOfCurrentSection = determineDirectionalPadToDirectionalPad(currentOptionOfCurrentSection)
+            waysToDoCurrentOptionOfCurrentSection.print()
+            val minLen = waysToDoCurrentOptionOfCurrentSection.lengthOfShortestPath()
+            println(s"Shortest length: $minLen")
+            len += minLen
+
+        println(s"Length: $len")
+
+
 
         // So now we have the list of components for making the second robot work.
         //
