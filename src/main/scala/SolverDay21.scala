@@ -39,9 +39,9 @@ class SolverDay21 extends Solver {
     def nrOfSections: Int = pathSections.size
     def getSection(i: Int): List[String] = pathSections(i)
     def nrOfPossiblePaths: Long = pathSections.map( list => list.length ).product
-    def print(): Unit = {
+    def print(title: String): Unit = {
       val sectionsAsString = pathSections.map( l => showSection(l) )
-      println(sectionsAsString.mkString(" * "))
+      println(s"$title: ${sectionsAsString.mkString(" * ")}")
     }
     def lengthOfShortestPath(): Long = {
       var minLength = 0L
@@ -49,6 +49,13 @@ class SolverDay21 extends Solver {
         val minLen = section.map( l => l.length ).min
         minLength += minLen
       minLength
+    }
+    def lengthOfLongestPath(): Long = {
+      var maxLength = 0L
+      for section <- pathSections do
+        val maxLen = section.map( l => l.length ).max
+        maxLength += maxLen
+      maxLength
     }
     private def showSection(l: List[String]): String = l.map( s => "\"" + s + "\"").mkString("[", ",", "]")
   }
@@ -79,88 +86,49 @@ class SolverDay21 extends Solver {
   override def solvePart1(lines: List[String]): String = {
     var totalComplexity = 0
 
-
-    for line <- List("029A") /* should be: lines */ do
+    for line <- lines do
       println(line)
-
-      //val powder: List[List[String]] = List(List("a", "b"), List("c", "d"), List("e", "f"))
-      //val boom = explodeListOfLists[String](powder, (str1,str2) => str1 + str2 , "")
-      //println(boom)
 
       // First robot instructions:
       var firstRobotPaths = allPathsThatResultIn(Coor(3,2), line, numericPad, numericPaths)
       val shortestLength = firstRobotPaths.map( l => l.length ).min
       firstRobotPaths = firstRobotPaths.filter( l => l.length == shortestLength )
-      println(firstRobotPaths)
+      //println(s"First robot paths: $firstRobotPaths")
 
       // With the first robot paths and the directional sequences determined,
       // we can incrementally generate a new mapping from "directional keypad button" to "directional keypad button".
       // In this mapping we only keep the shortest distances.
       for firstRobotPath <- firstRobotPaths do
-        println(firstRobotPath)
-
-
+        println(s"First robot path: $firstRobotPath")
 
         val secondRobotSequences = determineDirectionalPadToDirectionalPad(firstRobotPath)
-        secondRobotSequences.print()
+        //secondRobotSequences.print("Second robot sequences:")
 
-        // The NAIVE thing to do is to explode the "secondRobotSequences".
-        // Instead, we generate the "thirdRobotSequences" NOT for all "secondRobotSequences", but for the COMPONENTS of "secondRobotSequences".
-        // And we memoize them while we're at it.
-        // THEN we can use that memoized map to look find the shortest third-robot-sequences.
-        // Note that for these third-robot-sequences, we DON'T need to calculate the sequences themselves! Only the length of the shortest ones.
-
-        // We start at "A" (0,2). (We always do, every sequence should end there).
-
-
-        //
+        // Note that we always start at "A" (0,2). Because every sequence ends with "A", so that's where the next one takes off.
 
         var len = 0L
+        var len2 = 0L
         for i <- 0 until secondRobotSequences.nrOfSections do
           val currentSection = secondRobotSequences.getSection(i) // This is a List[String].
-          println(s"Current section: ${currentSection.mkString(",")}")
+          var minLengthsForSection: List[Long] = Nil
+
+          //println
+          //println(s"Current section: $i -  ${currentSection.mkString(",")}")
           for currentOptionOfCurrentSection <- currentSection do
+
             // "currentOptionOFFirstSection" is a String. A sequence of instructions that will end in 'A'.
-            println(s"Current option in current section = $currentOptionOfCurrentSection")
             val waysToDoCurrentOptionOfCurrentSection = determineDirectionalPadToDirectionalPad(currentOptionOfCurrentSection)
-            waysToDoCurrentOptionOfCurrentSection.print()
             val minLen = waysToDoCurrentOptionOfCurrentSection.lengthOfShortestPath()
-            println(s"Shortest length: $minLen")
-            len += minLen
+            minLengthsForSection = minLen :: minLengthsForSection
 
-        println(s"Length: $len")
-
-
-
-        // So now we have the list of components for making the second robot work.
-        //
+          len += minLengthsForSection.min
+        println(s"Shortest possible length: $len")
+        val numericPart = line.dropRight(1).toInt
+        val complexity = len * numericPart
+        println(s"...Complexity=$complexity ($len * $numericPart)")
 
 
-
-      //for startPos <- directionalPad.values do
-      //  for endPos <- directionalPad.values do
-      //    // This time, we want to know what the SECOND robot needs to type to let the FIRST go from "startPos" to "endPos".
-
-
-
-
-      /*
-      var secondRobotPaths = List[List[String]]()
-      for firstRobotPath <- firstRobotPaths do
-        println("X")
-        val secondRobotPaths_i = allPathsThatResultIn(Coor(0,2), firstRobotPath, directionalPad, directionalPaths)
-        println("Y")
-        secondRobotPaths = secondRobotPaths :+ secondRobotPaths_i
-      val secondRobotPathsFlattened = explodeListOfLists[String](secondRobotPaths, (str1, str2) => str1 + str2, "")
-
-      if (line=="029A") then
-        println(secondRobotPathsFlattened.distinct)
-*/
-
-
-
-
-      /*
+    /*
       val firstRobotInstructions = generateFirstSequence(line)
       //println(firstRobotInstructions)
       val secondRobotInstructions = generateDirectionalKeypadSequence(firstRobotInstructions)
@@ -191,11 +159,11 @@ class SolverDay21 extends Solver {
 
   /**
    * Given a set of instructions and a starting position, determine all paths that could lead to executing these instructions.
-   * @param startPos
-   * @param instructions
-   * @param pad
-   * @param path
-   * @return
+   * @param startPos Starting position for the sequence.
+   * @param instructions The instructions to be generated.
+   * @param pad A mapping from characters to coordinates. This can represent the numeric keypad or the directional keypad, as desired.
+   * @param paths A mapping of all the valid paths between two coordinates.
+   * @return All the paths that result in the given set of instructions.
    */
   private def allPathsThatResultIn(
     startPos: Coor,
