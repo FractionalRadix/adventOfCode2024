@@ -217,7 +217,28 @@ class SolverDay21 extends Solver {
       instructions3 = instructions3.filter( l => l.length  == shortestLength )
       println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
 
+      //println("Test findLengths:")
+      //val s1= findLengths(List(List("Hello","world"), List("cat", "dog", "fish"))) //  [[5,5],[3,3,4]]
+      //println(s1)
+      //val s2 = findLengths(List(List("Hello", "world"), List("cat", "dog", "fish"), List(), List(""))) // [[5,5],[3,3,4], [], [0]]
+      //println(s2)
 
+
+      // Now we need the length of the SHORTEST sequence that generates any of the "instructions3" sequences.
+      // Which means we don't need to keep the sequence - we just need to find the lengths, and find the shortest.
+      for instr <- instructions3 do
+        val pathComponents3 = directionalKeyPad.getPathsForSequence(instr)
+        println(pathComponents3)
+
+        /*
+        // Given this map of Integer to List[List[String]], let's find the corresponding Map of Integer to List[List[Int]]
+        var len = 1L
+        for component <- pathComponents3 do
+          val currentMin = component._2.map( l => l.length ).min
+          len = len * currentMin
+        println(len)
+
+         */
 
 
 
@@ -257,6 +278,17 @@ class SolverDay21 extends Solver {
    */
   private def crossProduct(l1: List[String], l2: List[String]): List[String] = {
     for e1 <- l1; e2 <- l2 yield e1 + e2
+  }
+
+  /**
+   * Given a list of list of String, yield the list of list of the lenghts of these strings.
+   * For example, [["Hello", "world"],["Cat", "Dog,"Fish"]] will yield [[5,5], [3,3,4]]
+   * @param l The list of lists of strings.
+   * @return The list of lists of the lengths of the strings.
+   */
+  private def findLengths(l: List[List[String]]): List[List[Int]] = {
+    for l1 <- l yield
+      l1.map( l2 => l2.length )
   }
 
 
