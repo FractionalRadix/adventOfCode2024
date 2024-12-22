@@ -60,33 +60,10 @@ class SolverDay21 extends Solver {
     private def showSection(l: List[String]): String = l.map( s => "\"" + s + "\"").mkString("[", ",", "]")
   }
 
-  /**
-   * The memoized instructions that you should type on a directional pad,
-   * to direct a robot to type on a further directional pad.
-   */
-  private val directionalPadToDirectionalPad = mutable.Map[(Coor, Coor), List[String]]()
-
-  /**
-   * Given the path that a robot should follow, give the possible ways to generate them.
-   * @param firstRobotPath A path to follow, such as ">>A"
-   * @return The sequences that will result in ">>A", assuming you start at (0,2).
-   */
-  private def determineDirectionalPadToDirectionalPad(firstRobotPath: String): PossiblePaths = {
-    var secondRobotSequences = List[List[String]]()
-    var curPos = Coor(0, 2)
-    for ch <- firstRobotPath do
-      val nextPos = directionalPad(ch)
-      val sequences = directionalPaths(curPos, nextPos)
-      directionalPadToDirectionalPad((curPos, nextPos)) = sequences
-      secondRobotSequences = secondRobotSequences :+ sequences
-      curPos = nextPos
-    PossiblePaths(secondRobotSequences)
-  }
-
   private class KeyPad(buttons: Map[Char, Coor], val forbidden: Coor) {
     private val paths = mutable.Map[(Coor, Coor), List[String]]()
 
-    def getPosition(button: Char): Coor = buttons(button)
+    private def getPosition(button: Char): Coor = buttons(button)
 
     /**
      * Determine all (non-cyclic) paths between from a starting position to an ending position.
@@ -122,7 +99,7 @@ class SolverDay21 extends Solver {
      * @param endButton The button that we want the robot arm to arrive at.
      * @return The list of all paths that take you from the starting button to the ending button.
      */
-    def getPathsBetween(startButton: Char, endButton: Char): List[String] = {
+    private def getPathsBetween(startButton: Char, endButton: Char): List[String] = {
       getPathsBetween(getPosition(startButton), getPosition(endButton))
     }
 
