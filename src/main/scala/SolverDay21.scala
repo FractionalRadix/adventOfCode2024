@@ -178,6 +178,8 @@ class SolverDay21 extends Solver {
     val numericKeyPad = KeyPad(numericPad, Coor(3,0))
     val directionalKeyPad = KeyPad(directionalPad, Coor(0,0))
 
+    var totalComplexity = 0L
+
     for line <- lines do
       println(s"Paths for $line:")
       val pathComponents1 = numericKeyPad.getPathsForSequence(line)
@@ -191,17 +193,17 @@ class SolverDay21 extends Solver {
       var instructions2 = List("")
       for key <- sortedKeys do
         instructions2 = crossProduct(instructions2, pathComponents1(key))
-      println(s"Cross product is $instructions2")
+      //println(s"Cross product is $instructions2")
 
       // Similarly, the number of sequences for the third robot is still tractable.
       var shortest: Option[Long] = None
-      println("Testcase: ")
+      //println("Testcase: ")
       val testcase      = instructionsForThirdRobot(directionalKeyPad, List("v<<A>>^A<A>AvA<^AA>A<vAAA>^A"))
-      println("Instructions3: ")
+      //println("Instructions3: ")
       for instr <- instructions2 do
         println(instr)
         val instructions3 = instructionsForThirdRobot(directionalKeyPad, List(instr))
-        println(s"Contained? ${instructions3.contains("v<<A>>^A<A>AvA<^AA>A<vAAA>^A")}")
+        //println(s"Contained? ${instructions3.contains("v<<A>>^A<A>AvA<^AA>A<vAAA>^A")}")
         for instr <- instructions3 do
           val instructions4 = instructionsForThirdRobot(directionalKeyPad, List(instr))
           val minLength = instructions4.map( l => l.length ).min
@@ -212,6 +214,12 @@ class SolverDay21 extends Solver {
             shortest = Some(minLength)
 
       println(shortest)
+      val numericPart = line.dropRight(1).toLong
+      val length = shortest.head
+      val complexity = numericPart * length
+      println(complexity)
+
+      totalComplexity += complexity
       /*
 
       val testCaseLengths = testcase.map(l => l.length)
@@ -232,7 +240,7 @@ class SolverDay21 extends Solver {
 
        */
 
-    ""
+    totalComplexity.toString
   }
 
   private def instructionsForThirdRobot(directionalKeyPad: KeyPad, instructions2: List[String]): List[String] = {
@@ -246,14 +254,14 @@ class SolverDay21 extends Solver {
         instructions_tmp = crossProduct(instructions_tmp, pathComponents2(key))
       instructions3 = instructions3 ++ instructions_tmp
     //println(s"Possible instruction sequences for third robot: $instructions3")
-    println(s"There are ${instructions3.size} possible sequences for the third robot.")
+    //println(s"There are ${instructions3.size} possible sequences for the third robot.")
     val lengths = instructions3.map(l => l.length)
     val shortestLength = lengths.min
-    println(s"  The shortest of these consists of ${lengths.min} characters.")
-    println(s"  The longest of these consists of ${lengths.max} characters.")
+    //println(s"  The shortest of these consists of ${lengths.min} characters.")
+    //println(s"  The longest of these consists of ${lengths.max} characters.")
     // Filter out the sequences that are longer than the shortest sequence.
     instructions3 = instructions3.filter(l => l.length == shortestLength)
-    println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
+    //println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
     instructions3
   }
 
