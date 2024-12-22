@@ -81,7 +81,74 @@ class SolverDay21 extends Solver {
     PossiblePaths(secondRobotSequences)
   }
 
+  private class KeyPad(buttons: Map[Char, Coor], val forbidden: Coor) {
+    private val paths = mutable.Map[(Coor, Coor), List[String]]()
+
+    def getPosition(button: Char): Coor = buttons(button)
+
+    /**
+     * Determine all (non-cyclic) paths between from a starting position to an ending position.
+     * The paths should be as short as possible; no cycles or detours.
+     * The paths must avoid the "forbidden" position.
+     * @param startPos The position that the robot arm is currently pointed at.
+     * @param endPos The position that we want the robot arm to arrive at.
+     * @return The list of all paths that take you from the starting position to the ending position.
+     */
+    def getPathsBetween(startPos: Coor, endPos: Coor): List[String] = {
+      // This method uses memoization.
+      if paths.contains((startPos, endPos)) then
+        paths((startPos, endPos))
+      else
+        val verticalDifference = endPos.row - startPos.row
+        val verticalMoves = if (endPos.row - startPos.row) > 0 then "v" * verticalDifference else "^" * -verticalDifference
+        val horizontalDifference = endPos.col - startPos.col
+        val horizontalMoves = if horizontalDifference > 0 then ">" * horizontalDifference else "<" * -horizontalDifference
+        val moveSet = verticalMoves + horizontalMoves
+        val allPaths = Util.permutations(moveSet)
+        val allSafePaths = allPaths.filter( path => avoidsPosition(startPos, path, forbidden))
+        paths((startPos, endPos)) = allSafePaths
+        allSafePaths
+    }
+
+    private def avoidsPosition(startPos: Coor, sequence: String, forbidden: Coor): Boolean = {
+      if startPos == forbidden then
+        return false
+      if sequence == "" then
+        return true
+      for ch <- sequence do
+        val nextPos = determineNextPosition(startPos, ch)
+        if nextPos == forbidden then
+          return false
+      true
+    }
+  }
+
   override def solvePart1(lines: List[String]): String = {
+    //TODO!+
+
+    // New approach: brute force, but with pruning.
+    // Type any character on the first pad.
+    // See what it does to the second, third, and fourth pads.
+    // WHENEVER
+    //  ANY of these pads revisits the same button before it hit 'A', STOP.
+    //  You hit the 'A' button for the right
+
+    var firstPadPos = Coor(3,2) // Pad inside the depressurized room, gives access to the area with the missing Historian.
+    var secondPadPos = Coor(0,2) // Pad inside the highly radiated room, gives access to the depressurized room.
+    val thirdPadPos = Coor(0,2) // Pad inside the -40 degrees room, gives access to the radiated room.
+    val fourthPadPos = Coor(0,2) // Pad that you use, in the room full of Historians. Gives access to the -40 degrees room.
+
+    // Let's try to type "0".
+
+
+
+
+
+
+    ""
+  }
+
+  def OLD_solvePart1(lines: List[String]): String = {
     var totalComplexity = 0
 
     for line <- lines do
@@ -92,10 +159,6 @@ class SolverDay21 extends Solver {
       var firstRobotPaths = explodeListOfLists[String](firstRobotPathsSections, (s1, s2) => s1 + s2, "")
       val shortestLength = firstRobotPaths.map( l => l.length ).min
       firstRobotPaths = firstRobotPaths.filter( l => l.length == shortestLength )
-
-
-
-
 
       // With the first robot paths and the directional sequences determined,
       // we can incrementally generate a new mapping from "directional keypad button" to "directional keypad button".
@@ -259,7 +322,6 @@ class SolverDay21 extends Solver {
     val map = collection.mutable.Map[(Coor,Coor), List[String]]()
     for startPos <- positions do
       for endPos <- positions do
-        //if startPos != endPos then {
           val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
           // Generate all variants of this sequence, but filter the ones that hit (3,0).
           val sequences = Util.permutations(availableMoves)
@@ -267,8 +329,6 @@ class SolverDay21 extends Solver {
             .filter( sequence => avoidsPosition(startPos, sequence, Coor(3,0)) )
             .map(str => str + "A")
           map((startPos, endPos)) = validSequences
-          //println(s"Mapping: from $startPos to $endPos: $sequences")
-        //}
     map.toMap
   }
 

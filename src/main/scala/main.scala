@@ -24,13 +24,13 @@ def main(): Unit =
   //solveDay18()
   //solveDay19()
   //solveDay20()
-  //solveDay21()
-  solveDay22()
+  solveDay21()
+  //solveDay22()
 
 def solveDay22(): Unit =
   println("Day 22:")
   // Part 1: 14180628689
-  // Part 2: ???
+  // Part 2: 1690
   SolverDay22().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay22.txt")
 
 def solveDay21(): Unit =

@@ -26,8 +26,8 @@ class SolverDay22 extends Solver {
   }
 
   override def solvePart2(lines: List[String]): String = {
-    //val seeds = lines.map( str => str.toLong )
-    val seeds = List(1,2,3,2024) //TODO!~ Test input, replace with the real seeds once the code is finished.
+    val seeds = lines.map( str => str.toLong )
+    //val seeds = List(1,2,3,2024) //TODO!~ Test input, replace with the real seeds once the code is finished.
     //val seeds = List(123L)
 
     val nrOfIterations = 2000 // 10 for the example // Careful, might need to be 2001, off-by-one thing!
