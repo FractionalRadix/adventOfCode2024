@@ -28,10 +28,6 @@ class SolverDay21 extends Solver {
     '>' -> Coor(1, 2)
   )
 
-  private val numericPaths = generateNumericPadSequences()
-
-  private val directionalPaths = generateDirectionalPadSequences()
-
   private class PossiblePaths(private val pathSections: List[List[String]]) {
     // A possible path is defined by taking one string from the first list,
     // followed by taking one from the second list,
@@ -227,48 +223,6 @@ class SolverDay21 extends Solver {
         println("Kaboom!")
   }
 
-  /**
-   * Generate all the shortest sequences from one position to another on the directional keypad.
-   * But remove those sequences that visit the forbidden position (0,0).
-   * @return All the safe shortest sequences from one position to another on the directional keypad.
-   */
-  private def generateDirectionalPadSequences(): Map[(Coor, Coor), List[String]] = {
-    val positions = List(Coor(0,1), Coor(0,2), Coor(1,0), Coor(1,1), Coor(1,2))
-    val map = collection.mutable.Map[(Coor,Coor), List[String]]()
-    for startPos <- positions do
-      for endPos <- positions do
-        val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
-        // Generate all variants of this sequence, but filter the ones that hit (3,0).
-        val sequences = Util.permutations(availableMoves)
-        val validSequences = sequences
-          .filter(sequence => avoidsPosition(startPos, sequence, Coor(3, 0)))
-          .map(str => str + "A")
-        map((startPos, endPos)) = validSequences
-    map.toMap
-  }
-
-  /**
-   * Generate all the shortest sequences to go from one position to another on the numeric keypad.
-   * But remove those sequences that visit the forbidden position (3,0).
-   * @return All the safe shortest sequences from one position to another on the numeric keypad.
-   */
-  private def generateNumericPadSequences(): Map[(Coor,Coor), List[String]] = {
-    // First, all positions on the numeric keypad.
-    val positionSeq = for row <- 0 to 3; col <- 0 to 2 if !(row==3 && col == 0) yield Coor(row,col)
-    val positions = positionSeq.toList
-    // Then, for every two positions on the pad, determine all shortest paths (that avoid the forbidden position).
-    val map = collection.mutable.Map[(Coor,Coor), List[String]]()
-    for startPos <- positions do
-      for endPos <- positions do
-          val availableMoves = moveHorizontally(startPos, endPos) + moveVertically(startPos, endPos)
-          // Generate all variants of this sequence, but filter the ones that hit (3,0).
-          val sequences = Util.permutations(availableMoves)
-          val validSequences = sequences
-            .filter( sequence => avoidsPosition(startPos, sequence, Coor(3,0)) )
-            .map(str => str + "A")
-          map((startPos, endPos)) = validSequences
-    map.toMap
-  }
 
   //TODO?~ Replace with the implementation in class KeyPad?
   private def avoidsPosition(startPos: Coor, sequence: String, forbidden: Coor): Boolean = {
@@ -289,24 +243,6 @@ class SolverDay21 extends Solver {
     answer
   }
 
-  private def generateVariants(curPos: Coor, moves: String, forbiddenPos: Coor): List[String] = {
-    if curPos == forbiddenPos then
-      return Nil
-
-    if moves.isEmpty then
-      return List("")
-
-    var result = List[String]()
-    for i <- moves.indices do
-      //print(s" $ch ")
-      val ch = moves(i)
-      val nextPos: Coor = determineNextPosition(curPos, ch)
-      val nextSequences1 = generateVariants(nextPos, moves.take(i) + moves.drop(i+1), forbiddenPos)
-      val nextSequences2 = nextSequences1.map( str => ch.toString + str)
-      result = result ++ nextSequences2
-    result
-  }
-
   private def determineNextPosition(curPos: Coor, ch: Char) = {
     val nextPos = ch match
       case '^' => Coor(curPos.row - 1, curPos.col)
@@ -315,37 +251,6 @@ class SolverDay21 extends Solver {
       case '<' => Coor(curPos.row, curPos.col - 1)
       case 'A' => curPos
     nextPos
-  }
-
-  private def generateFirstSequence(input: String): String = {
-
-    var curPos = Coor(3,2)
-    var result = ""
-    for ch <- input do
-      val nextPos = numericPad(ch)
-
-      // For now, let's ignore the "forbidden" area because we only look at distance travelled.
-      val ignoreForbidden = false
-      val horizontalMoves = moveHorizontally(curPos, nextPos)
-      val verticalMoves = moveVertically(curPos, nextPos)
-      result = if ignoreForbidden then {
-        result + horizontalMoves + verticalMoves + "A"
-      } else {
-        // Avoid position (3,0).
-        // If you are in the "danger row", move vertically first.
-        // If you are in the "danger column", move horizontally first.
-        // (Note that these conditions are exclusive).
-        // If you are in neither, move as you please.
-        if curPos.row == 3 then
-          result + verticalMoves + horizontalMoves + "A"
-        else if curPos.col == 0 then
-          result + horizontalMoves + verticalMoves + "A"
-        else
-          result + horizontalMoves + verticalMoves + "A"
-      }
-
-      curPos = nextPos
-    result
   }
 
   private def moveVertically(curPos: Coor, nextPos: Coor) = {
