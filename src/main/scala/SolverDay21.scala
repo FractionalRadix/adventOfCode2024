@@ -220,25 +220,6 @@ class SolverDay21 extends Solver {
       println(complexity)
 
       totalComplexity += complexity
-      /*
-
-      val testCaseLengths = testcase.map(l => l.length)
-      //println(s"Testcase lengths: $testCaseLengths")
-      val instructions3Lengths = instructions3.map(l => l.length)
-      //println(s"instructions3 lengths: $instructions3Lengths")
-
-
-      // Now to find what we should type on the "manual" keypad.
-      for sequence <- instructions3 do
-        val options = directionalKeyPad.getPathsForSequence(sequence)
-        println(s"Current version has ${options.size} components.")
-        val componentValues = options.values.toList
-        val componentLengths = findLengths(componentValues)
-        val shortestLengths = componentLengths.map( l => l.min )
-        println(shortestLengths)
-
-
-       */
 
     totalComplexity.toString
   }
@@ -271,7 +252,7 @@ class SolverDay21 extends Solver {
    * ["hello world", "bye world", "hello cat", "bye cat", "hello dog", "bye dog"]
    * Note that if either list is empty, the result will also be empty.
    * To get the identity operation, do a cross product with List("").
- *
+   *
    * @param l1 A list of Strings.
    * @param l2 A list of Strings.
    * @return A list containing all combinations of the elements of the input lists.
@@ -289,96 +270,6 @@ class SolverDay21 extends Solver {
   private def findLengths(l: List[List[String]]): List[List[Int]] = {
     for l1 <- l yield
       l1.map( l2 => l2.length )
-  }
-
-
-  private def allPossiblePaths(pathComponents: List[List[String]]): List[String] = {
-    if pathComponents.isEmpty then
-      List()
-    else
-      val head = pathComponents.head
-      val tail = allPossiblePaths( pathComponents.tail )
-      val new1 = head.map( str => str :: tail )
-
-      val result = for headList <- head yield
-        headList.map( str => str :: tail )
-      val l = result.toList
-
-    Nil // TODO!~
-  }
-
-
-  def OLD_solvePart1(lines: List[String]): String = {
-    var totalComplexity = 0
-
-    for line <- lines do
-      println(line)
-
-      // First robot instructions:
-      val firstRobotPathsSections = allPathsThatResultIn(Coor(3,2), line, numericPad, numericPaths)
-      var firstRobotPaths = explodeListOfLists[String](firstRobotPathsSections, (s1, s2) => s1 + s2, "")
-      val shortestLength = firstRobotPaths.map( l => l.length ).min
-      firstRobotPaths = firstRobotPaths.filter( l => l.length == shortestLength )
-
-      // With the first robot paths and the directional sequences determined,
-      // we can incrementally generate a new mapping from "directional keypad button" to "directional keypad button".
-      // In this mapping we only keep the shortest distances.
-      for firstRobotPath <- firstRobotPaths do
-        println(s"First robot path: $firstRobotPath")
-
-        val secondRobotSequences = determineDirectionalPadToDirectionalPad(firstRobotPath)
-        //secondRobotSequences.print("Second robot sequences:")
-
-        // Note that we always start at "A" (0,2). Because every sequence ends with "A", so that's where the next one takes off.
-
-        var len = 0L
-        for i <- 0 until secondRobotSequences.nrOfSections do
-          val currentSection = secondRobotSequences.getSection(i) // This is a List[String].
-          var minLengthsForSection: List[Long] = Nil
-
-          //println
-          //println(s"Current section: $i -  ${currentSection.mkString(",")}")
-          for currentOptionOfCurrentSection <- currentSection do
-
-            // "currentOptionOFFirstSection" is a String. A sequence of instructions that will end in 'A'.
-            val waysToDoCurrentOptionOfCurrentSection = determineDirectionalPadToDirectionalPad(currentOptionOfCurrentSection)
-            val minLen = waysToDoCurrentOptionOfCurrentSection.lengthOfShortestPath()
-            minLengthsForSection = minLen :: minLengthsForSection
-
-          len += minLengthsForSection.min
-        println(s"Shortest possible length: $len")
-        val numericPart = line.dropRight(1).toInt
-        val complexity = len * numericPart
-        println(s"...Complexity=$complexity ($len * $numericPart)")
-
-
-      val firstRobotInstructions = generateFirstSequence(line)
-      //println(firstRobotInstructions)
-      val secondRobotInstructions = generateDirectionalKeypadSequence(firstRobotInstructions)
-      //println(secondRobotInstructions)
-      val finalInstructions = generateDirectionalKeypadSequence(secondRobotInstructions)
-      //println(finalInstructions)
-
-      val numericKeyPad = KeyPad(numericPad, Coor(3, 0))
-      val directionalKeyPad = KeyPad(directionalPad, Coor(0, 0))
-      println(s"Performing first robot instructions for $line:")
-      performInstructions(firstRobotInstructions, Coor(3,2), numericKeyPad)
-      println(s"Performing second robot instructions for $line:")
-      performInstructions(secondRobotInstructions, Coor(0, 2), directionalKeyPad)
-      println(s"Performing final instructions for $line:")
-      performInstructions(finalInstructions, Coor(0,2), directionalKeyPad)
-
-      val length = finalInstructions.length
-      val numericPart = line.dropRight(1).toInt
-      val complexity = length * numericPart
-      println(s"...Complexity=$complexity ($length * $numericPart)")
-
-      generateNumericPadSequences()
-
-      totalComplexity += complexity
-
-
-    totalComplexity.toString
   }
 
   /**
@@ -439,19 +330,6 @@ class SolverDay21 extends Solver {
       if curPos == keyPad.forbidden then
         println("Kaboom!")
   }
-
-  //TODO?-
-  private def generateDirectionalKeypadSequence(input: String) = {
-    var curPos = Coor(0,2)
-    var result = ""
-    for ch <- input do
-      val nextPos = directionalPad(ch)
-      result = result + safePath(curPos, nextPos) + "A"
-      curPos = nextPos
-    result
-  }
-
-
 
   /**
    * Generate all the shortest sequences from one position to another on the directional keypad.
@@ -581,36 +459,6 @@ class SolverDay21 extends Solver {
   private def moveHorizontally(curPos: Coor, nextPos: Coor) = {
     if nextPos.col > curPos.col then ">" * (nextPos.col - curPos.col) else "<" * (curPos.col - nextPos.col)
   }
-
-  //TODO!-
-  /**
-   * Safe paths on the directional keypad
-   */
-  private def safePath(startPos: Coor, endPos: Coor): String = {
-    //val positions = List(Coor(0,1), Coor(0,2), Coor(1,0), Coor(1,1), Coor(1,2))
-
-    // If you're staying in the same row, you should never reach the forbidden area.
-    // Either it's not on your row, or it's outside your movement range.
-    val path = if startPos.row == endPos.row then
-      val str1 = moveHorizontally(startPos, endPos)
-      val str2 = moveVertically(startPos, endPos)
-      str1 + str2
-    else
-      // We need to move vertically and perhaps horizontally.
-      // If we are under the forbidden area, we should move horizontally FIRST.
-      // But if we are NOT under the forbidden area, we should move vertically FIRST.
-      if startPos.col == 0 then
-        val str1 = moveHorizontally(startPos, endPos)
-        val str2 = moveVertically(startPos, endPos)
-        str1 + str2
-      else
-        val str1 = moveVertically(startPos, endPos)
-        val str2 = moveHorizontally(startPos, endPos)
-        str1 + str2
-
-    path
-  }
-
 
   override def solvePart2(lines: List[String]): String = {
     "" //TODO!~
