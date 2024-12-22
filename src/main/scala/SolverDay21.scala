@@ -187,11 +187,17 @@ class SolverDay21 extends Solver {
 
       // Now we have a map from path component index to possible ways of doing that path.
       // Let's determine, for each sequence, what we'd need to type on the second directional pad.
+      // Let's make a "Tree" of maps:
+      //   Map[Int, List[ String ]]
+      //   Map[Int, List[ Map[Int,String] ]
+      //   Map[Int, List[ Map[Int, List[ Map[Int,String] ]]
+
       for i <- pathComponents1.keys.toList.sorted do
         val paths = pathComponents1(i)
         for path <- paths do
           val paths2 = directionalKeyPad.getPathsForSequence(path)
           //println(paths2)
+
 
 
 
