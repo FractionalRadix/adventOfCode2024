@@ -28,6 +28,30 @@ class SolverDay21 extends Solver {
     '>' -> Coor(1, 2)
   )
 
+  override def solvePart2(lines: List[String]): String = {
+    val numericKeyPad = KeyPad(numericPad, Coor(3,0))
+    val directionalKeyPad = KeyPad(directionalPad, Coor(0,0))
+
+    var totalComplexity = 0L
+
+    for line <- lines do
+      val numericPart = line.dropRight(1).toLong
+      val length = shortestSequenceLength(line)
+      val complexity = numericPart * length
+      totalComplexity += complexity
+
+    totalComplexity.toString
+  }
+
+  /**
+   * Determine the shortest sequence to type, if a chain of 25 robots has result in typing this code.
+   * @param accessCode The code that should be typed on the numeric keypad by the final robot.
+   * @return The length of the shortest sequence to type on the first keypad, to let the final robot type the code.
+   */
+  private def shortestSequenceLength(accessCode: String): Long = {
+    0L //TODO!~
+  }
+
   private class PossiblePaths(private val pathSections: List[List[String]]) {
     // A possible path is defined by taking one string from the first list,
     // followed by taking one from the second list,
@@ -215,10 +239,4 @@ class SolverDay21 extends Solver {
       if curPos == keyPad.forbidden then
         println("Kaboom!")
   }
-
-  override def solvePart2(lines: List[String]): String = {
-    "" //TODO!~
-  }
-
-
 }
