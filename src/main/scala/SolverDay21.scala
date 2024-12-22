@@ -162,7 +162,7 @@ class SolverDay21 extends Solver {
       val sortedKeys = pathComponents1.keys.toList.sorted
       var instructions2 = List("")
       for key <- sortedKeys do
-        instructions2 = crossProduct(instructions2, pathComponents1(key))
+        instructions2 = Util.crossProduct(instructions2, pathComponents1(key))
       //println(s"Cross product is $instructions2")
 
       // Similarly, the number of sequences for the third robot is still tractable.
@@ -194,7 +194,7 @@ class SolverDay21 extends Solver {
       val sortedKeys = pathComponents2.keys.toList.sorted
       var instructions_tmp = List("")
       for key <- sortedKeys do
-        instructions_tmp = crossProduct(instructions_tmp, pathComponents2(key))
+        instructions_tmp = Util.crossProduct(instructions_tmp, pathComponents2(key))
       instructions3 = instructions3 ++ instructions_tmp
     //println(s"Possible instruction sequences for third robot: $instructions3")
     //println(s"There are ${instructions3.size} possible sequences for the third robot.")
@@ -206,21 +206,6 @@ class SolverDay21 extends Solver {
     instructions3 = instructions3.filter(l => l.length == shortestLength)
     //println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
     instructions3
-  }
-
-  /**
-   * Given two lists of Strings, determine all combinations of them.
-   * For example, ["hello ","bye "] and ["world", "cat", "dog"] will yield:
-   * ["hello world", "bye world", "hello cat", "bye cat", "hello dog", "bye dog"]
-   * Note that if either list is empty, the result will also be empty.
-   * To get the identity operation, do a cross product with List("").
-   *
-   * @param l1 A list of Strings.
-   * @param l2 A list of Strings.
-   * @return A list containing all combinations of the elements of the input lists.
-   */
-  private def crossProduct(l1: List[String], l2: List[String]): List[String] = {
-    for e1 <- l1; e2 <- l2 yield e1 + e2
   }
 
   /**

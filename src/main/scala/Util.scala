@@ -9,6 +9,21 @@ class Util {
 
 object Util {
   /**
+   * Given two lists of Strings, determine all combinations of them.
+   * For example, ["hello ","bye "] and ["world", "cat", "dog"] will yield:
+   * ["hello world", "bye world", "hello cat", "bye cat", "hello dog", "bye dog"]
+   * Note that if either list is empty, the result will also be empty.
+   * To get the identity operation, do a cross product with List("").
+   *
+   * @param l1 A list of Strings.
+   * @param l2 A list of Strings.
+   * @return A list containing all combinations of the elements of the input lists.
+   */
+  def crossProduct(l1: List[String], l2: List[String]): List[String] = {
+    for e1 <- l1; e2 <- l2 yield e1 + e2
+  }
+
+  /**
    * Returns true if and only if the given list is a list of subsequent numbers.
    * For example, (1,2,3,4) yields <code>true</code>; (1,3,4,5) does not as the number 2 is missing.
    *
