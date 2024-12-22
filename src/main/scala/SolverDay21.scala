@@ -1,6 +1,8 @@
 package com.cormontia.adventOfCode2024
 
 import scala.collection.{immutable, mutable}
+import scala.util.boundary
+import scala.util.boundary.break
 
 class SolverDay21 extends Solver {
 
@@ -94,7 +96,7 @@ class SolverDay21 extends Solver {
      * @param endPos The position that we want the robot arm to arrive at.
      * @return The list of all paths that take you from the starting position to the ending position.
      */
-    def getPathsBetween(startPos: Coor, endPos: Coor): List[String] = {
+    private def getPathsBetween(startPos: Coor, endPos: Coor): List[String] = {
       // This method uses memoization.
       if paths.contains((startPos, endPos)) then
         paths((startPos, endPos))
@@ -105,9 +107,23 @@ class SolverDay21 extends Solver {
         val horizontalMoves = if horizontalDifference > 0 then ">" * horizontalDifference else "<" * -horizontalDifference
         val moveSet = verticalMoves + horizontalMoves
         val allPaths = Util.permutations(moveSet)
-        val allSafePaths = allPaths.filter( path => avoidsPosition(startPos, path, forbidden))
+        val allSafePaths = allPaths
+          .filter( path => avoidsPosition(startPos, path, forbidden) )
+          .map( path => path ++ "A" )
         paths((startPos, endPos)) = allSafePaths
         allSafePaths
+    }
+
+    /**
+     * Determine all (non-cyclic) paths between from a starting button to an ending button
+     * The paths should be as short as possible; no cycles or detours.
+     * The paths must avoid the "forbidden" position.
+     * @param startButton The button that the robot arm is currently pointed at.
+     * @param endButton The button that we want the robot arm to arrive at.
+     * @return The list of all paths that take you from the starting button to the ending button.
+     */
+    def getPathsBetween(startButton: Char, endButton: Char): List[String] = {
+      getPathsBetween(getPosition(startButton), getPosition(endButton))
     }
 
     private def avoidsPosition(startPos: Coor, sequence: String, forbidden: Coor): Boolean = {
@@ -115,16 +131,52 @@ class SolverDay21 extends Solver {
         return false
       if sequence == "" then
         return true
-      for ch <- sequence do
-        val nextPos = determineNextPosition(startPos, ch)
-        if nextPos == forbidden then
-          return false
-      true
+      var curPos = startPos
+      var answer = true
+      boundary {
+        for ch <- sequence do
+          val nextPos = determineNextPosition(curPos, ch)
+          if nextPos == forbidden then
+            answer = false
+            break()
+          curPos = nextPos
+      }
+      answer
+    }
+
+    def determineNextPosition(curPos: Coor, ch: Char): Coor = {
+      val nextPos = ch match
+        case '^' => Coor(curPos.row - 1, curPos.col)
+        case 'v' => Coor(curPos.row + 1, curPos.col)
+        case '>' => Coor(curPos.row, curPos.col + 1)
+        case '<' => Coor(curPos.row, curPos.col - 1)
+        case 'A' => curPos
+      nextPos
     }
   }
 
   override def solvePart1(lines: List[String]): String = {
     //TODO!+
+
+    val numericKeyPad = KeyPad(numericPad, Coor(3,0))
+    val directionalKeyPad = KeyPad(directionalPad, Coor(0,0))
+
+    val paths1 = numericKeyPad.getPathsBetween('2', '9')
+    println(paths1) // Expectation: >^^, ^>^, ^^>
+    val paths2 = numericKeyPad.getPathsBetween('1', 'A')
+    println(paths2) // Expectation: >v>, >>v . The value 'v>>' visits the forbidden position and is ruled out.
+
+    // Now let's find all the ways to type the first test input ("029A") on the first keypad.
+
+    // Given a Keypad, determine all paths from '0' to '2'.
+    for line <- lines do
+      println(s"Paths for $line:")
+      var curChar = 'A' // The initial position of the robot arm is on the 'A' position.
+      for nextChar <- line do
+        val paths = numericKeyPad.getPathsBetween(curChar, nextChar)
+        println(s"From $curChar to $nextChar: $paths")
+        curChar = nextChar
+
 
     // New approach: brute force, but with pruning.
     // Type any character on the first pad.
@@ -138,12 +190,8 @@ class SolverDay21 extends Solver {
     val thirdPadPos = Coor(0,2) // Pad inside the -40 degrees room, gives access to the radiated room.
     val fourthPadPos = Coor(0,2) // Pad that you use, in the room full of Historians. Gives access to the -40 degrees room.
 
+
     // Let's try to type "0".
-
-
-
-
-
 
     ""
   }
@@ -199,12 +247,14 @@ class SolverDay21 extends Solver {
       val finalInstructions = generateDirectionalKeypadSequence(secondRobotInstructions)
       //println(finalInstructions)
 
+      val numericKeyPad = KeyPad(numericPad, Coor(3, 0))
+      val directionalKeyPad = KeyPad(directionalPad, Coor(0, 0))
       println(s"Performing first robot instructions for $line:")
-      performInstructions(firstRobotInstructions, Coor(3,2), Coor(3,0))
+      performInstructions(firstRobotInstructions, Coor(3,2), numericKeyPad)
       println(s"Performing second robot instructions for $line:")
-      performInstructions(secondRobotInstructions, Coor(0,2), Coor(0,0))
+      performInstructions(secondRobotInstructions, Coor(0, 2), directionalKeyPad)
       println(s"Performing final instructions for $line:")
-      performInstructions(finalInstructions, Coor(0,2), Coor(0,0))
+      performInstructions(finalInstructions, Coor(0,2), directionalKeyPad)
 
       val length = finalInstructions.length
       val numericPart = line.dropRight(1).toInt
@@ -268,11 +318,11 @@ class SolverDay21 extends Solver {
       result
   }
 
-  private def performInstructions(instructions: String, startPos: Coor, forbiddenPos: Coor): Unit = {
+  private def performInstructions(instructions: String, startPos: Coor, keyPad: KeyPad): Unit = {
     var curPos = startPos
     for instruction <- instructions do
-      curPos = determineNextPosition(curPos, instruction)
-      if curPos == forbiddenPos then
+      curPos = keyPad.determineNextPosition(curPos, instruction)
+      if curPos == keyPad.forbidden then
         println("Kaboom!")
   }
 
@@ -332,18 +382,24 @@ class SolverDay21 extends Solver {
     map.toMap
   }
 
+  //TODO?~ Replace with the implementation in class KeyPad?
   private def avoidsPosition(startPos: Coor, sequence: String, forbidden: Coor): Boolean = {
     if startPos == forbidden then
       return false
     if sequence == "" then
       return true
-    for ch <- sequence do
-      val nextPos = determineNextPosition(startPos, ch)
-      if nextPos == forbidden then
-        return false
-    true
+    var curPos = startPos
+    var answer = true
+    boundary {
+      for ch <- sequence do
+        val nextPos = determineNextPosition(curPos, ch)
+        if nextPos == forbidden then
+          answer = false
+          break()
+        curPos = nextPos
+    }
+    answer
   }
-
 
   private def generateVariants(curPos: Coor, moves: String, forbiddenPos: Coor): List[String] = {
     if curPos == forbiddenPos then
