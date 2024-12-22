@@ -159,7 +159,6 @@ class SolverDay21 extends Solver {
       var instructions2 = List("")
       for key <- sortedKeys do
         instructions2 = Util.crossProduct(instructions2, pathComponents1(key))
-      //println(s"Cross product is $instructions2")
 
       // Similarly, the number of sequences for the third robot is still tractable.
       var shortest: Option[Long] = None
@@ -192,16 +191,10 @@ class SolverDay21 extends Solver {
       for key <- sortedKeys do
         instructions_tmp = Util.crossProduct(instructions_tmp, pathComponents2(key))
       instructions3 = instructions3 ++ instructions_tmp
-    //println(s"Possible instruction sequences for third robot: $instructions3")
-    //println(s"There are ${instructions3.size} possible sequences for the third robot.")
     val lengths = instructions3.map(l => l.length)
     val shortestLength = lengths.min
-    //println(s"  The shortest of these consists of ${lengths.min} characters.")
-    //println(s"  The longest of these consists of ${lengths.max} characters.")
     // Filter out the sequences that are longer than the shortest sequence.
-    instructions3 = instructions3.filter(l => l.length == shortestLength)
-    //println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
-    instructions3
+    instructions3.filter(l => l.length == shortestLength)
   }
 
   /**
@@ -221,44 +214,6 @@ class SolverDay21 extends Solver {
       curPos = keyPad.determineNextPosition(curPos, instruction)
       if curPos == keyPad.forbidden then
         println("Kaboom!")
-  }
-
-
-  //TODO?~ Replace with the implementation in class KeyPad?
-  private def avoidsPosition(startPos: Coor, sequence: String, forbidden: Coor): Boolean = {
-    if startPos == forbidden then
-      return false
-    if sequence == "" then
-      return true
-    var curPos = startPos
-    var answer = true
-    boundary {
-      for ch <- sequence do
-        val nextPos = determineNextPosition(curPos, ch)
-        if nextPos == forbidden then
-          answer = false
-          break()
-        curPos = nextPos
-    }
-    answer
-  }
-
-  private def determineNextPosition(curPos: Coor, ch: Char) = {
-    val nextPos = ch match
-      case '^' => Coor(curPos.row - 1, curPos.col)
-      case 'v' => Coor(curPos.row + 1, curPos.col)
-      case '>' => Coor(curPos.row, curPos.col + 1)
-      case '<' => Coor(curPos.row, curPos.col - 1)
-      case 'A' => curPos
-    nextPos
-  }
-
-  private def moveVertically(curPos: Coor, nextPos: Coor) = {
-    if nextPos.row > curPos.row then "v" * (nextPos.row - curPos.row) else "^" * (curPos.row - nextPos.row)
-  }
-
-  private def moveHorizontally(curPos: Coor, nextPos: Coor) = {
-    if nextPos.col > curPos.col then ">" * (nextPos.col - curPos.col) else "<" * (curPos.col - nextPos.col)
   }
 
   override def solvePart2(lines: List[String]): String = {
