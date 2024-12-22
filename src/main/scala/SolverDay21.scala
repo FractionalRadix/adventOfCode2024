@@ -153,6 +153,20 @@ class SolverDay21 extends Solver {
         case 'A' => curPos
       nextPos
     }
+
+    //TODO!+ MEMOIZE the results!
+    def getPathsForSequence(line: String): Map[Int, List[String]] = {
+      val pathComponents = mutable.Map[Int, List[String]]()
+      var curChar = 'A' // The initial position of the robot arm is on the 'A' position.
+      var i = 0
+      for nextChar <- line do
+        val paths = getPathsBetween(curChar, nextChar)
+        pathComponents(i) = paths
+        curChar = nextChar
+        i = i + 1
+      pathComponents.toMap
+    }
+
   }
 
   override def solvePart1(lines: List[String]): String = {
@@ -166,16 +180,21 @@ class SolverDay21 extends Solver {
     val paths2 = numericKeyPad.getPathsBetween('1', 'A')
     println(paths2) // Expectation: >v>, >>v . The value 'v>>' visits the forbidden position and is ruled out.
 
-    // Now let's find all the ways to type the first test input ("029A") on the first keypad.
-
-    // Given a Keypad, determine all paths from '0' to '2'.
     for line <- lines do
       println(s"Paths for $line:")
-      var curChar = 'A' // The initial position of the robot arm is on the 'A' position.
-      for nextChar <- line do
-        val paths = numericKeyPad.getPathsBetween(curChar, nextChar)
-        println(s"From $curChar to $nextChar: $paths")
-        curChar = nextChar
+      val pathComponents1 = numericKeyPad.getPathsForSequence(line)
+      println(pathComponents1)
+
+      // Now we have a map from path component index to possible ways of doing that path.
+      // Let's determine, for each sequence, what we'd need to type on the second directional pad.
+      for i <- pathComponents1.keys.toList.sorted do
+        val paths = pathComponents1(i)
+        for path <- paths do
+          val paths2 = directionalKeyPad.getPathsForSequence(path)
+          //println(paths2)
+
+
+
 
 
     // New approach: brute force, but with pruning.
@@ -194,6 +213,18 @@ class SolverDay21 extends Solver {
     // Let's try to type "0".
 
     ""
+  }
+
+  private def getPathsForSequence(line: String, keyPad: KeyPad): Map[Int, List[String]] = {
+    val pathComponents = mutable.Map[Int, List[String]]()
+    var curChar = 'A' // The initial position of the robot arm is on the 'A' position.
+    var i = 0
+    for nextChar <- line do
+      val paths = keyPad.getPathsBetween(curChar, nextChar)
+      pathComponents(i) = paths
+      curChar = nextChar
+      i = i + 1
+    pathComponents.toMap
   }
 
   def OLD_solvePart1(lines: List[String]): String = {
