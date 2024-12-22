@@ -154,17 +154,22 @@ class SolverDay21 extends Solver {
       nextPos
     }
 
-    //TODO!+ MEMOIZE the results!
+    private val sequences = mutable.Map[String, Map[Int, List[String]]]()
+
     def getPathsForSequence(line: String): Map[Int, List[String]] = {
-      val pathComponents = mutable.Map[Int, List[String]]()
-      var curChar = 'A' // The initial position of the robot arm is on the 'A' position.
-      var i = 0
-      for nextChar <- line do
-        val paths = getPathsBetween(curChar, nextChar)
-        pathComponents(i) = paths
-        curChar = nextChar
-        i = i + 1
-      pathComponents.toMap
+      if sequences.contains(line) then
+        sequences(line)
+      else
+        val pathComponents = mutable.Map[Int, List[String]]()
+        var curChar = 'A' // The initial position of the robot arm is on the 'A' position.
+        var i = 0
+        for nextChar <- line do
+          val paths = getPathsBetween(curChar, nextChar)
+          pathComponents(i) = paths
+          curChar = nextChar
+          i = i + 1
+        sequences(line) = pathComponents.toMap
+        pathComponents.toMap
     }
 
   }
