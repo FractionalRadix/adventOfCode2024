@@ -196,6 +196,7 @@ class SolverDay21 extends Solver {
         val paths = pathComponents1(i)
         for path <- paths do
           val paths2 = directionalKeyPad.getPathsForSequence(path)
+          //TODO?+ Filter out all elements of path2 that are longer than the shortest one?
           //println(paths2)
 
 
