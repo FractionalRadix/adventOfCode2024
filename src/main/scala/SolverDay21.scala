@@ -34,6 +34,67 @@ class SolverDay21 extends Solver {
 
     var totalComplexity = 0L
 
+    // All sequences always start at 'A'...
+    // And to go from (for example) '2' to '9' should always be the same sequence.
+    // So... there's just 121 ('0'-'A' x '0'-'A') sequence components?
+    // BUT! Keep in mind that while the first robot goes from "number" to "number", every SUBSEQUENT
+    // robot hits "A" after stuff is done!
+
+    val numericPaths = mutable.Map[(Char, Char), List[String]]()
+    val numericKeys = "0123456789A"
+    for key1 <- numericKeys do
+      for key2 <- numericKeys do
+        val moves = numericKeyPad.getPathsBetween(key1, key2)
+        println(s"From $key1 to $key2: $moves")
+        numericPaths((key1, key2)) = moves
+    // Now the catch. Doing this path via a second directional keypad means we must prepend every line with "A",
+    // the starting position. (<--- not sure if that's correct ??)
+
+    val directionalPaths = mutable.Map[(Char, Char), List[String]]()
+    val dirKeys = "<>^vA"
+    for key1 <- dirKeys do
+      for key2 <- dirKeys do
+        print(s"From $key1 to $key2: ")
+        val moves = directionalKeyPad.getPathsBetween(key1, key2)
+        println(s"From $key1 to $key2: $moves")
+        directionalPaths((key1, key2)) = moves
+
+    // Now let's look at the example expansion: 029A
+    // We look at 0-2, 2-9, and 9-A separately.
+    // 1. Determine the paths on the first numeric keypad.
+    val p02step1 = numericKeyPad.getPathsBetween('0', '2')
+    // 2. Determine the paths on the first directional keypad.
+    for path <- p02step1 do
+      println(path)
+      // Replace "^" with the shortest sequence for "A^" ?
+
+
+
+
+
+
+
+    // Now have a look at sequences that "zigzag".
+    // For example, (0,4) can be "^^<A" or "^<^A". (Note that "<^^A" is filtered because it enters the forbidden zone).
+    // "<^<A" MIGHT result in needing to press "A" more often than "<^^A" because it changes direction twice, while
+    // "<^^A" only changes direction once?
+
+/*
+    // What is (the length of) the shortest path from 'A' to '0'?
+    // 1. On the numeric keypad?
+    val dist1 = numericKeyPad.getPathsBetween('1', '9')
+    println(dist1)
+    // 2. On the first directional keypad?
+    for dist2part <- dist1 do
+      println(dist2part)
+      val correctedDist2Part = "A" + dist2part
+      for i <- 0 until correctedDist2Part.length - 1 do
+        val part = directionalKeyPad.getPathsBetween(correctedDist2Part(i), correctedDist2Part(i + 1))
+        //val firstPart = directionalKeyPad.getPathsBetween('A',dist2part(0))
+        //val secondPart = directionalKeyPad.getPathsBetween(dist2part(0), dist2part(1))
+        // Happens not to be longer...
+        println(s"..$part")
+*/
     for line <- lines do
       val numericPart = line.dropRight(1).toLong
       val length = shortestSequenceLength(line)
@@ -49,6 +110,9 @@ class SolverDay21 extends Solver {
    * @return The length of the shortest sequence to type on the first keypad, to let the final robot type the code.
    */
   private def shortestSequenceLength(accessCode: String): Long = {
+
+
+
     0L //TODO!~
   }
 
@@ -78,7 +142,7 @@ class SolverDay21 extends Solver {
   private class KeyPad(buttons: Map[Char, Coor], val forbidden: Coor) {
     private val paths = mutable.Map[(Coor, Coor), List[String]]()
 
-    private def getPosition(button: Char): Coor = buttons(button)
+    def getPosition(button: Char): Coor = buttons(button)
 
     /**
      * Determine all (non-cyclic) paths between from a starting position to an ending position.
@@ -114,7 +178,7 @@ class SolverDay21 extends Solver {
      * @param endButton The button that we want the robot arm to arrive at.
      * @return The list of all paths that take you from the starting button to the ending button.
      */
-    private def getPathsBetween(startButton: Char, endButton: Char): List[String] = {
+    def getPathsBetween(startButton: Char, endButton: Char): List[String] = {
       getPathsBetween(getPosition(startButton), getPosition(endButton))
     }
 
@@ -167,42 +231,49 @@ class SolverDay21 extends Solver {
 
   override def solvePart1(lines: List[String]): String = {
 
-    val numericKeyPad = KeyPad(numericPad, Coor(3,0))
-    val directionalKeyPad = KeyPad(directionalPad, Coor(0,0))
+    //TODO!~
+    val skipPart1 = true
+    if skipPart1 then
+      "<Part 1 temporarily skipped>"
+    else {
 
-    var totalComplexity = 0L
+      val numericKeyPad = KeyPad(numericPad, Coor(3, 0))
+      val directionalKeyPad = KeyPad(directionalPad, Coor(0, 0))
 
-    for line <- lines do
-      val pathComponents1 = numericKeyPad.getPathsForSequence(line)
+      var totalComplexity = 0L
 
-      // At this point, the number of possible sequences is still tractable.
-      // So let's generate all possible sequences for this line.
-      // We call it "instructions2" because it's the set of instructions for the second robot.
-      // (Technically "line" would be "instructions1").
-      val sortedKeys = pathComponents1.keys.toList.sorted
-      var instructions2 = List("")
-      for key <- sortedKeys do
-        instructions2 = Util.crossProduct(instructions2, pathComponents1(key))
+      for line <- lines do
+        val pathComponents1 = numericKeyPad.getPathsForSequence(line)
 
-      // Similarly, the number of sequences for the third robot is still tractable.
-      var shortest: Option[Long] = None
-      for instr <- instructions2 do
-        val instructions3 = instructionsForThirdRobot(directionalKeyPad, List(instr))
-        for instr <- instructions3 do
-          val instructions4 = instructionsForThirdRobot(directionalKeyPad, List(instr))
-          val minLength = instructions4.map( l => l.length ).min
-          if shortest.isEmpty then
-            shortest = Some(minLength)
-          else if minLength < shortest.head then
-            shortest = Some(minLength)
+        // At this point, the number of possible sequences is still tractable.
+        // So let's generate all possible sequences for this line.
+        // We call it "instructions2" because it's the set of instructions for the second robot.
+        // (Technically "line" would be "instructions1").
+        val sortedKeys = pathComponents1.keys.toList.sorted
+        var instructions2 = List("")
+        for key <- sortedKeys do
+          instructions2 = Util.crossProduct(instructions2, pathComponents1(key))
 
-      val numericPart = line.dropRight(1).toLong
-      val length = shortest.head
-      val complexity = numericPart * length
+        // Similarly, the number of sequences for the third robot is still tractable.
+        var shortest: Option[Long] = None
+        for instr <- instructions2 do
+          val instructions3 = instructionsForThirdRobot(directionalKeyPad, List(instr))
+          for instr <- instructions3 do
+            val instructions4 = instructionsForThirdRobot(directionalKeyPad, List(instr))
+            val minLength = instructions4.map(l => l.length).min
+            if shortest.isEmpty then
+              shortest = Some(minLength)
+            else if minLength < shortest.head then
+              shortest = Some(minLength)
 
-      totalComplexity += complexity
+        val numericPart = line.dropRight(1).toLong
+        val length = shortest.head
+        val complexity = numericPart * length
 
-    totalComplexity.toString
+        totalComplexity += complexity
+
+      totalComplexity.toString
+    }
   }
 
   private def instructionsForThirdRobot(directionalKeyPad: KeyPad, instructions2: List[String]): List[String] = {
