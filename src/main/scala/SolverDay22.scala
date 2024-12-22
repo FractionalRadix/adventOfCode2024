@@ -26,33 +26,47 @@ class SolverDay22 extends Solver {
   }
 
   override def solvePart2(lines: List[String]): String = {
-    val seeds = lines.map( str => str.toLong )
-    //TODO!+ Use these seeds to find the best deals....
+    //val seeds = lines.map( str => str.toLong )
+    val seeds = List(1,2,3,2024) //TODO!~ Test input, replace with the real seeds once the code is finished.
+    //val seeds = List(123L)
 
-    // (For now we're just testing what we've built so far).
+    val nrOfIterations = 2000 // 10 for the example // Careful, might need to be 2001, off-by-one thing!
+    val maps = for seed <- seeds yield
+      val prices = lastDigits(seed, nrOfIterations)
+      val changes = differenceList(prices)
+      // Let's find the highest price available for each sequence of 4 changes.
+      val windowed = changes.sliding(4).toList
+      // Now let's make a list of the highest value each sequence can give us.
+      // DUPLICATED sequences don't work! You must always go for the first occurrence of each sequence.
+      // Note that there's 19 ** 4 possible sequences - that's 130321 possible sequences.
+      // First, let's restore the link between sequences and values:
+      val seqVal = windowed.zip(prices.drop(4))
+      val seqVal2 = seqVal.map( (a,b) => (listOfFourToTuple(a), b) )
+      buildMap(seqVal2)
+      //println(map)
+
+    //maps.foreach( m => println(m) )
+
+    // Now let's make a set of all occurring Sequences.
+    val sequences = scala.collection.mutable.Set[Sequence]()
+    for map <- maps do
+      sequences.addAll(map.keys)
+    println(s"${sequences.size} sequences")
 
 
-    val prices = lastDigits(123L, 10)
-    println(prices) // Should be 3,0,6,5,4,4,6,4,4,2
-    val changes = differenceList(prices)
-    println(changes) // Should be -3,6,-1,-1,0,2,-2,0,-2
+    var bestBananaCount = 0L
+    val sequenceList = sequences.toList
+    for sequence <- sequenceList do
+      var bananaCount = 0L
+      for map <- maps do
+        val newBananas = map.get(sequence)
+        if newBananas.isDefined then
+          bananaCount += newBananas.head
+      if bananaCount > bestBananaCount then
+        bestBananaCount = bananaCount
 
-    // Let's find the highest price available for each sequence of 4 changes.
-    val windowed = changes.sliding(4).toList
-    println(windowed)
-    // Now let's make a list of the highest value each sequence can give us.
-    // DUPLICATED sequences don't work! You must always go for the first occurrence of each sequence.
-    // Note that there's 19 ** 4 possible sequences - that's 130321 possible sequences.
-    // First, let's restore the link between sequences and values:
-    val seqVal = windowed.zip(prices.drop(4))
-    println(seqVal)
-    val seqVal2 = seqVal.map( (a,b) => (listOfFourToTuple(a), b) )
-    println(seqVal2)
-    val map = buildMap(seqVal2)
-    println(map)
+    bestBananaCount.toString
 
-
-    "" //TODO!+
   }
 
   private case class Sequence(a0: Long, a1: Long, a2: Long, a3: Long)
