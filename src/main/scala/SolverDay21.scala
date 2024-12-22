@@ -194,19 +194,31 @@ class SolverDay21 extends Solver {
       println(s"Cross product is $instructions2")
 
       // Similarly, the number of sequences for the third robot is still tractable.
-      for instr <- instructions2 do
-        val instructions3 = instructionsForThirdRobot(directionalKeyPad, List(instr))
-        println(instructions3.map(l => l.length).min)
-
+      var shortest: Option[Long] = None
+      println("Testcase: ")
       val testcase      = instructionsForThirdRobot(directionalKeyPad, List("v<<A>>^A<A>AvA<^AA>A<vAAA>^A"))
+      println("Instructions3: ")
+      for instr <- instructions2 do
+        println(instr)
+        val instructions3 = instructionsForThirdRobot(directionalKeyPad, List(instr))
+        println(s"Contained? ${instructions3.contains("v<<A>>^A<A>AvA<^AA>A<vAAA>^A")}")
+        for instr <- instructions3 do
+          val instructions4 = instructionsForThirdRobot(directionalKeyPad, List(instr))
+          val minLength = instructions4.map( l => l.length ).min
+          //print(s" ${instructions4.length}")
+          if shortest.isEmpty then
+            shortest = Some(minLength)
+          else if minLength < shortest.head then
+            shortest = Some(minLength)
 
-      //println(testcase)
+      println(shortest)
+      /*
+
       val testCaseLengths = testcase.map(l => l.length)
-      println(s"Testcase lengths: $testCaseLengths")
-      //val instructions3Lengths = instructions3.map(l => l.length)
+      //println(s"Testcase lengths: $testCaseLengths")
+      val instructions3Lengths = instructions3.map(l => l.length)
       //println(s"instructions3 lengths: $instructions3Lengths")
 
-      /*
 
       // Now to find what we should type on the "manual" keypad.
       for sequence <- instructions3 do
