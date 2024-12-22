@@ -178,11 +178,6 @@ class SolverDay21 extends Solver {
     val numericKeyPad = KeyPad(numericPad, Coor(3,0))
     val directionalKeyPad = KeyPad(directionalPad, Coor(0,0))
 
-    //val paths1 = numericKeyPad.getPathsBetween('2', '9')
-    //println(paths1) // Expectation: >^^, ^>^, ^^>
-    //val paths2 = numericKeyPad.getPathsBetween('1', 'A')
-    //println(paths2) // Expectation: >v>, >>v . The value 'v>>' visits the forbidden position and is ruled out.
-
     for line <- lines do
       println(s"Paths for $line:")
       val pathComponents1 = numericKeyPad.getPathsForSequence(line)
@@ -198,72 +193,56 @@ class SolverDay21 extends Solver {
         instructions2 = crossProduct(instructions2, pathComponents1(key))
       println(s"Cross product is $instructions2")
 
-      // With all possible sequences for the second robot, let's find all possible sequences for the third robot.
-      var instructions3 = List[String]()
+      // Similarly, the number of sequences for the third robot is still tractable.
       for instr <- instructions2 do
-        val pathComponents2 = directionalKeyPad.getPathsForSequence(instr)
-        val sortedKeys = pathComponents2.keys.toList.sorted
-        var instructions_tmp = List("")
-        for key <- sortedKeys do
-          instructions_tmp = crossProduct(instructions_tmp, pathComponents2(key))
-        instructions3 = instructions3 ++ instructions_tmp
-      //println(s"Possible instruction sequences for third robot: $instructions3")
-      println(s"There are ${instructions3.size} possible sequences for the third robot.")
-      val lengths = instructions3.map( l => l.length )
-      val shortestLength = lengths.min
-      println(s"  The shortest of these consists of ${lengths.min} characters.")
-      println(s"  The longest of these consists of ${lengths.max} characters.")
-      // Filter out the sequences that are longer than the shortest sequence.
-      instructions3 = instructions3.filter( l => l.length  == shortestLength )
-      println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
+        val instructions3 = instructionsForThirdRobot(directionalKeyPad, List(instr))
+        println(instructions3.map(l => l.length).min)
 
-      //println("Test findLengths:")
-      //val s1= findLengths(List(List("Hello","world"), List("cat", "dog", "fish"))) //  [[5,5],[3,3,4]]
-      //println(s1)
-      //val s2 = findLengths(List(List("Hello", "world"), List("cat", "dog", "fish"), List(), List(""))) // [[5,5],[3,3,4], [], [0]]
-      //println(s2)
+      val testcase      = instructionsForThirdRobot(directionalKeyPad, List("v<<A>>^A<A>AvA<^AA>A<vAAA>^A"))
 
+      //println(testcase)
+      val testCaseLengths = testcase.map(l => l.length)
+      println(s"Testcase lengths: $testCaseLengths")
+      //val instructions3Lengths = instructions3.map(l => l.length)
+      //println(s"instructions3 lengths: $instructions3Lengths")
 
-      // Now we need the length of the SHORTEST sequence that generates any of the "instructions3" sequences.
-      // Which means we don't need to keep the sequence - we just need to find the lengths, and find the shortest.
-      for instr <- instructions3 do
-        val pathComponents3 = directionalKeyPad.getPathsForSequence(instr)
-        println(pathComponents3)
+      /*
 
-        /*
-        // Given this map of Integer to List[List[String]], let's find the corresponding Map of Integer to List[List[Int]]
-        var len = 1L
-        for component <- pathComponents3 do
-          val currentMin = component._2.map( l => l.length ).min
-          len = len * currentMin
-        println(len)
-
-         */
+      // Now to find what we should type on the "manual" keypad.
+      for sequence <- instructions3 do
+        val options = directionalKeyPad.getPathsForSequence(sequence)
+        println(s"Current version has ${options.size} components.")
+        val componentValues = options.values.toList
+        val componentLengths = findLengths(componentValues)
+        val shortestLengths = componentLengths.map( l => l.min )
+        println(shortestLengths)
 
 
-
-
-
-
-
-
-
-    // New approach: brute force, but with pruning.
-    // Type any character on the first pad.
-    // See what it does to the second, third, and fourth pads.
-    // WHENEVER
-    //  ANY of these pads revisits the same button before it hit 'A', STOP.
-    //  You hit the 'A' button for the right
-
-    var firstPadPos = Coor(3,2) // Pad inside the depressurized room, gives access to the area with the missing Historian.
-    var secondPadPos = Coor(0,2) // Pad inside the highly radiated room, gives access to the depressurized room.
-    val thirdPadPos = Coor(0,2) // Pad inside the -40 degrees room, gives access to the radiated room.
-    val fourthPadPos = Coor(0,2) // Pad that you use, in the room full of Historians. Gives access to the -40 degrees room.
-
-
-    // Let's try to type "0".
+       */
 
     ""
+  }
+
+  private def instructionsForThirdRobot(directionalKeyPad: KeyPad, instructions2: List[String]): List[String] = {
+    // With all possible sequences for the second robot, let's find all possible sequences for the third robot.
+    var instructions3 = List[String]()
+    for instr <- instructions2 do
+      val pathComponents2 = directionalKeyPad.getPathsForSequence(instr)
+      val sortedKeys = pathComponents2.keys.toList.sorted
+      var instructions_tmp = List("")
+      for key <- sortedKeys do
+        instructions_tmp = crossProduct(instructions_tmp, pathComponents2(key))
+      instructions3 = instructions3 ++ instructions_tmp
+    //println(s"Possible instruction sequences for third robot: $instructions3")
+    println(s"There are ${instructions3.size} possible sequences for the third robot.")
+    val lengths = instructions3.map(l => l.length)
+    val shortestLength = lengths.min
+    println(s"  The shortest of these consists of ${lengths.min} characters.")
+    println(s"  The longest of these consists of ${lengths.max} characters.")
+    // Filter out the sequences that are longer than the shortest sequence.
+    instructions3 = instructions3.filter(l => l.length == shortestLength)
+    println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
+    instructions3
   }
 
   /**
@@ -272,6 +251,7 @@ class SolverDay21 extends Solver {
    * ["hello world", "bye world", "hello cat", "bye cat", "hello dog", "bye dog"]
    * Note that if either list is empty, the result will also be empty.
    * To get the identity operation, do a cross product with List("").
+ *
    * @param l1 A list of Strings.
    * @param l2 A list of Strings.
    * @return A list containing all combinations of the elements of the input lists.
