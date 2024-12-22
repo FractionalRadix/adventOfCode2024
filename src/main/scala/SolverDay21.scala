@@ -171,38 +171,56 @@ class SolverDay21 extends Solver {
         sequences(line) = pathComponents.toMap
         pathComponents.toMap
     }
-
   }
 
   override def solvePart1(lines: List[String]): String = {
-    //TODO!+
 
     val numericKeyPad = KeyPad(numericPad, Coor(3,0))
     val directionalKeyPad = KeyPad(directionalPad, Coor(0,0))
 
-    val paths1 = numericKeyPad.getPathsBetween('2', '9')
-    println(paths1) // Expectation: >^^, ^>^, ^^>
-    val paths2 = numericKeyPad.getPathsBetween('1', 'A')
-    println(paths2) // Expectation: >v>, >>v . The value 'v>>' visits the forbidden position and is ruled out.
+    //val paths1 = numericKeyPad.getPathsBetween('2', '9')
+    //println(paths1) // Expectation: >^^, ^>^, ^^>
+    //val paths2 = numericKeyPad.getPathsBetween('1', 'A')
+    //println(paths2) // Expectation: >v>, >>v . The value 'v>>' visits the forbidden position and is ruled out.
 
     for line <- lines do
       println(s"Paths for $line:")
       val pathComponents1 = numericKeyPad.getPathsForSequence(line)
-      println(pathComponents1)
+      //println(pathComponents1)
 
-      // Now we have a map from path component index to possible ways of doing that path.
-      // Let's determine, for each sequence, what we'd need to type on the second directional pad.
-      // Let's make a "Tree" of maps:
-      //   Map[Int, List[ String ]]
-      //   Map[Int, List[ Map[Int,String] ]
-      //   Map[Int, List[ Map[Int, List[ Map[Int,String] ]]
+      // At this point, the number of possible sequences is still tractable.
+      // So let's generate all possible sequences for this line.
+      // We call it "instructions2" because it's the set of instructions for the second robot.
+      // (Technically "line" would be "instructions1").
+      val sortedKeys = pathComponents1.keys.toList.sorted
+      var instructions2 = List("")
+      for key <- sortedKeys do
+        instructions2 = crossProduct(instructions2, pathComponents1(key))
+      println(s"Cross product is $instructions2")
 
-      for i <- pathComponents1.keys.toList.sorted do
-        val paths = pathComponents1(i)
-        for path <- paths do
-          val paths2 = directionalKeyPad.getPathsForSequence(path)
-          //TODO?+ Filter out all elements of path2 that are longer than the shortest one?
-          //println(paths2)
+      // With all possible sequences for the second robot, let's find all possible sequences for the third robot.
+      var instructions3 = List[String]()
+      for instr <- instructions2 do
+        val pathComponents2 = directionalKeyPad.getPathsForSequence(instr)
+        val sortedKeys = pathComponents2.keys.toList.sorted
+        var instructions_tmp = List("")
+        for key <- sortedKeys do
+          instructions_tmp = crossProduct(instructions_tmp, pathComponents2(key))
+        instructions3 = instructions3 ++ instructions_tmp
+      //println(s"Possible instruction sequences for third robot: $instructions3")
+      println(s"There are ${instructions3.size} possible sequences for the third robot.")
+      val lengths = instructions3.map( l => l.length )
+      val shortestLength = lengths.min
+      println(s"  The shortest of these consists of ${lengths.min} characters.")
+      println(s"  The longest of these consists of ${lengths.max} characters.")
+      // Filter out the sequences that are longer than the shortest sequence.
+      instructions3 = instructions3.filter( l => l.length  == shortestLength )
+      println(s"  Filtering out the sequences over $shortestLength characters leaves ${instructions3.length} sequences.")
+
+
+
+
+
 
 
 
@@ -227,17 +245,36 @@ class SolverDay21 extends Solver {
     ""
   }
 
-  private def getPathsForSequence(line: String, keyPad: KeyPad): Map[Int, List[String]] = {
-    val pathComponents = mutable.Map[Int, List[String]]()
-    var curChar = 'A' // The initial position of the robot arm is on the 'A' position.
-    var i = 0
-    for nextChar <- line do
-      val paths = keyPad.getPathsBetween(curChar, nextChar)
-      pathComponents(i) = paths
-      curChar = nextChar
-      i = i + 1
-    pathComponents.toMap
+  /**
+   * Given two lists of Strings, determine all combinations of them.
+   * For example, ["hello ","bye "] and ["world", "cat", "dog"] will yield:
+   * ["hello world", "bye world", "hello cat", "bye cat", "hello dog", "bye dog"]
+   * Note that if either list is empty, the result will also be empty.
+   * To get the identity operation, do a cross product with List("").
+   * @param l1 A list of Strings.
+   * @param l2 A list of Strings.
+   * @return A list containing all combinations of the elements of the input lists.
+   */
+  private def crossProduct(l1: List[String], l2: List[String]): List[String] = {
+    for e1 <- l1; e2 <- l2 yield e1 + e2
   }
+
+
+  private def allPossiblePaths(pathComponents: List[List[String]]): List[String] = {
+    if pathComponents.isEmpty then
+      List()
+    else
+      val head = pathComponents.head
+      val tail = allPossiblePaths( pathComponents.tail )
+      val new1 = head.map( str => str :: tail )
+
+      val result = for headList <- head yield
+        headList.map( str => str :: tail )
+      val l = result.toList
+
+    Nil // TODO!~
+  }
+
 
   def OLD_solvePart1(lines: List[String]): String = {
     var totalComplexity = 0
@@ -356,7 +393,9 @@ class SolverDay21 extends Solver {
       val headList = l.head  // Then headList is ["a"].
       val tailList = explodeListOfLists(l.tail,f, nil) // Our tailList is ["ce", "cf", "de", "df"].
       for headElt <- headList do
-        val newList = tailList.map( str => f(headElt,str) ) // ["ace", "acf", "ade", "adf"] or ["bce", "bcf", "bde", "bdf"]
+        val newList = tailList.map( str => f(headElt,str) )
+        // newList is ["ace", "acf", "ade", "adf"] in the first iteration,
+        // and ["bce", "bcf", "bde", "bdf"] the second iteration.
         result = result ++ newList
       result
   }
