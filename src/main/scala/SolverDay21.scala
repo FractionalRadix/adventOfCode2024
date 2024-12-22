@@ -32,7 +32,7 @@ class SolverDay21 extends Solver {
 
   private val directionalPaths = generateDirectionalPadSequences()
 
-  class PossiblePaths(private val pathSections: List[List[String]]) {
+  private class PossiblePaths(private val pathSections: List[List[String]]) {
     // A possible path is defined by taking one string from the first list,
     // followed by taking one from the second list,
     // followed by taking one form the third list... and so on.
@@ -45,11 +45,6 @@ class SolverDay21 extends Solver {
       val sectionsAsString = pathSections.map( l => showSection(l) )
       println(s"$title: ${sectionsAsString.mkString(" * ")}")
     }
-    def allPaths(): List[String] = {
-      //TODO!~ Find a way to do this INCREMENTALLY. (And then start memoizing, too).
-      explodeListOfLists(pathSections, (str1, str2) => str1 + str2, "")
-    }
-
     def lengthOfShortestPath(): Long = {
       var minLength = 0L
       for section <- pathSections do
@@ -158,9 +153,7 @@ class SolverDay21 extends Solver {
     var totalComplexity = 0L
 
     for line <- lines do
-      println(s"Paths for $line:")
       val pathComponents1 = numericKeyPad.getPathsForSequence(line)
-      //println(pathComponents1)
 
       // At this point, the number of possible sequences is still tractable.
       // So let's generate all possible sequences for this line.
@@ -174,27 +167,19 @@ class SolverDay21 extends Solver {
 
       // Similarly, the number of sequences for the third robot is still tractable.
       var shortest: Option[Long] = None
-      //println("Testcase: ")
-      val testcase      = instructionsForThirdRobot(directionalKeyPad, List("v<<A>>^A<A>AvA<^AA>A<vAAA>^A"))
-      //println("Instructions3: ")
       for instr <- instructions2 do
-        println(instr)
         val instructions3 = instructionsForThirdRobot(directionalKeyPad, List(instr))
-        //println(s"Contained? ${instructions3.contains("v<<A>>^A<A>AvA<^AA>A<vAAA>^A")}")
         for instr <- instructions3 do
           val instructions4 = instructionsForThirdRobot(directionalKeyPad, List(instr))
           val minLength = instructions4.map( l => l.length ).min
-          //print(s" ${instructions4.length}")
           if shortest.isEmpty then
             shortest = Some(minLength)
           else if minLength < shortest.head then
             shortest = Some(minLength)
 
-      println(shortest)
       val numericPart = line.dropRight(1).toLong
       val length = shortest.head
       val complexity = numericPart * length
-      println(complexity)
 
       totalComplexity += complexity
 
@@ -239,7 +224,7 @@ class SolverDay21 extends Solver {
   }
 
   /**
-   * Given a list of list of String, yield the list of list of the lenghts of these strings.
+   * Given a list of list of String, yield the list of list of the lengths of these strings.
    * For example, [["Hello", "world"],["Cat", "Dog,"Fish"]] will yield [[5,5], [3,3,4]]
    * @param l The list of lists of strings.
    * @return The list of lists of the lengths of the strings.
@@ -247,57 +232,6 @@ class SolverDay21 extends Solver {
   private def findLengths(l: List[List[String]]): List[List[Int]] = {
     for l1 <- l yield
       l1.map( l2 => l2.length )
-  }
-
-  /**
-   * Given a set of instructions and a starting position, determine all paths that could lead to executing these instructions.
-   * However, do not give them as a list. Instead, give them as a list of sections.
-   * @param startPos Starting position for the sequence.
-   * @param instructions The instructions to be generated.
-   * @param keypad A mapping from characters to coordinates. This can represent the numeric keypad or the directional keypad, as desired.
-   * @param paths A mapping of all the valid paths between two coordinates.
-   * @return All the paths that result in the given set of instructions (implicit in the data structure returned).
-   */
-  private def allPathsThatResultIn(
-     startPos: Coor,
-     instructions: String,
-     keypad: Map[Char, Coor],
-     paths: Map[(Coor, Coor), List[String]]
-  ): List[List[String]] = {
-    var curPos = startPos
-    var firstRobotPaths = List[List[String]]()
-    for ch <- instructions do
-      val nextPos = keypad(ch)
-      val validPaths = paths((curPos, nextPos)).distinct
-      firstRobotPaths = firstRobotPaths :+ validPaths
-      curPos = nextPos
-    firstRobotPaths
-  }
-
-  /**
-   * Given a list of lists of elements, find all combinations that preserve the order.
-   * For example, [["a","b"], ["c","d"], ["e","f"]] yields ("ace","acf", "ade", "adf", "bce","bcf", "bde", "bdf")
-   * @param l The list of lists.
-   * @param f The function to combine two elements. For example, if we have a list of list of String, this would be
-   *          the String concatenation operation.
-   * @param nil The identity element for the element. For example, if we have a list of list of String, this would be
-   *            the empty String.
-   * @return All permutations of l that maintain the original order.
-   */
-  private def explodeListOfLists[T](l: List[List[T]], f: (T,T) => T, nil: T): List[T] = {
-    if l.isEmpty then
-      List(nil)
-    else
-      var result = List[T]()
-      // Assume that l is: [["a", "b"],["c","d"],["e","f"]].
-      val headList = l.head  // Then headList is ["a"].
-      val tailList = explodeListOfLists(l.tail,f, nil) // Our tailList is ["ce", "cf", "de", "df"].
-      for headElt <- headList do
-        val newList = tailList.map( str => f(headElt,str) )
-        // newList is ["ace", "acf", "ade", "adf"] in the first iteration,
-        // and ["bce", "bcf", "bde", "bdf"] the second iteration.
-        result = result ++ newList
-      result
   }
 
   private def performInstructions(instructions: String, startPos: Coor, keyPad: KeyPad): Unit = {
