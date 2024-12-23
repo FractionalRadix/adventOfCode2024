@@ -86,6 +86,27 @@ class SolverDay23 extends Solver {
 
   }
 
+  private def ALT_solvePart2(lines: List[String]): String = {
+    val pairs = for line <- lines yield
+      val c1 = line.take(2)
+      val c2 = line.slice(3, 5)
+      (c1, c2)
+
+    val computers = (pairs.map((c,_) =>c) ++ pairs.map((_,c) => c)).toSet
+
+    var clusters = scala.collection.mutable.Set[Set[String]]()
+    for pair <- pairs do
+      clusters.add(Set(pair._1, pair._2))
+    var newClusters = scala.collection.mutable.Set[Set[String]]()
+    for cluster1 <- clusters; cluster2 <- clusters if cluster1.intersect(cluster2).isEmpty do
+      val formsBiggerCluster = cluster1.forall( member => connectedToAll(cluster2, member, pairs))
+      if formsBiggerCluster then
+        newClusters.add(cluster1.union(cluster2))
+
+    //TODO!+
+    ""
+  }
+
   private def isConnected(c1: String, c2: String, pairs: List[(String, String)]): Boolean = {
     pairs.contains(c1,c2) || pairs.contains(c2,c1)
   }
