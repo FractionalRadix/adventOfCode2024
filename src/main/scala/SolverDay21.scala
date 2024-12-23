@@ -34,17 +34,11 @@ class SolverDay21 extends Solver {
 
     var totalComplexity = 0L
 
-    // All sequences always start at 'A'...
-    // And to go from (for example) '2' to '9' should always be the same sequence.
-    // So... there's just 121 ('0'-'A' x '0'-'A') sequence components?
-    // BUT! Keep in mind that while the first robot goes from "number" to "number", every SUBSEQUENT
-    // robot hits "A" after stuff is done!
-
     val numericPaths = mutable.Map[(Char, Char), List[String]]()
     val numericKeys = "0123456789A"
     for key1 <- numericKeys do
       for key2 <- numericKeys do
-        val moves = numericKeyPad.getPathsBetween(key1, key2)
+        val moves = numericKeyPad.getOptimalPathsBetween(key1, key2)
         println(s"From $key1 to $key2: $moves")
         numericPaths((key1, key2)) = moves
     // Now the catch. Doing this path via a second directional keypad means we must prepend every line with "A",
@@ -55,46 +49,24 @@ class SolverDay21 extends Solver {
     for key1 <- dirKeys do
       for key2 <- dirKeys do
         print(s"From $key1 to $key2: ")
-        val moves = directionalKeyPad.getPathsBetween(key1, key2)
+        val moves = directionalKeyPad.getOptimalPathsBetween(key1, key2)
         println(s"From $key1 to $key2: $moves")
         directionalPaths((key1, key2)) = moves
 
-    // Now let's look at the example expansion: 029A
-    // We look at 0-2, 2-9, and 9-A separately.
-    // 1. Determine the paths on the first numeric keypad.
-    val p02step1 = numericKeyPad.getPathsBetween('0', '2')
-    // 2. Determine the paths on the first directional keypad.
-    for path <- p02step1 do
-      println(path)
-      // Replace "^" with the shortest sequence for "A^" ?
+
+    // Another test to see if some paths become longer than others.
+    for source <- numericKeys do
+      for target <- numericKeys do
+        val paths1 = numericKeyPad.getOptimalPathsBetween(source, target)
+        println(s"From $source to $target: ${paths1.length} paths.")
+        for path1 <- paths1 do
+          val paths2 = explicate(directionalKeyPad.getOptimalPathsForSequence(path1))
+          for path2 <- paths2 do
+            val paths3 = explicate(directionalKeyPad.getOptimalPathsForSequence(path2))
+            print(s" ${paths3.length}")
+        println
 
 
-
-
-
-
-
-    // Now have a look at sequences that "zigzag".
-    // For example, (0,4) can be "^^<A" or "^<^A". (Note that "<^^A" is filtered because it enters the forbidden zone).
-    // "<^<A" MIGHT result in needing to press "A" more often than "<^^A" because it changes direction twice, while
-    // "<^^A" only changes direction once?
-
-/*
-    // What is (the length of) the shortest path from 'A' to '0'?
-    // 1. On the numeric keypad?
-    val dist1 = numericKeyPad.getPathsBetween('1', '9')
-    println(dist1)
-    // 2. On the first directional keypad?
-    for dist2part <- dist1 do
-      println(dist2part)
-      val correctedDist2Part = "A" + dist2part
-      for i <- 0 until correctedDist2Part.length - 1 do
-        val part = directionalKeyPad.getPathsBetween(correctedDist2Part(i), correctedDist2Part(i + 1))
-        //val firstPart = directionalKeyPad.getPathsBetween('A',dist2part(0))
-        //val secondPart = directionalKeyPad.getPathsBetween(dist2part(0), dist2part(1))
-        // Happens not to be longer...
-        println(s"..$part")
-*/
     for line <- lines do
       val numericPart = line.dropRight(1).toLong
       val length = shortestSequenceLength(line)
@@ -102,6 +74,60 @@ class SolverDay21 extends Solver {
       totalComplexity += complexity
 
     totalComplexity.toString
+  }
+
+  private def execute(instructions: String, keyPad: KeyPad, startPos: Char): String = {
+    var curPos = keyPad.getPosition(startPos)
+    var result = ""
+    for ch <- instructions do
+      if ch == 'A' then
+        result = result + keyPad.getButton(curPos)
+      curPos = keyPad.determineNextPosition(curPos, ch)
+
+    result
+  }
+
+  private def findDifferentPathLengths(numericKeyPad: KeyPad, directionalKeyPad: KeyPad): Unit = {
+    println()
+    for sourceKey <- List('0') do
+      for targetKey <- List('1') do
+        println(s"From $sourceKey to $targetKey:")
+        val paths = numericKeyPad.getPathsBetween(sourceKey, targetKey)
+        for path <- paths do
+          //println(s"..First robot: $path")
+          val paths2 = explicate(directionalKeyPad.getPathsForSequence(path))
+          for path2 <- paths2 do
+            println(s"....Second robot: $path2")
+            val paths3 = explicate(directionalKeyPad.getPathsForSequence(path2))
+            println(s"${paths3.length} different paths.")
+            val paths3lengths = paths3.map(l => l.length)
+            val minLen = paths3lengths.min
+            val maxLen = paths3lengths.max
+            if minLen != maxLen then
+              println(s"Same start and destination, different length: $minLen / $maxLen .")
+            else
+              println(s" $minLen")
+        println()
+  }
+
+  /**
+   * Given the components of a set of paths, determine all paths implicit in this set.
+   * WARNING! This has more or less exponential complexity!
+ *
+   * @param implicitPaths A map from positions to path components. For example,
+   *    (0 -> ["hello", "bye"]), (1->["silly","friendly"]), (2->["cat","dog"])
+   *    This would turn into the list [ ["hello", "silly", "cat"], ["hello", "silly", "dog"],
+   *    ["hello", "friendly", "cat"], ["hello", "friendly", "dog"],["bye", "silly", "cat"], ["bye", "silly", "dog"],
+   *    ["bye", "friendly", "cat"], ["bye", "friendly", "dog"].
+   * @return The list of all paths generated by this mapping.
+   */
+  private def explicate(implicitPaths: Map[Int, List[String]]): List[String] = {
+    var allPaths = List("")
+    val keys = implicitPaths.keys.toList.sorted
+    for key <- keys do
+      val pathComponents = implicitPaths(key)
+      allPaths = Util.crossProduct(allPaths, pathComponents)
+    allPaths
   }
 
   /**
@@ -143,6 +169,7 @@ class SolverDay21 extends Solver {
     private val paths = mutable.Map[(Coor, Coor), List[String]]()
 
     def getPosition(button: Char): Coor = buttons(button)
+    def getButton(coor: Coor): Char = buttons.find( mapping => mapping._2 == coor ).head._1
 
     /**
      * Determine all (non-cyclic) paths between from a starting position to an ending position.
@@ -180,6 +207,43 @@ class SolverDay21 extends Solver {
      */
     def getPathsBetween(startButton: Char, endButton: Char): List[String] = {
       getPathsBetween(getPosition(startButton), getPosition(endButton))
+    }
+
+    /**
+     * Memoization of "optimal paths".
+     */
+    private val optimalPaths = mutable.Map[(Char, Char), List[String]]()
+
+    /**
+     * An "optimal" path is one that avoids needless moves for the NEXT robot.
+     * For example, "^^>" is better than "^>^".
+     * The first can be done with  the sequence: "<A", "A","v>A" (6 moves in total).
+     * The second can be done with the sequence: "<A", "v>A", "<^A" (8 moves in total).
+     * @param startButton The button that the robot arm is currently pointed at.
+     * @param endButton The button that we want the robot arm to arrive at.
+     * @return The ways to go from the start button to the end button that require the least steps for the next robot.
+     */
+    def getOptimalPathsBetween(startButton: Char, endButton: Char): List[String] = {
+      if optimalPaths.contains((startButton, endButton)) then
+        optimalPaths((startButton, endButton))
+      else
+        val paths = getPathsBetween(startButton, endButton)
+        val startPos = getPosition(startButton)
+        val endPos = getPosition(endButton)
+        val verticalDifference = endPos.row - startPos.row
+        val verticalMoves = if (endPos.row - startPos.row) > 0 then "v" * verticalDifference else "^" * -verticalDifference
+        val horizontalDifference = endPos.col - startPos.col
+        val horizontalMoves = if horizontalDifference > 0 then ">" * horizontalDifference else "<" * -horizontalDifference
+        //TODO?+ Since the next robot starts at 'A', always start with the button closest to 'A' ?
+        var result = List[String]()
+        val str1 = horizontalMoves + verticalMoves + "A"
+        if avoidsPosition(startPos, str1, forbidden) then
+          result = str1 :: result
+        val str2 = verticalMoves + horizontalMoves + "A"
+        if avoidsPosition(startPos, str2, forbidden) then
+          result = str2 :: result
+        optimalPaths((startButton, endButton)) = result
+        result.distinct
     }
 
     private def avoidsPosition(startPos: Coor, sequence: String, forbidden: Coor): Boolean = {
@@ -226,6 +290,19 @@ class SolverDay21 extends Solver {
           i = i + 1
         sequences(line) = pathComponents.toMap
         pathComponents.toMap
+    }
+
+    //TODO?~ Memoize?
+    def getOptimalPathsForSequence(line: String): Map[Int, List[String]] = {
+      val pathComponents = mutable.Map[Int, List[String]]()
+      var curChar = 'A' //TODO?~ Parameterize?
+      var i = 0
+      for nextChar <- line do
+        val paths = getOptimalPathsBetween(curChar, nextChar)
+        pathComponents(i) = paths
+        curChar = nextChar
+        i = i + 1
+      pathComponents.toMap
     }
   }
 
