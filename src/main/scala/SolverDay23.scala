@@ -59,8 +59,12 @@ class SolverDay23 extends Solver {
     var found = false
     var largestCluster = scala.collection.mutable.Set[Set[String]]()
     while !found do
-      var newCandidateClusters = scala.collection.mutable.Set[Set[String]]()
+      val newCandidateClusters = scala.collection.mutable.Set[Set[String]]()
+      println(s"Checking ${candidateClusters.size} candidate clusters.")
+      var counter = 0
       for cluster <- candidateClusters do
+        if counter % 100 == 0 then print(s"$counter ")
+        counter = counter + 1
         // For every computer NOT in the cluster, check if it is connected to EVERY computer in the cluster.
         for computer <- computers if !cluster.contains(computer) do
           if connectedToAll(cluster, computer, pairs) then

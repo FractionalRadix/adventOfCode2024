@@ -30,9 +30,9 @@ def main(): Unit =
 
 def solveDay23(): Unit =
   println("Day 23:")
-  // Part 1: ???
+  // Part 1: 1110
   // Part 2: ???
-  SolverDay23().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay23_sample.txt")
+  SolverDay23().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay23.txt")
 
 def solveDay22(): Unit =
   println("Day 22:")
