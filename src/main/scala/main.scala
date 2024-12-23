@@ -31,7 +31,7 @@ def main(): Unit =
 def solveDay23(): Unit =
   println("Day 23:")
   // Part 1: 1110
-  // Part 2: ???
+  // Part 2: ej,hm,ks,ms,ns,rb,rq,sc,so,un,vb,vd,wd
   SolverDay23().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay23.txt")
 
 def solveDay22(): Unit =

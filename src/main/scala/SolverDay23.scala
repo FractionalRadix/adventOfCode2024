@@ -3,40 +3,31 @@ package com.cormontia.adventOfCode2024
 class SolverDay23 extends Solver {
 
   override def solvePart1(lines: List[String]): String = {
-    val skipPart1 = true
+    val pairs = for line <- lines yield
+      val c1 = line.take(2)
+      val c2 = line.slice(3, 5)
+      (c1, c2)
 
-    if skipPart1 then
-      "Part 1 temporarily skipped"
-    else
-      val pairs = for line <- lines yield
-        val c1 = line.take(2)
-        val c2 = line.slice(3, 5)
-        //println(s"$c1 connected with $c2")
-        (c1, c2)
+    // All pairs where at least one of the computer names starts with a 't'.
+    val firstSetPairs = pairs.filter((c1, c2) => c1(0) == 't' || c2(0) == 't').toSet
+    // All computers separately.
+    val computers1 = pairs.map((c1,c2) => c1)
+    val computers2 = pairs.map((c1,c2) => c2)
+    val computers = computers1.concat(computers2).toSet
 
-      // All pairs where at least one of the computer names starts with a 't'.
-      val firstSetPairs = pairs.filter((c1, c2) => c1(0) == 't' || c2(0) == 't').toSet
-      // All computers separately.
-      val computers1 = pairs.map((c1,c2) => c1)
-      val computers2 = pairs.map((c1,c2) => c2)
-      val computers = computers1.concat(computers2).toSet
+    val triplets = scala.collection.mutable.Set[Set[String]]()
+    for firstSetPair <- firstSetPairs do
+      // Is there a third computer that is connected to both?
+      // Find all computers that are connected to BOTH c1 and c2.
+      for computer <- computers do
+        if isConnected(computer, firstSetPair._1) & isConnected(computer, firstSetPair._2) then
+          val triplet = Set(firstSetPair._1, firstSetPair._2, computer)
+          triplets.add(triplet)
+      ;
 
-      //println(firstSetPairs)
-      //println(computers)
+    def isConnected(c1: String, c2: String) = pairs.contains((c1,c2)) || pairs.contains((c2,c1))
 
-      val triplets = scala.collection.mutable.Set[Set[String]]()
-      for firstSetPair <- firstSetPairs do
-        // Is there a third computer that is connected to both?
-        // Find all computers that are connected to BOTH c1 and c2.
-        for computer <- computers do
-          if isConnected(computer, firstSetPair._1) & isConnected(computer, firstSetPair._2) then
-            val triplet = Set(firstSetPair._1, firstSetPair._2, computer)
-            triplets.add(triplet)
-        ;
-
-      def isConnected(c1: String, c2: String) = pairs.contains((c1,c2)) || pairs.contains((c2,c1))
-
-      triplets.size.toString
+    triplets.size.toString
   }
 
   override def solvePart2(lines: List[String]): String = {
@@ -94,14 +85,32 @@ class SolverDay23 extends Solver {
 
     val computers = (pairs.map((c,_) =>c) ++ pairs.map((_,c) => c)).toSet
 
+    // Populate the initial set of clusters.
     var clusters = scala.collection.mutable.Set[Set[String]]()
     for pair <- pairs do
       clusters.add(Set(pair._1, pair._2))
-    var newClusters = scala.collection.mutable.Set[Set[String]]()
-    for cluster1 <- clusters; cluster2 <- clusters if cluster1.intersect(cluster2).isEmpty do
-      val formsBiggerCluster = cluster1.forall( member => connectedToAll(cluster2, member, pairs))
-      if formsBiggerCluster then
-        newClusters.add(cluster1.union(cluster2))
+    // For every cluster, find equal-sized other clusters that are completely separate from it.
+    // If every member of the original cluster is connected to every member of the other cluster,
+    // then we have a new cluster that is twice as large.
+    // In this way, we should approach the size of the largest cluster: it is between 2 ** N and 2 ** (N+1)
+    // We return the latest non-empty set of clusters.
+    // (Is this correct, or is it possible that we miss the largest cluster?)
+    var newClustersAvailable = true
+    while newClustersAvailable do
+      val newClusters = scala.collection.mutable.Set[Set[String]]()
+      for cluster1 <- clusters; cluster2 <- clusters if cluster1.intersect(cluster2).isEmpty do
+        val formsBiggerCluster = cluster1.forall( member => connectedToAll(cluster2, member, pairs))
+        if formsBiggerCluster then
+          newClusters.add(cluster1.union(cluster2))
+      if newClusters.nonEmpty then
+        newClustersAvailable = true
+        clusters = newClusters
+
+    // At this point "clusters" should contain all clusters of size 2 ** N.
+
+
+
+
 
     //TODO!+
     ""
