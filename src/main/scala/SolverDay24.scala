@@ -56,7 +56,8 @@ class SolverDay24 extends Solver {
     while !allZGatesDefined do
       for rule <- rules do
         val result = rule.applyRule(mapping)
-        mapping(rule.target) = result
+        if mapping(rule.target).isEmpty then
+          mapping(rule.target) = result
         allZGatesDefined = mapping.filter((k,v) => k(0) == 'z').forall((k,v) => v.isDefined)
 
     var result = 0
