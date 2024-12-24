@@ -45,6 +45,11 @@ class SolverDay24 extends Solver {
     for rule <- rules do
       println(rule)
 
+    // All 100 possible gates whose name starts with "z"
+    val allPossibleZGates = for digit0 <- 0 to 9; digit1 <- 0 to 9 yield s"z$digit0$digit1"
+    val zGates = allPossibleZGates.filter(name => mapping.keySet.contains(name))
+    println(zGates)
+
 
     //TODO!+
     ""
