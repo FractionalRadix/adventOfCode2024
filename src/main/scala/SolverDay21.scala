@@ -28,6 +28,22 @@ class SolverDay21 extends Solver {
     '>' -> Coor(1, 2)
   )
 
+  /**
+   * Going from A, "v<" results in 5 steps, "<v" results in 6.
+   * Let's find all sequences that start with "<v" and see if there are equivalent sequences that start with "v<".
+   * @param paths A list of paths on the directional keypad, that are supposed to start at 'A'.
+   * @return A copy of the input, but with all "v<" paths removed if they had a corresponding "<v" paths.
+   */
+  private def removeLeftDownMoves(paths: List[String]): List[String] = {
+    var result = paths
+    val leftDownStrings = paths.filter(str => str.startsWith("<v"))
+    for candidateForRemoval <- leftDownStrings do
+      val startsWithDownLeft = "v<" + candidateForRemoval.drop(2)
+      if paths.contains(startsWithDownLeft) then
+        result = result.filter(str => str != candidateForRemoval)
+    result
+  }
+
   override def solvePart2(lines: List[String]): String = {
     val numericKeyPad = KeyPad(numericPad, Coor(3,0))
     val directionalKeyPad = KeyPad(directionalPad, Coor(0,0))
@@ -39,42 +55,191 @@ class SolverDay21 extends Solver {
     for key1 <- numericKeys do
       for key2 <- numericKeys do
         val moves = numericKeyPad.getOptimalPathsBetween(key1, key2)
-        println(s"From $key1 to $key2: $moves")
         numericPaths((key1, key2)) = moves
-    // Now the catch. Doing this path via a second directional keypad means we must prepend every line with "A",
-    // the starting position. (<--- not sure if that's correct ??)
+    println(s"Numeric paths: $numericPaths.")
+    // We can optimize this further: A-Down-Left becomes 5 steps, A-Left-Down becomes 6 steps.
+    // So if any sequence starts with "Left-Down" and there is a corresponding sequence that starts with "Down-Left",
+    // then the sequence that stars with "Left-Down" can be removed.
+    for (k,v) <- numericPaths do
+      numericPaths(k) = removeLeftDownMoves(v)
+    println(s"Numeric paths after optimization: $numericPaths.")
+    println(s"Numeric paths that still result in more than one subsequent path: ${numericPaths.filter((k,v) => v.length > 1)}")
+    // Result of that last in is still a long list, but more optimizations might be available.
 
     val directionalPaths = mutable.Map[(Char, Char), List[String]]()
     val dirKeys = "<>^vA"
     for key1 <- dirKeys do
       for key2 <- dirKeys do
-        print(s"From $key1 to $key2: ")
         val moves = directionalKeyPad.getOptimalPathsBetween(key1, key2)
-        println(s"From $key1 to $key2: $moves")
         directionalPaths((key1, key2)) = moves
+    println(s"Directional paths: $directionalPaths.")
+    for (k,v) <- directionalPaths do
+      directionalPaths(k) = removeLeftDownMoves(v)
+    println(s"Directional paths after optimization: $directionalPaths")
+    println(s"Directional paths that still result in more than one subsequent path: ${directionalPaths.filter((k,v) => v.length > 1)}")
+    //  Result of that last one:  HashMap((v,A) -> List(^>A, >^A), (>,^) -> List(^<A, <^A), (^,>) -> List(v>A, >vA))
 
 
-    // Another test to see if some paths become longer than others.
-    for source <- numericKeys do
-      for target <- numericKeys do
-        val paths1 = numericKeyPad.getOptimalPathsBetween(source, target)
-        println(s"From $source to $target: ${paths1.length} paths.")
-        for path1 <- paths1 do
-          val paths2 = explicate(directionalKeyPad.getOptimalPathsForSequence(path1))
-          for path2 <- paths2 do
-            val paths3 = explicate(directionalKeyPad.getOptimalPathsForSequence(path2))
-            print(s" ${paths3.length}")
-        println
 
+    //val twoRobotsDown: mutable.Map[String, List[Int]] = precalculateAttempt1(directionalKeyPad, dirKeys)
 
     for line <- lines do
       val numericPart = line.dropRight(1).toLong
-      val length = shortestSequenceLength(line)
+      //val length = shortestSequenceLength(line, numericKeyPad, directionalKeyPad, twoRobotsDown.toMap)
+      val length = 0L //TODO!~
       val complexity = numericPart * length
       totalComplexity += complexity
 
     totalComplexity.toString
   }
+
+  private def precalculateAttempt1(directionalKeyPad: KeyPad, dirKeys: String) = {
+    // On optimizing paths:
+    // The next robot does NOT always start on "A".
+    // Let's say we have 3 robots, all on starting A.
+    // The first must type ">v".
+    // So the second must type "vA" followed by "<A".
+    // After typing "vA", the arm of the first robot is on ">".
+
+
+    // Now here's the plan: every sequence on the DIRECTIONAL keypad is a sequence of 1, 2, or 3 characters, followed by an 'A'.
+    // So we pre-calculate these sequences, and keep track of their SHORTEST lengths.
+    val twoRobotsDown = mutable.Map[String, List[Int]]()
+
+
+    // For all sequences of 1 (followed by the usual 'A') on the directional keypad, find their shortest version 2 robots down the line.
+    for ch1 <- dirKeys do
+      val sequence = s"${ch1}A"
+      var iter = List(sequence)
+      for i <- 1 to 2 do
+        iter = iterate(iter, directionalKeyPad)
+      twoRobotsDown(sequence) = iter.map(l => l.length).distinct
+
+    // For all sequences of 2 (followed by the usual 'A') on the directional keypad, find their shortest version 2 robots down the line.
+    for ch1 <- dirKeys; ch2 <- dirKeys do
+      val sequence = s"$ch1${ch2}A"
+      var iter = List(sequence)
+      for i <- 1 to 2 do
+        iter = iterate(iter, directionalKeyPad)
+      twoRobotsDown(sequence) = iter.map(l => l.length).distinct
+
+    //TODO!~ Runs out of heap space for 3 robots.
+    // For all sequences of 3 (followed by the usual 'A') on the directional keypad, find their shortest version 2 robots down the line.
+    for ch1 <- dirKeys; ch2 <- dirKeys; ch3 <- dirKeys do
+      val sequence = s"$ch1$ch2${ch3}A"
+      var iter = List(sequence)
+      for i <- 1 to 2 do
+        iter = iterate(iter, directionalKeyPad)
+      twoRobotsDown(sequence) = iter.map(l => l.length).distinct
+
+    println(twoRobotsDown)
+    // Is there any mapping in "twoRobotsDown" where the value contains more than one number?
+    val multipleOptions = twoRobotsDown.filter((k, v) => v.length > 1)
+    println(multipleOptions)
+    twoRobotsDown
+  }
+
+  private def iterate(list: List[String], keypad: KeyPad): List[String] = {
+    val res1 = for str <- list yield
+      //explicate(keypad.getOptimalPathsForSequence(str))
+      explicate(keypad.getPathsForSequence(str))
+    res1.flatten()
+  }
+
+  /**
+   * Determine the shortest sequence to type, if a chain of 25 robots has result in typing this code.
+   *
+   * @param accessCode The code that should be typed on the numeric keypad by the final robot.
+   * @return The length of the shortest sequence to type on the first keypad, to let the final robot type the code.
+   */
+  private def shortestSequenceLength(
+    accessCode: String,
+    numericKeyPad: KeyPad,
+    directionalKeyPad: KeyPad,
+    twoRobotsDown: Map[String, List[Int]]
+  ): Long = {
+    println(s"Finding shortest sequence length for $accessCode.")
+    val accessPairs = accessCode.sliding(2).toList
+    for pair <- accessPairs do
+      val firstPaths = numericKeyPad.getOptimalPathsBetween(pair(0), pair(1))
+      //TODO!~ Find the shortest...
+      // Note that you don't need to know the shortest string, only its LENGTH!
+      println(s"--From ${pair(0)} to ${pair(1)}.")
+      val secondPaths = firstPaths
+        .flatMap( str => explicate(directionalKeyPad.getOptimalPathsForSequence(str)) )
+        .distinct
+      println(s"--$secondPaths")
+
+
+      ;
+
+    0L //TODO!~
+  }
+  // Memoization:
+  //private val pathLengths = mutable.Map[(Char,Char), Long]()
+
+
+  private def findSequencesWithMultipleLengths(dirKeys: String, directionalKeyPad: KeyPad): Unit = {
+    // For every combination of 2 on the directional keypad, let's see how it works out in 3 robots.
+    for ch1 <- dirKeys; ch2 <- dirKeys do
+      val sequence = s"$ch1${ch2}A"
+      var iter = List(sequence)
+      for i <- 1 to 3 do
+        iter = iterate(iter, directionalKeyPad)
+        val lengths = iter.map(l => l.length).distinct
+        if lengths.length > 1 then
+          println(s"Iteration $i. $sequence $lengths")
+
+
+    // For every combination of 3 on the directional keypad, let's see how it works out in 3 robots.
+    for ch1 <- dirKeys; ch2 <- dirKeys; ch3 <- dirKeys do
+      val sequence = s"$ch1$ch2$ch3"
+      var iter = List(sequence)
+      for i <- 1 to 3 do
+        //println(s"Sequence of 3. Iteration $i")
+        iter = iterate(iter, directionalKeyPad)
+        val lengths = iter.map(l => l.length).distinct
+        if lengths.length > 1 then
+          println(s"Iteration $i. $sequence $lengths")
+
+    // For every combination of 4 on the directional keypad, let's see how it works out in 3 robots.
+    for ch1 <- dirKeys; ch2 <- dirKeys; ch3 <- dirKeys; ch4 <- dirKeys do
+      val sequence = s"$ch1$ch2$ch3$ch4"
+      var iter = List(sequence)
+      for i <- 1 to 2 do
+        //println(s"Sequence of 4. Iteration $i")
+
+        iter = iterate(iter, directionalKeyPad)
+        val lengths1 = iter.map(l => l.length).distinct
+        if lengths1.length > 1 then
+          println(s"Iteration $i. $sequence $lengths1")
+  }
+
+  private def experimentOnNumericKeypad(numericKeyPad: KeyPad, directionalKeyPad: KeyPad): Unit = {
+    // Another test to see if some paths become longer than others.
+    // For example, "From 2 to 4" will give you options of 25 long and of 21 long.
+    // Conversely, "From 4 to 2" will give you options of 17 long and of 21 long.
+    // ....one would think these paths were equivalent...
+    // At the level of paths2, "2 to 4" is nine commands, "4 to 2" is only 7 ??
+    for source <- List('2') /* numericKeys */ do
+      for target <- List('4') /* numericKeys */ do
+        val paths1 = numericKeyPad.getOptimalPathsBetween(source, target)
+        println(s"From $source to $target: ${paths1.length} paths.")
+        for path1 <- paths1 do
+          val paths2 = explicate(directionalKeyPad.getOptimalPathsForSequence(path1))
+          //val lengths = paths2.map( l => l.length )
+          //print(s" ${lengths.mkString(",")}")
+          for path2 <- paths2 do
+            println(s"Path lvl 2: $path2")
+            val paths3 = explicate(directionalKeyPad.getOptimalPathsForSequence(path2))
+            //for path3 <- paths3 do
+            //  println(s"...$path3")
+            val lengths = paths3.map(l => l.length).distinct
+            print(s" ${lengths.mkString(",")}");
+        println
+  }
+
+
 
   private def execute(instructions: String, keyPad: KeyPad, startPos: Char): String = {
     var curPos = keyPad.getPosition(startPos)
@@ -130,17 +295,6 @@ class SolverDay21 extends Solver {
     allPaths
   }
 
-  /**
-   * Determine the shortest sequence to type, if a chain of 25 robots has result in typing this code.
-   * @param accessCode The code that should be typed on the numeric keypad by the final robot.
-   * @return The length of the shortest sequence to type on the first keypad, to let the final robot type the code.
-   */
-  private def shortestSequenceLength(accessCode: String): Long = {
-
-
-
-    0L //TODO!~
-  }
 
   private class PossiblePaths(private val pathSections: List[List[String]]) {
     // A possible path is defined by taking one string from the first list,
@@ -236,12 +390,25 @@ class SolverDay21 extends Solver {
         val horizontalMoves = if horizontalDifference > 0 then ">" * horizontalDifference else "<" * -horizontalDifference
         //TODO?+ Since the next robot starts at 'A', always start with the button closest to 'A' ?
         var result = List[String]()
+
+        // First, avoid the moves that "zigzag". Optimize for getting the same button in a row.
         val str1 = horizontalMoves + verticalMoves + "A"
         if avoidsPosition(startPos, str1, forbidden) then
           result = str1 :: result
         val str2 = verticalMoves + horizontalMoves + "A"
         if avoidsPosition(startPos, str2, forbidden) then
           result = str2 :: result
+
+        /*
+        // Second, going from A, "v<" results in 5 steps, "<v" results in 6.
+        // Let's find all sequences that start with "<v" and see if there are equivalent sequences that start with "v<".
+        val startLeftDown = result.filter( str => str.startsWith("<v"))
+        for candidateForRemoval <- startLeftDown do
+          val startDownLeft = "v<" + candidateForRemoval.drop(2)
+          if result.contains(startDownLeft) then
+            result = result.filter( str => str != candidateForRemoval )
+         */
+
         optimalPaths((startButton, endButton)) = result
         result.distinct
     }
@@ -309,7 +476,7 @@ class SolverDay21 extends Solver {
   override def solvePart1(lines: List[String]): String = {
 
     //TODO!~
-    val skipPart1 = true
+    val skipPart1 = false
     if skipPart1 then
       "<Part 1 temporarily skipped>"
     else {
