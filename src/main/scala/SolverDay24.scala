@@ -2,6 +2,13 @@ package com.cormontia.adventOfCode2024
 
 class SolverDay24 extends Solver {
 
+  override def solvePart2(lines: List[String]): String = {
+    val mapping = parseInitialAssignment(lines)
+    val rules = parseRules(lines, mapping)
+    //TODO!+
+    ""
+  }
+
   private enum Operation:
     case And, Or, Xor
 
@@ -26,32 +33,14 @@ class SolverDay24 extends Solver {
   }
 
   override def solvePart1(lines: List[String]): String = {
-
-    val mapping = scala.collection.mutable.Map[String, Option[Boolean]]()
-    var rules = List[Rule]() // first op second -> third
-
-    for line <- lines do
-      if line.contains(":") then
-        // Initial gate
-        val name = line.takeWhile(ch => ch != ':')
-        val value = line.dropWhile(ch => ch != ':').drop(1).trim.toInt
-        mapping(name) = Some(value == 1)
-      else if line.contains("->") then
-        // rule
-        rules = parseRule(line, mapping) :: rules
-
-    //for (k,v) <- mapping do
-    //  println(s"Gate $k has value $v")
-    //for rule <- rules do
-    //  println(rule)
+    val mapping = parseInitialAssignment(lines)
+    val rules = parseRules(lines, mapping)
 
     // All 100 possible gates whose name starts with "z"
     val allPossibleZGates = for digit0 <- 0 to 9; digit1 <- 0 to 9 yield s"z$digit0$digit1"
     val zGates = allPossibleZGates.filter(name => mapping.keySet.contains(name))
-    //println(zGates)
 
     var allZGatesDefined = mapping.filter((k,v) => k(0) == 'z').forall((k,v) => v.isDefined)
-    println(s"all z gates defined? $allZGatesDefined")
 
     while !allZGatesDefined do
       for rule <- rules do
@@ -60,14 +49,35 @@ class SolverDay24 extends Solver {
           mapping(rule.target) = result
         allZGatesDefined = mapping.filter((k,v) => k(0) == 'z').forall((k,v) => v.isDefined)
 
-    var result = 0
+    var result = 0L
     for zGate <- zGates.toList.sorted.reverse do
       val bit = mapping.get(zGate).head.head
-      result = 2 * result + (if bit then 1 else 0)
-      println(s"$zGate: $bit")
+      result = 2L * result + (if bit then 1 else 0)
+
     result.toString
+  }
 
+  private def parseInitialAssignment(lines: List[String]): scala.collection.mutable.Map[String, Option[Boolean]] = {
+    val mapping = scala.collection.mutable.Map[String, Option[Boolean]]()
 
+    for line <- lines do
+      if line.contains(":") then
+        // Initial wire
+        val name = line.takeWhile(ch => ch != ':')
+        val value = line.dropWhile(ch => ch != ':').drop(1).trim.toInt
+        mapping(name) = Some(value == 1)
+
+    mapping
+  }
+
+  private def parseRules(lines: List[String], mapping: scala.collection.mutable.Map[String, Option[Boolean]]): List[Rule] = {
+    var rules = List[Rule]()
+
+    for line <- lines do
+      if line.contains("->") then
+        rules = parseRule(line, mapping) :: rules
+
+    rules
   }
 
   private def parseRule(line: String, mapping: scala.collection.mutable.Map[String, Option[Boolean]]): Rule = {
@@ -89,8 +99,4 @@ class SolverDay24 extends Solver {
     Rule(sourceGate1, op, sourceGate2, targetGate)
   }
 
-  override def solvePart2(lines: List[String]): String = {
-    //TODO!+
-    ""
-  }
 }
