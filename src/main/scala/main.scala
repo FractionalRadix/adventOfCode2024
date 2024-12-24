@@ -38,10 +38,12 @@ def solveDay25(): Unit =
 
 def solveDay24(): Unit =
   println("Day 24:")
-  // Part 1: ???
+  // Part 1: 1557947376 is TOO LOW
   // Part 2: ???
-  SolverDay24().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay24_sample1.txt")
+  //SolverDay24().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay24_sample1.txt")
   //SolverDay24().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay24_sample2.txt")
+  SolverDay24().solve("/home/serge/IdeaProjects/adventOfCode2024/src/main/resources/inputFiles/AoCDay24.txt")
+
 
 def solveDay23(): Unit =
   println("Day 23:")
