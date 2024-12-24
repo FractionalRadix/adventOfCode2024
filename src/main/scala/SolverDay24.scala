@@ -5,8 +5,72 @@ class SolverDay24 extends Solver {
   override def solvePart2(lines: List[String]): String = {
     val mapping = parseInitialAssignment(lines)
     val rules = parseRules(lines, mapping)
+
+    // Note that we don't have to CORRECT the device!
+    // We only need to find 8 gates that are involved in ERRONEOUS calculations!
+
+    // Let's find the erroneous calculations, then find the gates that they all have in common.
+
+    // First let's see what happens if we add numbers that each only contain 1 bit, in different places.
+    val xGates = mapping.keySet.filter( str => str(0) == 'x' )
+    val yGates = mapping.keySet.filter( str => str(0) == 'y' )
+    val zGates = mapping.keySet.filter( str => str(0) == 'z' )
+
+    for xBitPos <- 0 until xGates.size; yBitPos <- 0 until yGates.size if xBitPos != yBitPos do
+        val xBit: Long = 1 << xBitPos
+        val yBit: Long = 1 << yBitPos
+        //println(s"$xBit, $yBit")
+        val map = setXY(xBitPos, yBitPos, mapping.keySet.toSet)
+
+
     //TODO!+
     ""
+  }
+
+  private def applyRules(rules: List[Rule], originalMapping: Map[String, Option[Boolean]]): Long = {
+    val mapping = scala.collection.mutable.Map[String, Option[Boolean]]()
+    mapping.addAll(originalMapping)
+
+
+    var allZGatesDefined = mapping.filter((k,v) => k(0) == 'z').forall((k,v) => v.isDefined)
+
+    while !allZGatesDefined do
+      for rule <- rules do
+        val result = rule.applyRule(mapping)
+        if mapping(rule.target).isEmpty then
+          mapping(rule.target) = result
+        allZGatesDefined = mapping.filter((k,v) => k(0) == 'z').forall((k,v) => v.isDefined)
+
+    //// All 100 possible gates whose name starts with "z"
+    //val allPossibleZGates = for digit0 <- 0 to 9; digit1 <- 0 to 9 yield s"z$digit0$digit1"
+    //val zGates = allPossibleZGates.filter(name => mapping.keySet.contains(name))
+    val zGates = mapping.keySet.filter( name => name(0) == 'z')
+    var result = 0L
+    for zGate <- zGates.toList.sorted.reverse do
+      val bit = mapping.get(zGate).head.head
+      result = 2L * result + (if bit then 1 else 0)
+
+    result
+  }
+
+  /** A mapping where bit N of x is set to TRUE, M of y is set to TRUE,
+   * every other value of x and y is set to FALSE, and everything else is set to None.
+   */
+  private def setXY(n: Int, m: Int, wires: Set[String]): scala.collection.mutable.Map[String, Option[Boolean]] = {
+    val mapping = scala.collection.mutable.Map[String, Option[Boolean]]()
+    for wire <- wires do
+      mapping(wire) = None
+    for tens <- 0 to 9; ones <- 0 to 9 do
+      val value = 10 * tens + ones
+      val xName = s"x$tens$ones"
+      val yName = s"y$tens$ones"
+
+      if wires.contains(xName) then
+        mapping(xName) = Some(n == value)
+      if wires.contains(yName) then
+        mapping(yName) = Some(m == value)
+
+    mapping
   }
 
   private enum Operation:
@@ -35,25 +99,7 @@ class SolverDay24 extends Solver {
   override def solvePart1(lines: List[String]): String = {
     val mapping = parseInitialAssignment(lines)
     val rules = parseRules(lines, mapping)
-
-    // All 100 possible gates whose name starts with "z"
-    val allPossibleZGates = for digit0 <- 0 to 9; digit1 <- 0 to 9 yield s"z$digit0$digit1"
-    val zGates = allPossibleZGates.filter(name => mapping.keySet.contains(name))
-
-    var allZGatesDefined = mapping.filter((k,v) => k(0) == 'z').forall((k,v) => v.isDefined)
-
-    while !allZGatesDefined do
-      for rule <- rules do
-        val result = rule.applyRule(mapping)
-        if mapping(rule.target).isEmpty then
-          mapping(rule.target) = result
-        allZGatesDefined = mapping.filter((k,v) => k(0) == 'z').forall((k,v) => v.isDefined)
-
-    var result = 0L
-    for zGate <- zGates.toList.sorted.reverse do
-      val bit = mapping.get(zGate).head.head
-      result = 2L * result + (if bit then 1 else 0)
-
+    val result = applyRules(rules, mapping.toMap)
     result.toString
   }
 
