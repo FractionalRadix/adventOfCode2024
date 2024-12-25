@@ -25,12 +25,12 @@ class SolverDay25 extends Solver {
       println(cols)
 
     val maxHeight = grids.head.maxHeight()
-    println(s"Max height is ${maxHeight}")
+    println(s"Max height is $maxHeight")
 
     var count = 0
     for lk1 <- grids do
       for lk2 <- grids do
-        if lk1.isKey() && !lk2.isKey() then
+        if lk1.isKey && !lk2.isKey then
           val cols1 = lk1.countColumns()
           val cols2 = lk2.countColumns()
           val sum = cols1.zip(cols2).map((a,b) => a + b)
@@ -53,12 +53,12 @@ class SolverDay25 extends Solver {
         println(line)
     }
 
-    def isKey(): Boolean = lines.head.head == '.'
+    def isKey: Boolean = lines.head.head == '.'
 
     def maxHeight(): Int = lines.length - 2
 
     def countColumns(): List[Int] = {
-      val useLines = if isKey() then lines.reverse else lines
+      val useLines = if isKey then lines.reverse else lines
       val grid = Grid[Char](lines, ch => ch)
       var columns = List[Int]()
       for col <- 0 until grid.nrOfCols do
