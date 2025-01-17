@@ -68,8 +68,6 @@ class SolverDay25 extends Solver {
     }
   }
 
-
-
   override def solvePart2(lines: List[String]): String = {
     //TODO!+
     ""
